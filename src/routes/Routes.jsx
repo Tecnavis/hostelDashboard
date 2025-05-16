@@ -1,9 +1,11 @@
+import AdminAdmins from "@/pages/admin/admins/Admins";
 import AdminAnalytics from "@/pages/admin/analytics/Analytics";
 import AdminBookings from "@/pages/admin/bookings/Bookings";
 import AdminDashboard from "@/pages/admin/dashboard/Dashboard";
 import AdminHostels from "@/pages/admin/hostels/Hostels";
 import AdminMessages from "@/pages/admin/messages/Messages";
 import AdminOwners from "@/pages/admin/owners/Owners";
+import AdminOwnersStaffs from "@/pages/admin/ownersStaff/OwnersStaff";
 import HomePage from "@/pages/Home";
 import LoginPage from "@/pages/login/Login";
 import OwnerAnalytics from "@/pages/owner/analytics/Analytics";
@@ -27,8 +29,10 @@ export default function AppRoutes() {
       <Route path="/admin/hostels" element={<AdminHostels />} />
       <Route path="/admin/analytics" element={<AdminAnalytics />} />
       <Route path="/admin/owners" element={<AdminOwners />} />
+      <Route path="/admin/owners/:id" element={<AdminOwnersStaffs />} />
       <Route path="/admin/messages" element={<AdminMessages />} />
       <Route path="/admin/bookings" element={<AdminBookings />} />
+      <Route path="/admin/admins" element={<AdminAdmins />} />
 
       {/* owner dashboard */}
 

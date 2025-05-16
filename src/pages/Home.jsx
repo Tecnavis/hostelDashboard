@@ -2,9 +2,9 @@
 
 import { motion } from "framer-motion"
 import { Building, Hotel, Users } from "lucide-react"
-
 import { Button } from "@/components/ui/button"
 import { useNavigate } from "react-router-dom"
+import banner_img from "@/../public/banner.svg"
 
 export default function HomePage() {
   const router = useNavigate()
@@ -23,10 +23,10 @@ export default function HomePage() {
             <span className="text-2xl font-bold text-rose-600">HostelHub</span>
           </motion.div>
           <div className="flex gap-4">
-            <Button variant="ghost" onClick={() => router("/login")}>
+            <Button className={"cursor-pointer"} variant="ghost" onClick={() => router("/login")}>
               Login
             </Button>
-            <Button variant="default" className="bg-rose-600 hover:bg-rose-700" onClick={() => router("/login")}>
+            <Button variant="default" className="bg-rose-600 hover:bg-rose-700 cursor-pointer" onClick={() => router("/login")}>
               Get Started
             </Button>
           </div>
@@ -45,7 +45,7 @@ export default function HomePage() {
             <p className="text-xl text-gray-600">
               A complete dashboard solution for hostel owners and administrators to manage bookings, rooms, and guests.
             </p>
-            <div className="flex gap-4 mt-4">
+            {/* <div className="flex gap-4 mt-4">
               <Button size="lg" className="bg-rose-600 hover:bg-rose-700" onClick={() => router("/login")}>
                 Login as Admin
               </Button>
@@ -57,7 +57,7 @@ export default function HomePage() {
               >
                 Login as Hostel Owner
               </Button>
-            </div>
+            </div> */}
           </motion.div>
 
           <motion.div
@@ -66,7 +66,7 @@ export default function HomePage() {
             transition={{ duration: 0.7, delay: 0.4 }}
             className="bg-white rounded-2xl shadow-2xl overflow-hidden border border-gray-100"
           >
-            <img src="/placeholder.svg?height=600&width=800" alt="Dashboard Preview" className="w-full h-auto" />
+            <img src={banner_img} alt="Dashboard Preview" className="w-full h-auto" />
           </motion.div>
         </div>
 

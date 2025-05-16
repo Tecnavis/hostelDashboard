@@ -63,7 +63,7 @@ import {
   useGetAllAdminQuery,
 } from "@/app/service/admin";
 
-export default function AdminHostels() {
+export default function AdminAdmins() {
   const [isAddHostelOpen, setIsAddHostelOpen] = useState(false);
   const [statusFilter, setStatusFilter] = useState("all");
   const [showPassword, setShowPassword] = useState(false);
@@ -173,9 +173,7 @@ export default function AdminHostels() {
         <main className="flex-1 overflow-y-auto p-6">
           <div className="max-w-7xl mx-auto space-y-6">
             <div className="flex items-center justify-between mt-10">
-              <h1 className="text-lg sm:text-xl md:text-2xl font-bold">
-                Manage Admins
-              </h1>
+              <h1 className="text-lg sm:text-xl md:text-2xl font-bold">Manage Admins</h1>
               <div className="flex items-center gap-2">
                 <Dialog
                   open={isAddHostelOpen}
@@ -353,19 +351,16 @@ export default function AdminHostels() {
                       <thead>
                         <tr className="border-b">
                           <th className="text-left py-3 px-4 font-medium text-gray-500">
-                            Hostel Name
+                            Name
                           </th>
                           <th className="text-left py-3 px-4 font-medium text-gray-500">
-                            Owner
+                            Email
                           </th>
                           <th className="text-left py-3 px-4 font-medium text-gray-500">
-                            Location
+                            Phone
                           </th>
                           <th className="text-left py-3 px-4 font-medium text-gray-500">
-                            Rooms
-                          </th>
-                          <th className="text-left py-3 px-4 font-medium text-gray-500">
-                            Price Range
+                            Role
                           </th>
                           <th className="text-left py-3 px-4 font-medium text-gray-500">
                             Status
@@ -390,7 +385,6 @@ export default function AdminHostels() {
                             </td>
                             <td className="py-3 px-4">{admin.email}</td>
                             <td className="py-3 px-4">{admin.phone}</td>
-                            <td className="py-3 px-4">{"8"}</td>
                             <td className="py-3 px-4">{admin.role}</td>
                             <td className="py-3 px-4">
                               <Badge

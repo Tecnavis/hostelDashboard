@@ -7,15 +7,14 @@ import {
   ChevronDown,
   ChevronLeft,
   ChevronRight,
-  Download,
-  Eye,
-  EyeOff,
   Filter,
+  ImagePlus,
   MoreHorizontal,
   Pencil,
   Plus,
   Search,
   Trash2,
+  Upload,
   UserCheck,
   UserX,
 } from "lucide-react";
@@ -33,7 +32,6 @@ import {
 import {
   Dialog,
   DialogContent,
-  DialogDescription,
   DialogFooter,
   DialogHeader,
   DialogTitle,
@@ -47,38 +45,41 @@ import {
 } from "@/components/ui/dropdown-menu";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
-import {
-  Select,
-  SelectContent,
-  SelectItem,
-  SelectTrigger,
-  SelectValue,
-} from "@/components/ui/select";
 import { Tabs, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Textarea } from "@/components/ui/textarea";
+import { useGetAllownerQuery } from "@/app/service/owner";
 import {
-  useAddNewAdminMutation,
-  useBlockAdminMutation,
-  useDeleteAdminMutation,
-  useGetAllAdminQuery,
-} from "@/app/service/admin";
+  useAddNewhostelMutation,
+  useBlockhostelMutation,
+  useDeletehostelMutation,
+  useGetAllhostelQuery,
+} from "@/app/service/hostel";
 
 export default function AdminHostels() {
   const [isAddHostelOpen, setIsAddHostelOpen] = useState(false);
   const [statusFilter, setStatusFilter] = useState("all");
-  const [showPassword, setShowPassword] = useState(false);
   const [name, setName] = useState("");
   const [phone, setPhone] = useState("");
-  const [email, setEmail] = useState("");
-  const [password, setPassword] = useState("");
+  const [location, setLocation] = useState({
+    street: "",
+    place: "",
+    pincode: "",
+  });
+  const [selectedImages, setSelectedImages] = useState([]);
+  const [amenities, setAmenities] = useState([""]);
+  const [description, setDescription] = useState("");
+  const [category, setCategory] = useState("");
+  const [ownerId, setOwnerId] = useState("");
   const [searchTerm, setSearchTerm] = useState("");
   const [currentPage, setCurrentPage] = useState(1);
   const itemsPerPage = 10;
 
-  const { data, isError, isLoading, refetch } = useGetAllAdminQuery();
-  const [deleteAdmin, { isLoading: isDeleting }] = useDeleteAdminMutation();
-  const [blockAdmin] = useBlockAdminMutation();
-  const [addNewAdmin, { isLoading: isPosting }] = useAddNewAdminMutation();
+  const { data, isError, isLoading, refetch } = useGetAllhostelQuery();
+  const [deletehostel, { isLoading: isDeleting }] = useDeletehostelMutation();
+  const [blockhostel] =  useBlockhostelMutation();
+  const [addNewhostel, { isLoading: isPosting }] = useAddNewhostelMutation();
+  const { data: owners = [] } = useGetAllownerQuery();
+
 
   if (isLoading) return <h1>Loading...</h1>;
   if (isError || !Array.isArray(data))
@@ -88,10 +89,14 @@ export default function AdminHostels() {
 
   const filteredUsers = data
     ?.filter(
-      (user) =>
-        user.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
-        user.email.toLowerCase().includes(searchTerm.toLowerCase()) ||
-        user.phone.toLowerCase().includes(searchTerm.toLowerCase())
+      (hostel) =>
+        // hostel?.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
+        hostel?.category.toLowerCase().includes(searchTerm.toLowerCase()) ||
+        hostel?.phone.toLowerCase().includes(searchTerm.toLowerCase()) ||
+        hostel?.ownerId?.name
+          .toLowerCase()
+          .includes(searchTerm.toLowerCase()) ||
+        hostel?.location?.place.toLowerCase().includes(searchTerm.toLowerCase())
     )
     ?.filter((user) => {
       if (statusFilter === "all") return true;
@@ -108,43 +113,83 @@ export default function AdminHostels() {
     startIndex + itemsPerPage
   );
 
+  const handleFacilities = (index, value) => {
+    const newAmenities = [...amenities];
+    newAmenities[index] = value;
+    setAmenities(newAmenities);
+  };
+
+  const addFacilities = () => {
+    setAmenities([...amenities, ""]);
+  };
+
+  const removeFacilities = (index) => {
+    const newAmenities = amenities.filter((_, i) => i !== index);
+    setAmenities(newAmenities);
+  };
+
+  // create  hostel
+
   const handleSubmit = async (e) => {
     e.preventDefault();
+
     if (
-      email.trim() === "" ||
-      password.trim() === "" ||
+      category.trim() === "" ||
+      selectedImages.length === 0 ||
+      ownerId.trim() === "" ||
+      description.trim() === "" ||
+      name.trim() === "" ||
       phone.trim() === "" ||
-      name.trim() === ""
-    )
+      location.street.trim() === "" ||
+      location.place.trim() === "" ||
+      location.pincode.trim() === ""
+    ) {
       return;
+    }
+
+    // Prepare FormData
+    const formData = new FormData();
+    formData.append("ownerId", ownerId);
+    formData.append("category", category);
+    formData.append("description", description);
+    formData.append("name", name);
+    formData.append("phone", phone);
+    formData.append("location[street]", location.street);
+    formData.append("location[place]", location.place);
+    formData.append("location[pincode]", location.pincode);
+    amenities.forEach((a, i) => {
+      if (a.trim() !== "") {
+        formData.append(`amenities[${i}]`, a);
+      }
+    });
+    selectedImages.forEach((file) => {
+      formData.append("images", file);
+    });
 
     try {
-      const { status } = await addNewAdmin({
-        email,
-        password,
-        name,
-        phone,
-        superAdminId: "682598d1adb06a35c127291f",
-        role: "admin",
-      }).unwrap();
-      if (status === 201) {
-        setEmail("");
-        setPassword("");
+      const response = await addNewhostel(formData).unwrap();
+      if (response?.status === 201) {
+        // Reset form state
+        setCategory("");
+        setOwnerId("");
         setName("");
         setPhone("");
+        setSelectedImages([]);
+        setAmenities([""]);
+        setDescription("");
+        setLocation({ street: "", place: "", pincode: "" });
         setIsAddHostelOpen(false);
         refetch();
       }
     } catch (error) {
-      console.error("Admin create failed:", error);
+      console.error("Hostel create failed:", error);
     }
   };
-
   // delete admin
 
   const handleDelete = async (id) => {
     try {
-      const { status } = await deleteAdmin(id).unwrap();
+      const { status } = await deletehostel(id).unwrap();
       if (status === 200) {
         refetch();
       }
@@ -156,7 +201,7 @@ export default function AdminHostels() {
   //  block & unblock admin
   const handleBlocUnblock = async (id) => {
     try {
-      const { status } = await blockAdmin(id).unwrap();
+      const { status } = await blockhostel(id).unwrap();
       if (status === 200) {
         refetch();
       }
@@ -174,7 +219,7 @@ export default function AdminHostels() {
           <div className="max-w-7xl mx-auto space-y-6">
             <div className="flex items-center justify-between mt-10">
               <h1 className="text-lg sm:text-xl md:text-2xl font-bold">
-                Manage Admins
+                Manage Hostels
               </h1>
               <div className="flex items-center gap-2">
                 <Dialog
@@ -187,14 +232,18 @@ export default function AdminHostels() {
                       className="bg-rose-600 hover:bg-rose-700 gap-2 cursor-pointer"
                     >
                       <Plus className="h-4 w-4" />
-                      Add admin
+                      Add hostel
                     </Button>
                   </DialogTrigger>
                   <DialogContent className="sm:max-w-[600px]">
                     <DialogHeader>
-                      <DialogTitle>Add New Admin</DialogTitle>
+                      <DialogTitle>Add New Hostel</DialogTitle>
                     </DialogHeader>
-                    <div className="grid gap-4 py-4">
+                    {/* <div className="grid gap-4 py-4"> */}
+                    <div
+                      className="overflow-y-auto pr-2 mt-2 space-y-4"
+                      style={{ maxHeight: "calc(90vh - 130px)" }}
+                    >
                       <div className="grid grid-cols-2 gap-4">
                         <div className="space-y-2">
                           <Label htmlFor="-name">Name</Label>
@@ -207,46 +256,6 @@ export default function AdminHostels() {
                           />
                         </div>
                         <div className="space-y-2">
-                          <Label htmlFor="email">Email</Label>
-                          <Input
-                            id="email"
-                            placeholder="Enter admin email"
-                            value={email}
-                            onChange={(e) => setEmail(e.target.value)}
-                            required
-                          />
-                        </div>
-                      </div>
-                      <div className="grid grid-cols-2 gap-4">
-                        <div className="space-y-2">
-                          <Label htmlFor="password">Password</Label>
-
-                          <div className="relative">
-                            <Input
-                              id="password"
-                              type={showPassword ? "text" : "password"}
-                              placeholder="••••••••"
-                              value={password}
-                              onChange={(e) => setPassword(e.target.value)}
-                              required
-                            />
-                            <Button
-                              type="button"
-                              variant="ghost"
-                              size="icon"
-                              className="absolute right-2 top-1/2 -translate-y-1/2"
-                              onClick={() => setShowPassword(!showPassword)}
-                            >
-                              {showPassword ? (
-                                <EyeOff className="h-4 w-4 text-muted-foreground cursor-pointer" />
-                              ) : (
-                                <Eye className="h-4 w-4 text-muted-foreground cursor-pointer" />
-                              )}
-                            </Button>
-                          </div>
-                        </div>
-
-                        <div className="space-y-2">
                           <Label htmlFor="phone">Phone</Label>
                           <Input
                             id="phone"
@@ -256,6 +265,169 @@ export default function AdminHostels() {
                             required
                           />
                         </div>
+                      </div>
+                      <div className="grid grid-cols-2 gap-4">
+                        <div className="space-y-2">
+                          <Label htmlFor="street">Street</Label>
+                          <Input
+                            id="street"
+                            placeholder="Enter street"
+                            value={location.street}
+                            onChange={(e) =>
+                              setLocation({
+                                ...location,
+                                street: e.target.value,
+                              })
+                            }
+                          />
+                        </div>
+                        <div className="space-y-2">
+                          <Label htmlFor="place">Place</Label>
+                          <Input
+                            id="place"
+                            placeholder="Enter place"
+                            value={location.place}
+                            onChange={(e) =>
+                              setLocation({
+                                ...location,
+                                place: e.target.value,
+                              })
+                            }
+                          />
+                        </div>
+                        <div className="space-y-2">
+                          <Label htmlFor="pincode">Pincode</Label>
+                          <Input
+                            id="pincode"
+                            placeholder="Enter pincode"
+                            value={location.pincode}
+                            onChange={(e) =>
+                              setLocation({
+                                ...location,
+                                pincode: e.target.value,
+                              })
+                            }
+                          />
+                        </div>
+                        <div className="space-y-2">
+                          <Label htmlFor="pincode">Description</Label>
+                          <Textarea
+                            id="description"
+                            placeholder="Enter description"
+                            value={description}
+                            onChange={(e) => setDescription(e.target.value)}
+                          />
+                        </div>
+
+                        <div className="space-y-2">
+                          <Label>Facilites</Label>
+                          {amenities.map((link, index) => (
+                            <div
+                              key={index}
+                              className="flex gap-2 items-center"
+                            >
+                              <Input
+                                value={link}
+                                onChange={(e) =>
+                                  handleFacilities(index, e.target.value)
+                                }
+                                placeholder={`Enter facilities ${index + 1}`}
+                              />
+                              {amenities.length > 1 && (
+                                <Button
+                                  type="button"
+                                  variant="ghost"
+                                  size="sm"
+                                  onClick={() => removeFacilities(index)}
+                                >
+                                  ✕
+                                </Button>
+                              )}
+                            </div>
+                          ))}
+                          <Button
+                            type="button"
+                            variant="outline"
+                            size="sm"
+                            onClick={addFacilities}
+                          >
+                            + Add Facilities
+                          </Button>
+                        </div>
+                        <div className="space-y-2">
+                          <Label htmlFor="category">Category</Label>
+                          <select
+                            id="category"
+                            value={category}
+                            onChange={(e) => setCategory(e.target.value)}
+                            className="w-full border border-gray-300 rounded px-3 py-2"
+                          >
+                            <option value="">Select category</option>
+                            <option value="boys">Boys</option>
+                            <option value="girls">Girls</option>
+                            <option value="co-ed">Co-ed</option>
+                            <option value="family">Family</option>
+                          </select>
+                        </div>
+                        <div className="space-y-2">
+                          <Label htmlFor="owner">Owners</Label>
+                          <select
+                            id="owner"
+                            value={ownerId}
+                            onChange={(e) => setOwnerId(e.target.value)}
+                            className="w-full border border-gray-300 rounded px-3 py-2 text-sm text-gray-700 focus:outline-none  "
+                          >
+                            <option className="ml-2" value="">
+                              Select owner
+                            </option>
+                            {owners.map((owner) => (
+                              <option key={owner._id} value={owner._id}>
+                                {owner.name}
+                              </option>
+                            ))}
+                          </select>
+                        </div>
+                      </div>
+                      <div className="space-y-2">
+                        <Label htmlFor="images">Upload Images</Label>
+                        <label className="border-2 border-dashed rounded-md p-6 flex flex-col items-center justify-center gap-2 cursor-pointer">
+                          <ImagePlus className="h-8 w-8 text-muted-foreground" />
+                          <p className="text-sm text-muted-foreground">
+                            Click to upload
+                          </p>
+                          <Upload className="h-4 w-4" />
+
+                          <Input
+                            type="file"
+                            accept="image/*"
+                            multiple
+                            className="hidden"
+                            onChange={(e) => {
+                              if (e.target.files) {
+                                setSelectedImages((prevImages) => [
+                                  ...prevImages,
+                                  ...Array.from(e.target.files),
+                                ]);
+                              }
+                            }}
+                          />
+                        </label>
+
+                        {selectedImages.length > 0 && (
+                          <div className="grid gap-2 mt-4">
+                            <Label>Preview</Label>
+                            <div className="grid grid-cols-2 gap-2">
+                              {selectedImages.map((file, index) => (
+                                <img
+                                  key={index}
+                                  src={URL.createObjectURL(file)}
+                                  alt="preview"
+                                  className="w-full h-32 object-cover rounded-md"
+                                />
+                              ))}
+                            </div>
+                          </div>
+                        )}
                       </div>
                     </div>
                     <DialogFooter>
@@ -287,7 +459,7 @@ export default function AdminHostels() {
                 <CardHeader className="pb-2">
                   <div className="flex items-center justify-between">
                     <div>
-                      <CardTitle>All Admins</CardTitle>
+                      <CardTitle>All Hostels</CardTitle>
                       <CardDescription>
                         Manage and monitor all registered admins
                       </CardDescription>
@@ -353,19 +525,22 @@ export default function AdminHostels() {
                       <thead>
                         <tr className="border-b">
                           <th className="text-left py-3 px-4 font-medium text-gray-500">
-                            Hostel Name
+                            Name
                           </th>
                           <th className="text-left py-3 px-4 font-medium text-gray-500">
                             Owner
                           </th>
                           <th className="text-left py-3 px-4 font-medium text-gray-500">
+                            Phone
+                          </th>
+                          <th className="text-left py-3 px-4 font-medium text-gray-500">
                             Location
                           </th>
                           <th className="text-left py-3 px-4 font-medium text-gray-500">
-                            Rooms
+                            Facilities
                           </th>
                           <th className="text-left py-3 px-4 font-medium text-gray-500">
-                            Price Range
+                            Category
                           </th>
                           <th className="text-left py-3 px-4 font-medium text-gray-500">
                             Status
@@ -376,29 +551,45 @@ export default function AdminHostels() {
                         </tr>
                       </thead>
                       <tbody>
-                        {paginatedUsers?.map((admin) => (
-                          <tr key={admin._id} className="border-b">
+                        {paginatedUsers?.map((hostel) => (
+                          <tr key={hostel._id} className="border-b">
                             <td className="py-3 px-4">
                               <div className="flex items-center gap-3">
                                 <div className="h-10 w-10 bg-gray-100 rounded-md flex items-center justify-center">
                                   <Building className="h-5 w-5 text-gray-500" />
                                 </div>
                                 <span className="font-medium">
-                                  {admin.name}
+                                  {hostel.name || "hi"}
                                 </span>
                               </div>
                             </td>
-                            <td className="py-3 px-4">{admin.email}</td>
-                            <td className="py-3 px-4">{admin.phone}</td>
-                            <td className="py-3 px-4">{"8"}</td>
-                            <td className="py-3 px-4">{admin.role}</td>
+                            <td className="py-3 px-4">
+                              {hostel?.ownerId?.name}
+                            </td>
+                            <td className="py-3 px-4">{hostel.phone}</td>
+                            <td className="py-3 px-4">
+                              {hostel?.location?.place}
+                            </td>
+                            <td className="py-3 px-4 space-x-2">
+                              {hostel?.amenities?.map((a, i) => (
+                                <span
+                                  key={i}
+                                  className="bg-gray-100 px-2 py-1 rounded text-sm"
+                                >
+                                  {a}
+                                </span>
+                              ))}
+                            </td>
+
+                            <td className="py-3 px-4">{hostel?.category}</td>
+
                             <td className="py-3 px-4">
                               <Badge
                                 variant={
-                                  admin.isActive ? "success" : "secondary"
+                                  hostel.isActive ? "success" : "secondary"
                                 }
                               >
-                                {admin.isActive ? "Active" : "Inactive"}
+                                {hostel.isActive ? "Active" : "Inactive"}
                               </Badge>
                             </td>
                             <td className="py-3 px-4">
@@ -415,9 +606,11 @@ export default function AdminHostels() {
                                 <DropdownMenuContent align="end">
                                   <DropdownMenuItem
                                     className={"cursor-pointer"}
-                                    onClick={() => handleBlocUnblock(admin._id)}
+                                    onClick={() =>
+                                      handleBlocUnblock(hostel._id)
+                                    }
                                   >
-                                    {admin.isActive ? (
+                                    {hostel.isActive ? (
                                       <>
                                         <UserX className="h-4 w-4 mr-2" />
                                         Block
@@ -437,7 +630,7 @@ export default function AdminHostels() {
                                   </DropdownMenuItem>
                                   <DropdownMenuItem
                                     className="text-red-600 cursor-pointer"
-                                    onClick={() => handleDelete(admin._id)}
+                                    onClick={() => handleDelete(hostel._id)}
                                   >
                                     <Trash2 className="h-4 w-4 mr-2" />
                                     {isDeleting ? "Deleting..." : "Delete"}
@@ -467,7 +660,7 @@ export default function AdminHostels() {
                         <span className="font-medium">
                           {filteredUsers.length}
                         </span>{" "}
-                        admins
+                        hostels
                       </div>
                       <div className="flex items-center gap-2">
                         <Button

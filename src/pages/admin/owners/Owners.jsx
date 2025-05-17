@@ -74,15 +74,13 @@ export default function AdminOwners() {
   const [isAddHostelOpen, setIsAddHostelOpen] = useState(false);
   const [statusFilter, setStatusFilter] = useState("all");
   const [showPassword, setShowPassword] = useState(false);
-  const [ownerName, setOwnerName] = useState("");
-  const [hostelName, setHostelName] = useState("");
-  const [ownerPhone, setOwnerPhone] = useState("");
-  const [hostelPhone, setHostelPhone] = useState("");
-  const [location, setLocation] = useState({
-    street: "",
-    place: "",
-    pincode: "",
-  });
+  const [name, setName] = useState("");
+  const [phone, setPhone] = useState("");
+  // const [location, setLocation] = useState({
+  //   street: "",
+  //   place: "",
+  //   pincode: "",
+  // });
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [searchTerm, setSearchTerm] = useState("");
@@ -104,11 +102,9 @@ export default function AdminOwners() {
   const filteredUsers = data
     ?.filter(
       (owner) =>
-        owner.ownerName.toLowerCase().includes(searchTerm.toLowerCase()) ||
-        owner.hostelName.toLowerCase().includes(searchTerm.toLowerCase()) ||
+        owner.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
         owner.email.toLowerCase().includes(searchTerm.toLowerCase()) ||
-        owner.ownerPhone.toLowerCase().includes(searchTerm.toLowerCase()) ||
-        owner.hostelPhone.toLowerCase().includes(searchTerm.toLowerCase())
+        owner.phone.toLowerCase().includes(searchTerm.toLowerCase())
     )
     ?.filter((owner) => {
       if (statusFilter === "all") return true;
@@ -130,13 +126,12 @@ export default function AdminOwners() {
     if (
       email.trim() === "" ||
       password.trim() === "" ||
-      hostelName.trim() === "" ||
-      ownerName.trim() === "" ||
-      hostelPhone.trim() === "" ||
-      ownerPhone.trim() === "" ||
-      location.street.trim() === "" ||
-      location.place.trim() === "" ||
-      location.pincode.trim() === ""
+      name.trim() === "" ||
+      phone.trim() === ""
+      // ownerPhone.trim() === "" ||
+      // location.street.trim() === "" ||
+      // location.place.trim() === "" ||
+      // location.pincode.trim() === ""
     )
       return;
 
@@ -144,22 +139,16 @@ export default function AdminOwners() {
       const { status } = await addNewAdmin({
         email,
         password,
-        hostelName,
-        ownerName,
-        hostelPhone,
-        ownerPhone,
+        name,
+        phone,
         role: "owner",
-        location, // ⬅️ added here
       }).unwrap();
 
       if (status === 201) {
         setEmail("");
         setPassword("");
-        setOwnerName("");
-        setHostelName("");
-        setOwnerPhone("");
-        setHostelPhone("");
-        setLocation({ street: "", place: "", pincode: "" });
+        setName("");
+        setPhone("");
         setIsAddHostelOpen(false);
         refetch();
       }
@@ -226,27 +215,15 @@ export default function AdminOwners() {
                     <div className="grid gap-4 py-4">
                       <div className="grid grid-cols-2 gap-4">
                         <div className="space-y-2">
-                          <Label htmlFor="owner-name">Owner Name</Label>
+                          <Label htmlFor="owner-name">Name</Label>
                           <Input
                             id="owner-name"
                             placeholder="Enter admin name"
-                            value={ownerName}
-                            onChange={(e) => setOwnerName(e.target.value)}
+                            value={name}
+                            onChange={(e) => setName(e.target.value)}
                             required
                           />
                         </div>
-                        <div className="space-y-2">
-                          <Label htmlFor="hostel-name">Hostel Name</Label>
-                          <Input
-                            id="hostel-name"
-                            placeholder="Enter admin email"
-                            value={hostelName}
-                            onChange={(e) => setHostelName(e.target.value)}
-                            required
-                          />
-                        </div>
-                      </div>
-                      <div className="grid grid-cols-2 gap-4">
                         <div className="space-y-2">
                           <Label htmlFor="email">Email</Label>
                           <Input
@@ -257,6 +234,8 @@ export default function AdminOwners() {
                             required
                           />
                         </div>
+                      </div>
+                      <div className="grid grid-cols-2 gap-4">
                         <div className="space-y-2">
                           <Label htmlFor="password">Password</Label>
 
@@ -286,26 +265,16 @@ export default function AdminOwners() {
                         </div>
 
                         <div className="space-y-2">
-                          <Label htmlFor="owner-phone">Owner Phone</Label>
+                          <Label htmlFor="phone">Phone</Label>
                           <Input
-                            id="owner-phone"
+                            id="phone"
                             placeholder="+91 0000000"
-                            value={ownerPhone}
-                            onChange={(e) => setOwnerPhone(e.target.value)}
+                            value={phone}
+                            onChange={(e) => setPhone(e.target.value)}
                             required
                           />
                         </div>
-                        <div className="space-y-2">
-                          <Label htmlFor="hostel-phone">Hostel Phone</Label>
-                          <Input
-                            id="hostel-phone"
-                            placeholder="+91 0000000"
-                            value={hostelPhone}
-                            onChange={(e) => setHostelPhone(e.target.value)}
-                            required
-                          />
-                        </div>
-                        <div className="space-y-2">
+                        {/* <div className="space-y-2">
                           <Label htmlFor="street">Street</Label>
                           <Input
                             id="street"
@@ -332,8 +301,8 @@ export default function AdminOwners() {
                               })
                             }
                           />
-                        </div>
-                        <div className="space-y-2">
+                        </div> */}
+                        {/* <div className="space-y-2">
                           <Label htmlFor="pincode">Pincode</Label>
                           <Input
                             id="pincode"
@@ -346,7 +315,7 @@ export default function AdminOwners() {
                               })
                             }
                           />
-                        </div>
+                        </div> */}
                       </div>
                     </div>
                     <DialogFooter>
@@ -444,26 +413,15 @@ export default function AdminOwners() {
                       <thead>
                         <tr className="border-b">
                           <th className="text-left py-3 px-4 font-medium text-gray-500">
-                            Owner Name
-                          </th>
-                          <th className="text-left py-3 px-4 font-medium text-gray-500">
-                            Hostel Name
+                            Name
                           </th>
                           <th className="text-left py-3 px-4 font-medium text-gray-500">
                             Email
                           </th>
                           <th className="text-left py-3 px-4 font-medium text-gray-500">
-                            Owner Phone
+                            Phone
                           </th>
-                          <th className="text-left py-3 px-4 font-medium text-gray-500">
-                            Hostel Phone
-                          </th>
-                          <th className="text-left py-3 px-4 font-medium text-gray-500">
-                            Location
-                          </th>
-                          <th className="text-left py-3 px-4 font-medium text-gray-500">
-                            Pin Code
-                          </th>
+
                           <th className="text-left py-3 px-4 font-medium text-gray-500">
                             Role
                           </th>
@@ -489,21 +447,12 @@ export default function AdminOwners() {
                                     navigate(`/admin/owners/${owner._id}`)
                                   }
                                 >
-                                  {owner?.ownerName}
+                                  {owner?.name}
                                 </span>
                               </div>
                             </td>
-                            <td className="py-3 px-4">{owner?.hostelName}</td>
                             <td className="py-3 px-4">{owner?.email}</td>
-                            <td className="py-3 px-4">{owner?.ownerPhone}</td>
-                            <td className="py-3 px-4">{owner?.hostelPhone}</td>
-                            <td className="py-3 px-4">
-                              {owner?.location?.place}
-                            </td>
-                            <td className="py-3 px-4">
-                              {owner?.location?.pincode}
-                            </td>
-
+                            <td className="py-3 px-4">{owner?.phone}</td>
                             <td className="py-3 px-4">{owner?.role}</td>
                             <td className="py-3 px-4">
                               <Badge

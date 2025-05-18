@@ -444,7 +444,7 @@ export default function AdminOwners() {
                                 <span
                                   className="font-medium cursor-pointer"
                                   onClick={() =>
-                                    navigate(`/admin/owners/${owner._id}`)
+                                    navigate(`/admin/owners/staffs/${owner._id}`)
                                   }
                                 >
                                   {owner?.name}

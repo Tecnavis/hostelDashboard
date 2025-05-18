@@ -46,60 +46,53 @@ import {
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Tabs, TabsList, TabsTrigger } from "@/components/ui/tabs";
-import { Textarea } from "@/components/ui/textarea";
-import { useGetAllownerQuery } from "@/app/service/owner";
 import {
-  useAddNewhostelMutation,
-  useBlockhostelMutation,
-  useDeletehostelMutation,
-  useGetAllhostelQuery,
-} from "@/app/service/hostel";
-import { useNavigate } from "react-router-dom";
+  useAddNewroomMutation,
+  useBlockroomMutation,
+  useDeleteroomMutation,
+  useGetAllroomQuery,
+} from "@/app/service/room";
+import { useNavigate, useParams } from "react-router-dom";
 
-export default function AdminHostels() {
+export default function AdminHostelsRooms() {
   const [isAddHostelOpen, setIsAddHostelOpen] = useState(false);
   const [statusFilter, setStatusFilter] = useState("all");
-  const [name, setName] = useState("");
-  const [phone, setPhone] = useState("");
-  const [location, setLocation] = useState({
-    street: "",
-    place: "",
-    pincode: "",
-  });
+  const [roomNumber, setRoomNumber] = useState("");
+  const [capacity, setCapacity] = useState("");
   const [selectedImages, setSelectedImages] = useState([]);
-  const [amenities, setAmenities] = useState([""]);
-  const [description, setDescription] = useState("");
-  const [category, setCategory] = useState("");
-  const [ownerId, setOwnerId] = useState("");
+  const [features, setFeatures] = useState([""]);
+  const [currentOccupancy, setCurrentOccupancy] = useState("");
+  const [price, setPrice] = useState("");
   const [searchTerm, setSearchTerm] = useState("");
   const [currentPage, setCurrentPage] = useState(1);
   const itemsPerPage = 10;
-  const navigate = useNavigate();
+  const { id } = useParams();
 
-  const { data, isError, isLoading, refetch } = useGetAllhostelQuery();
-  const [deletehostel, { isLoading: isDeleting }] = useDeletehostelMutation();
-  const [blockhostel] =  useBlockhostelMutation();
-  const [addNewhostel, { isLoading: isPosting }] = useAddNewhostelMutation();
-  const { data: owners = [] } = useGetAllownerQuery();
-
+  const { data, isError, isLoading, refetch } = useGetAllroomQuery();
+  const [deleteroom, { isLoading: isDeleting }] = useDeleteroomMutation();
+  const [blockroom] = useBlockroomMutation();
+  const [addNewroom, { isLoading: isPosting }] = useAddNewroomMutation();
 
   if (isLoading) return <h1>Loading...</h1>;
   if (isError || !Array.isArray(data))
     return <h1>Oops! Something went wrong.</h1>;
 
   // searching
-
+  
   const filteredUsers = data
-    ?.filter(
-      (hostel) =>
-        hostel?.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
-        hostel?.category.toLowerCase().includes(searchTerm.toLowerCase()) ||
-        hostel?.phone.toLowerCase().includes(searchTerm.toLowerCase()) ||
-        hostel?.ownerId?.name
-          .toLowerCase()
-          .includes(searchTerm.toLowerCase()) ||
-        hostel?.location?.place.toLowerCase().includes(searchTerm.toLowerCase())
-    )
+   .filter((room) => {
+  const price = String(room?.price || "").toLowerCase();
+  const roomNumber = String(room?.roomNumber || "").toLowerCase();
+  const hostelName = String(room?.hostelId?.name || "").toLowerCase();
+  const capacity = String(room?.capacity || "").toLowerCase();
+
+  return (
+    price.includes(searchTerm.toLowerCase()) ||
+    roomNumber.includes(searchTerm.toLowerCase()) ||
+    hostelName.includes(searchTerm.toLowerCase()) ||
+    capacity.includes(searchTerm.toLowerCase())
+  );
+})
     ?.filter((user) => {
       if (statusFilter === "all") return true;
       if (statusFilter === "active") return user.isActive;
@@ -115,100 +108,92 @@ export default function AdminHostels() {
     startIndex + itemsPerPage
   );
 
-  const handleFacilities = (index, value) => {
-    const newAmenities = [...amenities];
-    newAmenities[index] = value;
-    setAmenities(newAmenities);
+  const handleFeatures = (index, value) => {
+    const newFeatures = [...features];
+    newFeatures[index] = value;
+    setFeatures(newFeatures);
   };
 
-  const addFacilities = () => {
-    setAmenities([...amenities, ""]);
+  const addFeatures = () => {
+    setFeatures([...features, ""]);
   };
 
-  const removeFacilities = (index) => {
-    const newAmenities = amenities.filter((_, i) => i !== index);
-    setAmenities(newAmenities);
+  const removeFeatures = (index) => {
+    const newFeatures = features.filter((_, i) => i !== index);
+    setFeatures(newFeatures);
   };
 
   // create  hostel
 
   const handleSubmit = async (e) => {
     e.preventDefault();
-
+   
     if (
-      category.trim() === "" ||
+      roomNumber.trim() === "" ||
       selectedImages.length === 0 ||
-      ownerId.trim() === "" ||
-      description.trim() === "" ||
-      name.trim() === "" ||
-      phone.trim() === "" ||
-      location.street.trim() === "" ||
-      location.place.trim() === "" ||
-      location.pincode.trim() === ""
+      price.trim() === "" ||
+      capacity.trim() === "" ||
+      currentOccupancy.trim() === ""
     ) {
       return;
     }
 
     // Prepare FormData
     const formData = new FormData();
-    formData.append("ownerId", ownerId);
-    formData.append("category", category);
-    formData.append("description", description);
-    formData.append("name", name);
-    formData.append("phone", phone);
-    formData.append("location[street]", location.street);
-    formData.append("location[place]", location.place);
-    formData.append("location[pincode]", location.pincode);
-    amenities.forEach((a, i) => {
+    formData.append("hostelId", id);
+    formData.append("roomNumber", roomNumber);
+    formData.append("capacity", capacity);
+    formData.append("price", price);
+    formData.append("currentOccupancy", currentOccupancy);
+
+    features.forEach((a, i) => {
       if (a.trim() !== "") {
-        formData.append(`amenities[${i}]`, a);
+        formData.append(`features[${i}]`, a);
       }
     });
     selectedImages.forEach((file) => {
       formData.append("images", file);
-    });
+    });    
 
     try {
-      const response = await addNewhostel(formData).unwrap();
+      const response = await addNewroom(formData).unwrap();
       if (response?.status === 201) {
         // Reset form state
-        setCategory("");
-        setOwnerId("");
-        setName("");
-        setPhone("");
+        setRoomNumber("");
+        setCapacity("");
+        setFeatures([""]);
+        setCurrentOccupancy("");
         setSelectedImages([]);
-        setAmenities([""]);
-        setDescription("");
-        setLocation({ street: "", place: "", pincode: "" });
+        setPrice("");
         setIsAddHostelOpen(false);
         refetch();
       }
     } catch (error) {
-      console.error("Hostel create failed:", error);
+      console.error("Room create failed:", error);
     }
   };
   // delete admin
 
-  const handleDelete = async (id) => {
+  const handleDelete = async (roomId) => {
     try {
-      const { status } = await deletehostel(id).unwrap();
+      const { status } = await deleteroom({id: roomId, hostelId: id}).unwrap();
       if (status === 200) {
         refetch();
       }
     } catch (error) {
-      console.error("Failed to delete admin:", error);
+      console.error("Failed to delete room:", error);
     }
   };
 
   //  block & unblock admin
   const handleBlocUnblock = async (id) => {
     try {
-      const { status } = await blockhostel(id).unwrap();
+      const { status } = await blockroom(id).unwrap();
       if (status === 200) {
         refetch();
       }
     } catch (error) {
-      console.error("Failed to block admin:", error);
+      console.error("Failed to block room:", error);
     }
   };
 
@@ -248,82 +233,62 @@ export default function AdminHostels() {
                     >
                       <div className="grid grid-cols-2 gap-4">
                         <div className="space-y-2">
-                          <Label htmlFor="-name">Name</Label>
+                          <Label htmlFor="roomNumber">Room Number</Label>
                           <Input
-                            id="name"
-                            placeholder="Enter admin name"
-                            value={name}
-                            onChange={(e) => setName(e.target.value)}
+                            id="roomNumber"
+                            placeholder="Enter room number"
+                            value={roomNumber}
+                            onChange={(e) => setRoomNumber(e.target.value)}
                             required
                           />
                         </div>
                         <div className="space-y-2">
-                          <Label htmlFor="phone">Phone</Label>
+                          <Label htmlFor="capacity">Capacity</Label>
                           <Input
-                            id="phone"
-                            placeholder="+91 0000000"
-                            value={phone}
-                            onChange={(e) => setPhone(e.target.value)}
+                            id="capacity"
+                            placeholder="Enter room capacity"
+                            value={capacity}
+                            onChange={(e) => setCapacity(e.target.value)}
                             required
                           />
                         </div>
+                        
                       </div>
                       <div className="grid grid-cols-2 gap-4">
                         <div className="space-y-2">
-                          <Label htmlFor="street">Street</Label>
+                          <Label htmlFor="currentOccupancy">
+                            Current Occupancy
+                          </Label>
+
                           <Input
-                            id="street"
-                            placeholder="Enter street"
-                            value={location.street}
+                            id="currentOccupancy"
+                            placeholder="Enter number of people currently in the room"
+                            value={currentOccupancy}
                             onChange={(e) =>
-                              setLocation({
-                                ...location,
-                                street: e.target.value,
-                              })
+                              setCurrentOccupancy(e.target.value)
                             }
+                            required
                           />
                         </div>
-                        <div className="space-y-2">
-                          <Label htmlFor="place">Place</Label>
+                         <div className="space-y-2">
+                          <Label htmlFor="price">
+                            Price
+                          </Label>
+
                           <Input
-                            id="place"
-                            placeholder="Enter place"
-                            value={location.place}
+                            id="price"
+                            placeholder="Enter room price"
+                            value={price}
                             onChange={(e) =>
-                              setLocation({
-                                ...location,
-                                place: e.target.value,
-                              })
+                              setPrice(e.target.value)
                             }
-                          />
-                        </div>
-                        <div className="space-y-2">
-                          <Label htmlFor="pincode">Pincode</Label>
-                          <Input
-                            id="pincode"
-                            placeholder="Enter pincode"
-                            value={location.pincode}
-                            onChange={(e) =>
-                              setLocation({
-                                ...location,
-                                pincode: e.target.value,
-                              })
-                            }
-                          />
-                        </div>
-                        <div className="space-y-2">
-                          <Label htmlFor="pincode">Description</Label>
-                          <Textarea
-                            id="description"
-                            placeholder="Enter description"
-                            value={description}
-                            onChange={(e) => setDescription(e.target.value)}
+                            required
                           />
                         </div>
 
                         <div className="space-y-2">
-                          <Label>Facilites</Label>
-                          {amenities.map((link, index) => (
+                          <Label>Features</Label>
+                          {features.map((link, index) => (
                             <div
                               key={index}
                               className="flex gap-2 items-center"
@@ -331,16 +296,16 @@ export default function AdminHostels() {
                               <Input
                                 value={link}
                                 onChange={(e) =>
-                                  handleFacilities(index, e.target.value)
+                                  handleFeatures(index, e.target.value)
                                 }
-                                placeholder={`Enter facilities ${index + 1}`}
+                                placeholder={`Enter feature ${index + 1}`}
                               />
-                              {amenities.length > 1 && (
+                              {features.length > 1 && (
                                 <Button
                                   type="button"
                                   variant="ghost"
                                   size="sm"
-                                  onClick={() => removeFacilities(index)}
+                                  onClick={() => removeFeatures(index)}
                                 >
                                   ✕
                                 </Button>
@@ -351,43 +316,10 @@ export default function AdminHostels() {
                             type="button"
                             variant="outline"
                             size="sm"
-                            onClick={addFacilities}
+                            onClick={addFeatures}
                           >
-                            + Add Facilities
+                            + Add Feature
                           </Button>
-                        </div>
-                        <div className="space-y-2">
-                          <Label htmlFor="category">Category</Label>
-                          <select
-                            id="category"
-                            value={category}
-                            onChange={(e) => setCategory(e.target.value)}
-                            className="w-full border border-gray-300 rounded px-3 py-2"
-                          >
-                            <option value="">Select category</option>
-                            <option value="boys">Boys</option>
-                            <option value="girls">Girls</option>
-                            <option value="co-ed">Co-ed</option>
-                            <option value="family">Family</option>
-                          </select>
-                        </div>
-                        <div className="space-y-2">
-                          <Label htmlFor="owner">Owners</Label>
-                          <select
-                            id="owner"
-                            value={ownerId}
-                            onChange={(e) => setOwnerId(e.target.value)}
-                            className="w-full border border-gray-300 rounded px-3 py-2 text-sm text-gray-700 focus:outline-none  "
-                          >
-                            <option className="ml-2" value="">
-                              Select owner
-                            </option>
-                            {owners.map((owner) => (
-                              <option key={owner._id} value={owner._id}>
-                                {owner.name}
-                              </option>
-                            ))}
-                          </select>
                         </div>
                       </div>
                       <div className="space-y-2">
@@ -527,22 +459,19 @@ export default function AdminHostels() {
                       <thead>
                         <tr className="border-b">
                           <th className="text-left py-3 px-4 font-medium text-gray-500">
-                            Name
+                            Room No
                           </th>
                           <th className="text-left py-3 px-4 font-medium text-gray-500">
-                            Owner
+                            Capacity
                           </th>
                           <th className="text-left py-3 px-4 font-medium text-gray-500">
-                            Phone
+                            Price
                           </th>
                           <th className="text-left py-3 px-4 font-medium text-gray-500">
-                            Location
+                            Features
                           </th>
                           <th className="text-left py-3 px-4 font-medium text-gray-500">
-                            Facilities
-                          </th>
-                          <th className="text-left py-3 px-4 font-medium text-gray-500">
-                            Category
+                            Occupancy
                           </th>
                           <th className="text-left py-3 px-4 font-medium text-gray-500">
                             Status
@@ -553,27 +482,25 @@ export default function AdminHostels() {
                         </tr>
                       </thead>
                       <tbody>
-                        {paginatedUsers?.map((hostel) => (
-                          <tr key={hostel._id} className="border-b">
+                        {paginatedUsers?.map((room) => (
+                          <tr key={room._id} className="border-b">
                             <td className="py-3 px-4">
                               <div className="flex items-center gap-3">
                                 <div className="h-10 w-10 bg-gray-100 rounded-md flex items-center justify-center">
                                   <Building className="h-5 w-5 text-gray-500" />
                                 </div>
-                                <span className="font-medium cursor-pointer" onClick={() => navigate(`/admin/hostels/rooms/${hostel._id}`)}>
-                                  {hostel.name}
+                                <span className="font-medium">
+                                  {room.roomNumber}
                                 </span>
                               </div>
                             </td>
                             <td className="py-3 px-4">
-                              {hostel?.ownerId?.name}
+                              {room.capacity}
                             </td>
-                            <td className="py-3 px-4">{hostel.phone}</td>
-                            <td className="py-3 px-4">
-                              {hostel?.location?.place}
-                            </td>
+                            <td className="py-3 px-4">{room.price}</td>
+                          
                             <td className="py-3 px-4 space-x-2">
-                              {hostel?.amenities?.map((a, i) => (
+                              {room?.features?.map((a, i) => (
                                 <span
                                   key={i}
                                   className="bg-gray-100 px-2 py-1 rounded text-sm"
@@ -583,15 +510,15 @@ export default function AdminHostels() {
                               ))}
                             </td>
 
-                            <td className="py-3 px-4">{hostel?.category}</td>
+                            <td className="py-3 px-4">{room.currentOccupancy}</td>
 
                             <td className="py-3 px-4">
                               <Badge
                                 variant={
-                                  hostel.isActive ? "success" : "secondary"
+                                  room.isActive ? "success" : "secondary"
                                 }
                               >
-                                {hostel.isActive ? "Active" : "Inactive"}
+                                {room.isActive ? "Active" : "Inactive"}
                               </Badge>
                             </td>
                             <td className="py-3 px-4">
@@ -609,10 +536,10 @@ export default function AdminHostels() {
                                   <DropdownMenuItem
                                     className={"cursor-pointer"}
                                     onClick={() =>
-                                      handleBlocUnblock(hostel._id)
+                                      handleBlocUnblock(room._id)
                                     }
                                   >
-                                    {hostel.isActive ? (
+                                    {room.isActive ? (
                                       <>
                                         <UserX className="h-4 w-4 mr-2" />
                                         Block
@@ -632,7 +559,7 @@ export default function AdminHostels() {
                                   </DropdownMenuItem>
                                   <DropdownMenuItem
                                     className="text-red-600 cursor-pointer"
-                                    onClick={() => handleDelete(hostel._id)}
+                                    onClick={() => handleDelete(room._id)}
                                   >
                                     <Trash2 className="h-4 w-4 mr-2" />
                                     {isDeleting ? "Deleting..." : "Delete"}

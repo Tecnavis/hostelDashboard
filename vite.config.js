@@ -10,6 +10,11 @@ export default defineConfig({
     host: '0.0.0.0',
     port: 7861,
   },
+    preview: {
+    host: '0.0.0.0',
+    port: 7861,
+    allowedHosts: ['hostel-dashboard-48qp.onrender.com'], 
+  },
   resolve: {
     alias: {
       "@": path.resolve(__dirname, "./src"),

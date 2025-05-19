@@ -50,9 +50,9 @@ import {
   useAddNewroomMutation,
   useBlockroomMutation,
   useDeleteroomMutation,
-  useGetAllroomQuery,
+  useGetAllHostelRoomQuery,
 } from "@/app/service/room";
-import { useNavigate, useParams } from "react-router-dom";
+import { useParams } from "react-router-dom";
 
 export default function AdminHostelsRooms() {
   const [isAddHostelOpen, setIsAddHostelOpen] = useState(false);
@@ -63,12 +63,21 @@ export default function AdminHostelsRooms() {
   const [features, setFeatures] = useState([""]);
   const [currentOccupancy, setCurrentOccupancy] = useState("");
   const [price, setPrice] = useState("");
+  const [roomType, setRoomType] = useState("");
+  const [payment, setPayment] = useState("");
+  const [charge, setCharge] = useState("");
+  const [gardianInfo, setGardianInfo] = useState({
+    name: "",
+    email: "",
+    phone: "",
+  });
+  const [visitTimes, setVisitTimes] = useState([""]);
   const [searchTerm, setSearchTerm] = useState("");
   const [currentPage, setCurrentPage] = useState(1);
   const itemsPerPage = 10;
   const { id } = useParams();
 
-  const { data, isError, isLoading, refetch } = useGetAllroomQuery();
+  const { data, isError, isLoading, refetch } = useGetAllHostelRoomQuery(id);
   const [deleteroom, { isLoading: isDeleting }] = useDeleteroomMutation();
   const [blockroom] = useBlockroomMutation();
   const [addNewroom, { isLoading: isPosting }] = useAddNewroomMutation();
@@ -78,21 +87,21 @@ export default function AdminHostelsRooms() {
     return <h1>Oops! Something went wrong.</h1>;
 
   // searching
-  
-  const filteredUsers = data
-   .filter((room) => {
-  const price = String(room?.price || "").toLowerCase();
-  const roomNumber = String(room?.roomNumber || "").toLowerCase();
-  const hostelName = String(room?.hostelId?.name || "").toLowerCase();
-  const capacity = String(room?.capacity || "").toLowerCase();
 
-  return (
-    price.includes(searchTerm.toLowerCase()) ||
-    roomNumber.includes(searchTerm.toLowerCase()) ||
-    hostelName.includes(searchTerm.toLowerCase()) ||
-    capacity.includes(searchTerm.toLowerCase())
-  );
-})
+  const filteredUsers = data
+    .filter((room) => {
+      const price = String(room?.price || "").toLowerCase();
+      const roomNumber = String(room?.roomNumber || "").toLowerCase();
+      const hostelName = String(room?.hostelId?.name || "").toLowerCase();
+      const capacity = String(room?.capacity || "").toLowerCase();
+
+      return (
+        price.includes(searchTerm.toLowerCase()) ||
+        roomNumber.includes(searchTerm.toLowerCase()) ||
+        hostelName.includes(searchTerm.toLowerCase()) ||
+        capacity.includes(searchTerm.toLowerCase())
+      );
+    })
     ?.filter((user) => {
       if (statusFilter === "all") return true;
       if (statusFilter === "active") return user.isActive;
@@ -123,11 +132,26 @@ export default function AdminHostelsRooms() {
     setFeatures(newFeatures);
   };
 
+  const handleVisitTime = (index, value) => {
+    const newVisitTime = [...visitTimes];
+    newVisitTime[index] = value;
+    setVisitTimes(newVisitTime);
+  };
+
+  const addVisitTime = () => {
+    setVisitTimes([...visitTimes, ""]);
+  };
+
+  const removeVisitTime = (index) => {
+    const newVisitTime = visitTimes.filter((_, i) => i !== index);
+    setVisitTimes(newVisitTime);
+  };
+
   // create  hostel
 
   const handleSubmit = async (e) => {
     e.preventDefault();
-   
+
     if (
       roomNumber.trim() === "" ||
       selectedImages.length === 0 ||
@@ -145,15 +169,26 @@ export default function AdminHostelsRooms() {
     formData.append("capacity", capacity);
     formData.append("price", price);
     formData.append("currentOccupancy", currentOccupancy);
+    formData.append("gardianInfo[name]", gardianInfo.name);
+    formData.append("gardianInfo[email]", gardianInfo.email);
+    formData.append("gardianInfo[phone]", gardianInfo.phone);
+    formData.append("roomType", roomType);
+    formData.append("payment", payment);
+    formData.append("charge", charge);
 
     features.forEach((a, i) => {
       if (a.trim() !== "") {
         formData.append(`features[${i}]`, a);
       }
     });
+    visitTimes.forEach((a, i) => {
+      if (a.trim() !== "") {
+        formData.append(`visitTimes[${i}]`, a);
+      }
+    });
     selectedImages.forEach((file) => {
       formData.append("images", file);
-    });    
+    });
 
     try {
       const response = await addNewroom(formData).unwrap();
@@ -166,6 +201,15 @@ export default function AdminHostelsRooms() {
         setSelectedImages([]);
         setPrice("");
         setIsAddHostelOpen(false);
+        setGardianInfo({
+          name: "",
+          email: "",
+          phone: "",
+        });
+        setRoomType("");
+        setPayment("");
+        setCharge("");
+        setVisitTimes([""]);
         refetch();
       }
     } catch (error) {
@@ -176,7 +220,10 @@ export default function AdminHostelsRooms() {
 
   const handleDelete = async (roomId) => {
     try {
-      const { status } = await deleteroom({id: roomId, hostelId: id}).unwrap();
+      const { status } = await deleteroom({
+        id: roomId,
+        hostelId: id,
+      }).unwrap();
       if (status === 200) {
         refetch();
       }
@@ -206,7 +253,7 @@ export default function AdminHostelsRooms() {
           <div className="max-w-7xl mx-auto space-y-6">
             <div className="flex items-center justify-between mt-10">
               <h1 className="text-lg sm:text-xl md:text-2xl font-bold">
-                Manage Hostels
+                Manage Rooms
               </h1>
               <div className="flex items-center gap-2">
                 <Dialog
@@ -224,7 +271,7 @@ export default function AdminHostelsRooms() {
                   </DialogTrigger>
                   <DialogContent className="sm:max-w-[600px]">
                     <DialogHeader>
-                      <DialogTitle>Add New Hostel</DialogTitle>
+                      <DialogTitle>Add New Room</DialogTitle>
                     </DialogHeader>
                     {/* <div className="grid gap-4 py-4"> */}
                     <div
@@ -252,7 +299,82 @@ export default function AdminHostelsRooms() {
                             required
                           />
                         </div>
-                        
+
+                        <div className="space-y-2">
+                          <Label htmlFor="roomtype">Room Type</Label>
+                          <Input
+                            id="roomtype"
+                            placeholder="Enter room type"
+                            value={roomType}
+                            onChange={(e) => setRoomType(e.target.value)}
+                            required
+                          />
+                        </div>
+
+                        <div className="space-y-2">
+                          <Label htmlFor="charge">Charge</Label>
+                          <Input
+                            id="charge"
+                            placeholder="Enter room Charge"
+                            value={charge}
+                            onChange={(e) => setCharge(e.target.value)}
+                            required
+                          />
+                        </div>
+
+                        <div className="space-y-2">
+                          <Label htmlFor="payment">Payment</Label>
+                          <Input
+                            id="payment"
+                            placeholder="Enter payment"
+                            value={payment}
+                            onChange={(e) => setPayment(e.target.value)}
+                            required
+                          />
+                        </div>
+
+                        <div className="space-y-2">
+                          <Label htmlFor="name">Gardian Name</Label>
+                          <Input
+                            id="name"
+                            placeholder="Enter street"
+                            value={gardianInfo.name}
+                            onChange={(e) =>
+                              setGardianInfo({
+                                ...gardianInfo,
+                                name: e.target.value,
+                              })
+                            }
+                          />
+                        </div>
+                        <div className="space-y-2">
+                          <Label htmlFor="email">Gardian Email</Label>
+                          <Input
+                            id="email"
+                            placeholder="Enter gardian email"
+                            value={gardianInfo.email}
+                            onChange={(e) =>
+                              setGardianInfo({
+                                ...gardianInfo,
+                                email: e.target.value,
+                              })
+                            }
+                          />
+                        </div>
+                        <div className="space-y-2">
+                          <Label htmlFor="phone">Gardian Phone</Label>
+                          <Input
+                            id="phone"
+                            placeholder="Enter gardian phone"
+                            value={gardianInfo.phone}
+                            onChange={(e) =>
+                              setGardianInfo({
+                                ...gardianInfo,
+                                phone: e.target.value,
+                              })
+                            }
+                          />
+                        </div>
                       </div>
                       <div className="grid grid-cols-2 gap-4">
                         <div className="space-y-2">
@@ -270,31 +392,27 @@ export default function AdminHostelsRooms() {
                             required
                           />
                         </div>
-                         <div className="space-y-2">
-                          <Label htmlFor="price">
-                            Price
-                          </Label>
+                        <div className="space-y-2">
+                          <Label htmlFor="price">Price</Label>
 
                           <Input
                             id="price"
                             placeholder="Enter room price"
                             value={price}
-                            onChange={(e) =>
-                              setPrice(e.target.value)
-                            }
+                            onChange={(e) => setPrice(e.target.value)}
                             required
                           />
                         </div>
 
                         <div className="space-y-2">
                           <Label>Features</Label>
-                          {features.map((link, index) => (
+                          {features.map((feature, index) => (
                             <div
                               key={index}
                               className="flex gap-2 items-center"
                             >
                               <Input
-                                value={link}
+                                value={feature}
                                 onChange={(e) =>
                                   handleFeatures(index, e.target.value)
                                 }
@@ -319,6 +437,42 @@ export default function AdminHostelsRooms() {
                             onClick={addFeatures}
                           >
                             + Add Feature
+                          </Button>
+                        </div>
+
+                        <div className="space-y-2">
+                          <Label>Visit Times</Label>
+                          {visitTimes.map((time, index) => (
+                            <div
+                              key={index}
+                              className="flex gap-2 items-center"
+                            >
+                              <Input
+                                value={time}
+                                onChange={(e) =>
+                                  handleVisitTime(index, e.target.value)
+                                }
+                                placeholder={`Enter visit time ${index + 1}`}
+                              />
+                              {visitTimes.length > 1 && (
+                                <Button
+                                  type="button"
+                                  variant="ghost"
+                                  size="sm"
+                                  onClick={() => removeVisitTime(index)}
+                                >
+                                  ✕
+                                </Button>
+                              )}
+                            </div>
+                          ))}
+                          <Button
+                            type="button"
+                            variant="outline"
+                            size="sm"
+                            onClick={addVisitTime}
+                          >
+                            + Add Visit Time
                           </Button>
                         </div>
                       </div>
@@ -393,9 +547,9 @@ export default function AdminHostelsRooms() {
                 <CardHeader className="pb-2">
                   <div className="flex items-center justify-between">
                     <div>
-                      <CardTitle>All Hostels</CardTitle>
+                      <CardTitle>All Rooms</CardTitle>
                       <CardDescription>
-                        Manage and monitor all registered admins
+                        Manage and monitor all registered rooms
                       </CardDescription>
                     </div>
                   </div>
@@ -471,6 +625,15 @@ export default function AdminHostelsRooms() {
                             Features
                           </th>
                           <th className="text-left py-3 px-4 font-medium text-gray-500">
+                            Room Type
+                          </th>
+                          <th className="text-left py-3 px-4 font-medium text-gray-500">
+                            Charge
+                          </th>
+                          <th className="text-left py-3 px-4 font-medium text-gray-500">
+                            Payment
+                          </th>
+                          <th className="text-left py-3 px-4 font-medium text-gray-500">
                             Occupancy
                           </th>
                           <th className="text-left py-3 px-4 font-medium text-gray-500">
@@ -494,11 +657,8 @@ export default function AdminHostelsRooms() {
                                 </span>
                               </div>
                             </td>
-                            <td className="py-3 px-4">
-                              {room.capacity}
-                            </td>
+                            <td className="py-3 px-4">{room.capacity}</td>
                             <td className="py-3 px-4">{room.price}</td>
-                          
                             <td className="py-3 px-4 space-x-2">
                               {room?.features?.map((a, i) => (
                                 <span
@@ -509,9 +669,18 @@ export default function AdminHostelsRooms() {
                                 </span>
                               ))}
                             </td>
-
-                            <td className="py-3 px-4">{room.currentOccupancy}</td>
-
+                            <td className="py-3 px-4">
+                              {room?.roomType}
+                            </td>
+                            <td className="py-3 px-4">
+                              {room?.charge}
+                            </td>
+                            <td className="py-3 px-4">
+                              {room?.payment}
+                            </td>
+                            <td className="py-3 px-4">
+                              {room.currentOccupancy}
+                            </td>
                             <td className="py-3 px-4">
                               <Badge
                                 variant={
@@ -535,9 +704,7 @@ export default function AdminHostelsRooms() {
                                 <DropdownMenuContent align="end">
                                   <DropdownMenuItem
                                     className={"cursor-pointer"}
-                                    onClick={() =>
-                                      handleBlocUnblock(room._id)
-                                    }
+                                    onClick={() => handleBlocUnblock(room._id)}
                                   >
                                     {room.isActive ? (
                                       <>

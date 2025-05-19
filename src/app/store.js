@@ -4,6 +4,7 @@ import { adminApi } from "./service/admin";
 import { ownerApi } from "./service/owner";
 import { hostelApi } from "./service/hostel";
 import { roomApi } from "./service/room";
+import { userApi } from "./service/user";
 
 export const store = configureStore({
   reducer: {
@@ -11,6 +12,7 @@ export const store = configureStore({
     [ownerApi.reducerPath]: ownerApi.reducer,
     [hostelApi.reducerPath]: hostelApi.reducer,
     [roomApi.reducerPath]: roomApi.reducer,
+    [userApi.reducerPath]: userApi.reducer,
   },
 
   middleware: (getDefaultMiddleware) =>
@@ -18,7 +20,8 @@ export const store = configureStore({
       .concat(adminApi.middleware)
       .concat(ownerApi.middleware)
       .concat(hostelApi.middleware)
-      .concat(roomApi.middleware),
+      .concat(roomApi.middleware)
+      .concat(userApi.middleware),
 });
 
 setupListeners(store.dispatch);

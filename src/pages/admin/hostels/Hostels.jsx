@@ -71,6 +71,8 @@ export default function AdminHostels() {
   const [description, setDescription] = useState("");
   const [category, setCategory] = useState("");
   const [ownerId, setOwnerId] = useState("");
+  const [accommodationType, setAccommodationType] = useState("");
+  const [price, setPrice] = useState("");
   const [searchTerm, setSearchTerm] = useState("");
   const [currentPage, setCurrentPage] = useState(1);
   const itemsPerPage = 10;
@@ -78,10 +80,9 @@ export default function AdminHostels() {
 
   const { data, isError, isLoading, refetch } = useGetAllhostelQuery();
   const [deletehostel, { isLoading: isDeleting }] = useDeletehostelMutation();
-  const [blockhostel] =  useBlockhostelMutation();
+  const [blockhostel] = useBlockhostelMutation();
   const [addNewhostel, { isLoading: isPosting }] = useAddNewhostelMutation();
   const { data: owners = [] } = useGetAllownerQuery();
-
 
   if (isLoading) return <h1>Loading...</h1>;
   if (isError || !Array.isArray(data))
@@ -144,7 +145,9 @@ export default function AdminHostels() {
       phone.trim() === "" ||
       location.street.trim() === "" ||
       location.place.trim() === "" ||
-      location.pincode.trim() === ""
+      location.pincode.trim() === "" ||
+      accommodationType.trim() === "" ||
+      price.trim() === ""
     ) {
       return;
     }
@@ -156,6 +159,8 @@ export default function AdminHostels() {
     formData.append("description", description);
     formData.append("name", name);
     formData.append("phone", phone);
+    formData.append("accommodationType", accommodationType);
+    formData.append("price", price);
     formData.append("location[street]", location.street);
     formData.append("location[place]", location.place);
     formData.append("location[pincode]", location.pincode);
@@ -179,6 +184,8 @@ export default function AdminHostels() {
         setSelectedImages([]);
         setAmenities([""]);
         setDescription("");
+        setPrice("");
+        setAccommodationType("");
         setLocation({ street: "", place: "", pincode: "" });
         setIsAddHostelOpen(false);
         refetch();
@@ -270,6 +277,28 @@ export default function AdminHostels() {
                       </div>
                       <div className="grid grid-cols-2 gap-4">
                         <div className="space-y-2">
+                          <Label htmlFor="price">Price</Label>
+                          <Input
+                            id="price"
+                            placeholder="Price"
+                            value={price}
+                            onChange={(e) => setPrice(e.target.value)}
+                            required
+                          />
+                        </div>
+                        <div className="space-y-2">
+                          <Label htmlFor="accommodation">Accommodation</Label>
+                          <Input
+                            id="accommodation"
+                            placeholder="Accommodation"
+                            value={accommodationType}
+                            onChange={(e) =>
+                              setAccommodationType(e.target.value)
+                            }
+                            required
+                          />
+                        </div>
+                        <div className="space-y-2">
                           <Label htmlFor="street">Street</Label>
                           <Input
                             id="street"
@@ -358,7 +387,14 @@ export default function AdminHostels() {
                         </div>
                         <div className="space-y-2">
                           <Label htmlFor="category">Category</Label>
-                          <select
+                          <Input
+                            id="category"
+                            placeholder="Enter Category"
+                            value={category}
+                            onChange={(e) => setCategory(e.target.value)}
+                            required
+                          />
+                          {/* <select
                             id="category"
                             value={category}
                             onChange={(e) => setCategory(e.target.value)}
@@ -369,7 +405,7 @@ export default function AdminHostels() {
                             <option value="girls">Girls</option>
                             <option value="co-ed">Co-ed</option>
                             <option value="family">Family</option>
-                          </select>
+                          </select> */}
                         </div>
                         <div className="space-y-2">
                           <Label htmlFor="owner">Owners</Label>
@@ -542,6 +578,12 @@ export default function AdminHostels() {
                             Facilities
                           </th>
                           <th className="text-left py-3 px-4 font-medium text-gray-500">
+                            Accommodation
+                          </th>
+                          <th className="text-left py-3 px-4 font-medium text-gray-500">
+                            Price
+                          </th>
+                          <th className="text-left py-3 px-4 font-medium text-gray-500">
                             Category
                           </th>
                           <th className="text-left py-3 px-4 font-medium text-gray-500">
@@ -560,7 +602,14 @@ export default function AdminHostels() {
                                 <div className="h-10 w-10 bg-gray-100 rounded-md flex items-center justify-center">
                                   <Building className="h-5 w-5 text-gray-500" />
                                 </div>
-                                <span className="font-medium cursor-pointer" onClick={() => navigate(`/admin/hostels/rooms/${hostel._id}`)}>
+                                <span
+                                  className="font-medium cursor-pointer"
+                                  onClick={() =>
+                                    navigate(
+                                      `/admin/hostels/rooms/${hostel._id}`
+                                    )
+                                  }
+                                >
                                   {hostel.name}
                                 </span>
                               </div>
@@ -582,6 +631,10 @@ export default function AdminHostels() {
                                 </span>
                               ))}
                             </td>
+                            <td className="py-3 px-4">
+                              {hostel?.accommodationType}
+                            </td>
+                            <td className="py-3 px-4">{hostel?.price}</td>
 
                             <td className="py-3 px-4">{hostel?.category}</td>
 

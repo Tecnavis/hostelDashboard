@@ -14,6 +14,7 @@ import {
   Settings,
   Shield,
   Users,
+  User
 } from "lucide-react";
 
 import { cn } from "@/lib/utils";
@@ -32,6 +33,7 @@ export function Sidebar({ role }) {
     { title: "Admins", href: "/admin/admins", icon: Shield },
     { title: "Owners", href: "/admin/owners", icon: Users },
     { title: "Hostels", href: "/admin/hostels", icon: Building },
+    { title: "Users", href: "/admin/users", icon: User },
     { title: "Bookings", href: "/admin/bookings", icon: Hotel },
     { title: "Analytics", href: "/admin/analytics", icon: BarChart3 },
     { title: "Messages", href: "/admin/messages", icon: MessageSquare },

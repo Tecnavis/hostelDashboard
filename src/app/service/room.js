@@ -11,6 +11,10 @@ export const roomApi = createApi({
       query: (id) => `/rooms`,
     }),
 
+     getAllHostelRoom: builder.query({
+      query: (id) => `/rooms/hostels/${id}`,
+    }),
+
     // Get room by id
 
     getAroomById: builder.query({
@@ -71,6 +75,7 @@ export const roomApi = createApi({
 
 export const {
     useGetAllroomQuery, 
+    useGetAllHostelRoomQuery,
     useGetAroomByIdQuery,
     useAddNewroomMutation, 
     useUpdateroomMutation,

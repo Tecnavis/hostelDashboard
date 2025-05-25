@@ -10,12 +10,17 @@ import AdminOwnersStaffs from "@/pages/admin/owners/ownersStaff/OwnersStaff";
 import AdminUsers from "@/pages/admin/user/User";
 import HomePage from "@/pages/Home";
 import LoginPage from "@/pages/login/Login";
+import SignupPage from "@/pages/login/Signup";
 import OwnerAnalytics from "@/pages/owner/analytics/Analytics";
 import OwnerBookings from "@/pages/owner/bookings/Bookings";
 import OwnerDashboard from "@/pages/owner/dashboard/Dashboard";
 import OwnerHostels from "@/pages/owner/hostels/Hostels";
+import OwnerHostelsRooms from "@/pages/owner/hostels/rooms/Rooms";
 import OwnerMessages from "@/pages/owner/messages/Messages";
-import OwnerRooms from "@/pages/owner/rooms/Rooms";
+import OwnerStaffs from "@/pages/owner/staffs/Staffs";
+import OwnerRooms from "@/pages/owner/staffs/Staffs";
+import OwnerUsers from "@/pages/owner/user/User";
+import ProtectedRoutes from "@/utils/ProtectedRoutes";
 import React from "react";
 import { Route, Routes } from "react-router-dom";
 
@@ -24,29 +29,43 @@ export default function AppRoutes() {
     <Routes>
       <Route path="/" element={<HomePage />} />
       <Route path="/login" element={<LoginPage />} />
+      <Route path="/signup" element={<SignupPage />} />
 
       {/* admin dashboard */}
 
-      <Route path="/admin/dashboard" element={<AdminDashboard />} />
-      <Route path="/admin/hostels" element={<AdminHostels />} />
-      <Route path="/admin/hostels/rooms/:id" element={<AdminHostelsRooms />} />
-      <Route path="/admin/analytics" element={<AdminAnalytics />} />
-      <Route path="/admin/owners" element={<AdminOwners />} />
-      <Route path="/admin/owners/staffs/:id" element={<AdminOwnersStaffs />} />
-      <Route path="/admin/messages" element={<AdminMessages />} />
-      <Route path="/admin/bookings" element={<AdminBookings />} />
-      <Route path="/admin/admins" element={<AdminAdmins />} />
-      <Route path="/admin/users" element={<AdminUsers />} />
+      <Route element={<ProtectedRoutes />}>
+        <Route path="/admin/dashboard" element={<AdminDashboard />} />
+        <Route path="/admin/hostels" element={<AdminHostels />} />
+        <Route
+          path="/admin/hostels/rooms/:id"
+          element={<AdminHostelsRooms />}
+        />
+        <Route path="/admin/analytics" element={<AdminAnalytics />} />
+        <Route path="/admin/owners" element={<AdminOwners />} />
+        <Route
+          path="/admin/owners/staffs/:id"
+          element={<AdminOwnersStaffs />}
+        />
+        <Route path="/admin/messages" element={<AdminMessages />} />
+        <Route path="/admin/bookings" element={<AdminBookings />} />
+        <Route path="/admin/admins" element={<AdminAdmins />} />
+        <Route path="/admin/users" element={<AdminUsers />} />
 
+        {/* owner dashboard */}
 
-      {/* owner dashboard */}
-
-      <Route path="/owner/dashboard" element={<OwnerDashboard />} />
-      <Route path="/owner/hostels" element={<OwnerHostels />} />
-      <Route path="/owner/analytics" element={<OwnerAnalytics />} />
-      <Route path="/owner/rooms" element={<OwnerRooms />} />
-      <Route path="/owner/messages" element={<OwnerMessages />} />
-      <Route path="/owner/bookings" element={<OwnerBookings />} />
+        <Route path="/owner/dashboard" element={<OwnerDashboard />} />
+        <Route path="/owner/users" element={<OwnerUsers />} />
+        <Route path="/owner/hostels" element={<OwnerHostels />} />
+        <Route
+          path="/owner/hostels/rooms/:id"
+          element={<OwnerHostelsRooms />}
+        />
+        <Route path="/owner/analytics" element={<OwnerAnalytics />} />
+        <Route path="/owner/staffs" element={<OwnerStaffs />} />
+        <Route path="/owner/users" element={<AdminUsers />} />
+        <Route path="/owner/messages" element={<OwnerMessages />} />
+        <Route path="/owner/bookings" element={<OwnerBookings />} />
+      </Route>
     </Routes>
   );
 }

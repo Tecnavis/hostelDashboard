@@ -5,6 +5,7 @@ import { ownerApi } from "./service/owner";
 import { hostelApi } from "./service/hostel";
 import { roomApi } from "./service/room";
 import { userApi } from "./service/user";
+import { bookingApi } from "./service/bookings";
 
 export const store = configureStore({
   reducer: {
@@ -13,6 +14,7 @@ export const store = configureStore({
     [hostelApi.reducerPath]: hostelApi.reducer,
     [roomApi.reducerPath]: roomApi.reducer,
     [userApi.reducerPath]: userApi.reducer,
+    [bookingApi.reducerPath]: bookingApi.reducer,
   },
 
   middleware: (getDefaultMiddleware) =>
@@ -21,6 +23,7 @@ export const store = configureStore({
       .concat(ownerApi.middleware)
       .concat(hostelApi.middleware)
       .concat(roomApi.middleware)
+      .concat(bookingApi.middleware)
       .concat(userApi.middleware),
 });
 

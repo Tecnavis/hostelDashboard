@@ -14,23 +14,29 @@ import {
   Settings,
   Shield,
   Users,
-  User
+  User,
 } from "lucide-react";
 
 import { cn } from "@/lib/utils";
 import { Button } from "@/components/ui/button";
 import { Sheet, SheetContent } from "@/components/ui/sheet";
-import { NavLink, useLocation } from "react-router-dom";
+import { NavLink, useLocation, useNavigate } from "react-router-dom";
 
-export function Sidebar({ role }) {
+export function Sidebar() {
   const location = useLocation();
   const pathname = location.pathname;
   const [isCollapsed, setIsCollapsed] = useState(false);
   const [isMobileOpen, setIsMobileOpen] = useState(false);
+  const navigate = useNavigate();
+
+  const admin = JSON.parse(localStorage.getItem("admin"));
+  const owner = JSON.parse(localStorage.getItem("owner"));
 
   const adminNavItems = [
     { title: "Dashboard", href: "/admin/dashboard", icon: LayoutDashboard },
-    { title: "Admins", href: "/admin/admins", icon: Shield },
+    ...(admin?.adminDetails?.role === "super-admin"
+      ? [{ title: "Admins", href: "/admin/admins", icon: Shield }]
+      : []),
     { title: "Owners", href: "/admin/owners", icon: Users },
     { title: "Hostels", href: "/admin/hostels", icon: Building },
     { title: "Users", href: "/admin/users", icon: User },
@@ -42,18 +48,32 @@ export function Sidebar({ role }) {
 
   const ownerNavItems = [
     { title: "Dashboard", href: "/owner/dashboard", icon: LayoutDashboard },
+    ...(owner?.ownerDetails?.role === "owner"
+      ? [{ title: "Staffs", href: "/owner/staffs", icon: Users }]
+      : []),
     { title: "My Hostels", href: "/owner/hostels", icon: Building },
-    { title: "Rooms", href: "/owner/rooms", icon: Hotel },
-    { title: "Bookings", href: "/owner/bookings", icon: Users },
+    { title: "Users", href: "/owner/users", icon: User },
+    { title: "Bookings", href: "/owner/bookings", icon:  Hotel  },
     { title: "Analytics", href: "/owner/analytics", icon: BarChart3 },
     { title: "Messages", href: "/owner/messages", icon: MessageSquare },
     // { title: "Settings", href: "/owner/settings", icon: Settings },
   ];
 
-  const navItems = role === "admin" ? adminNavItems : ownerNavItems;
+  const navItems =
+    admin?.adminDetails?.role === "admin" ||
+    admin?.adminDetails?.role === "super-admin"
+      ? adminNavItems
+      : ownerNavItems;
 
   const toggleSidebar = () => {
     setIsCollapsed(!isCollapsed);
+  };
+
+  const handleLogout = () => {
+    localStorage.removeItem("admin");
+    localStorage.removeItem("owner");
+
+    navigate("/login");
   };
 
   return (
@@ -77,11 +97,17 @@ export function Sidebar({ role }) {
                 <Hotel
                   className={cn(
                     "h-6 w-6",
-                    role === "admin" ? "text-rose-600" : "text-orange-600"
+                    admin?.adminDetails?.role === "admin" ||
+                      admin?.adminDetails?.role === "super-admin"
+                      ? "text-rose-600"
+                      : "text-orange-600"
                   )}
                 />
                 <span className="text-xl font-bold">
-                  {role === "admin" ? "Admin Panel" : "Owner Panel"}
+                  {admin?.adminDetails?.role === "admin" ||
+                  admin?.adminDetails?.role === "super-admin"
+                    ? "Admin Panel"
+                    : "Owner Panel"}
                 </span>
               </div>
             </div>
@@ -110,6 +136,7 @@ export function Sidebar({ role }) {
               <Button
                 variant="ghost"
                 className="w-full justify-start text-red-600"
+                onClick={handleLogout}
               >
                 <LogOut className="mr-2 h-5 w-5" />
                 Logout
@@ -136,12 +163,18 @@ export function Sidebar({ role }) {
             <Hotel
               className={cn(
                 "h-6 w-6 flex-shrink-0",
-                role === "admin" ? "text-rose-600" : "text-orange-600"
+                admin?.adminDetails?.role === "admin" ||
+                  admin?.adminDetails?.role === "super-admin"
+                  ? "text-rose-600"
+                  : "text-orange-600"
               )}
             />
             {!isCollapsed && (
               <span className="text-xl font-bold whitespace-nowrap">
-                {role === "admin" ? "Admin Panel" : "Owner Panel"}
+                {admin?.adminDetails?.role === "admin" ||
+                admin?.adminDetails?.role === "super-admin"
+                  ? "Admin Panel"
+                  : "Owner Panel"}
               </span>
             )}
           </div>
@@ -188,6 +221,7 @@ export function Sidebar({ role }) {
               "text-red-600",
               isCollapsed ? "w-10 h-10 p-0" : "w-full justify-start"
             )}
+            onClick={handleLogout}
           >
             <LogOut className={cn("h-5 w-5", !isCollapsed && "mr-2")} />
             {!isCollapsed && "Logout"}

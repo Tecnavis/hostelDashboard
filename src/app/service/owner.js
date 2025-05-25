@@ -11,11 +11,28 @@ export const ownerApi = createApi({
       query: () => `/owners`,
     }),
 
+    // get all super admin owners
+      getAllSuperAdminowner: builder.query({
+      query: (id) => `/owners/super-admin/${id}`,
+    }),
+
 // get all owner staff
 
     getAllownerStaff: builder.query({
       query: (id) => `/owners/super-owner/${id}`,
     }),
+
+     // Post admin login
+
+    loginOwner: builder.mutation({
+        query: (logowner) => ({
+          url: `/owners/login`,
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: logowner,
+        }),
+      }),
+
 
     // Get owner by id
 
@@ -77,6 +94,8 @@ export const ownerApi = createApi({
 });
 
 export const {
+  useGetAllSuperAdminownerQuery,
+  useLoginOwnerMutation,
     useGetAllownerQuery, 
     useGetAllownerStaffQuery,
     useGetAownerByIdQuery,

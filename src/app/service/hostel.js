@@ -11,6 +11,18 @@ export const hostelApi = createApi({
       query: (id) => `/hostels`,
     }),
 
+
+    // get all super admin hostles
+      getAllSuperAdminhostel: builder.query({
+      query: (id) => `/hostels/super-admin/${id}`,
+    }),
+
+     // get all owner hostles
+      getAllOwnerhostel: builder.query({
+      query: (id) => `/hostels/owner/${id}`,
+    }),
+
+
     // Get hostel by id
 
     getAhostelById: builder.query({
@@ -70,6 +82,8 @@ export const hostelApi = createApi({
 });
 
 export const {
+  useGetAllSuperAdminhostelQuery,
+  useGetAllOwnerhostelQuery,
     useGetAllhostelQuery, 
     useGetAhostelByIdQuery,
     useAddNewhostelMutation, 

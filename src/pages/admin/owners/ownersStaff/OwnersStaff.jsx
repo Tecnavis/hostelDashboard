@@ -76,6 +76,11 @@ export default function AdminOwnersStaffs() {
   const itemsPerPage = 10;
   const { id } = useParams();
 
+    const admin = JSON.parse(localStorage.getItem("admin"));
+
+     const  superAdminId = admin?.adminDetails?.role == "admin" ?  admin?.adminDetails?.superAdminId : admin?.adminDetails?._id ;
+
+
   const { data, isError, isLoading, refetch } = useGetAllownerStaffQuery(id);
   const [deleteAdmin, { isLoading: isDeleting }] = useDeleteownerMutation();
   const [blockAdmin] = useBlockownerMutation();
@@ -127,6 +132,7 @@ export default function AdminOwnersStaffs() {
         phone,
         role: "staff",
         ownerId: id,
+         superAdminId
       }).unwrap();
 
       if (status === 201) {

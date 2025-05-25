@@ -30,44 +30,12 @@ import {
   CardHeader,
   CardTitle,
 } from "@/components/ui/card";
-// import {
-//   Dialog,
-//   DialogContent,
-//   DialogDescription,
-//   DialogFooter,
-//   DialogHeader,
-//   DialogTitle,
-//   DialogTrigger,
-// } from "@/components/ui/dialog";
-// import {
-//   DropdownMenu,
-//   DropdownMenuContent,
-//   DropdownMenuItem,
-//   DropdownMenuTrigger,
-// } from "@/components/ui/dropdown-menu";
 import { Input } from "@/components/ui/input";
-// import { Label } from "@/components/ui/label";
-// import {
-//   Select,
-//   SelectContent,
-//   SelectItem,
-//   SelectTrigger,
-//   SelectValue,
-// } from "@/components/ui/select";
-// import { Tabs, TabsList, TabsTrigger } from "@/components/ui/tabs";
-// import { Textarea } from "@/components/ui/textarea";
-import {
-  useAddNewAdminMutation,
-  useBlockAdminMutation,
-  useDeleteAdminMutation,
-  useGetAllAdminQuery,
-} from "@/app/service/admin";
+
 import { useGetAllUserQuery } from "@/app/service/user";
 
 export default function AdminUsers() {
-  const [isAddHostelOpen, setIsAddHostelOpen] = useState(false);
   const [statusFilter, setStatusFilter] = useState("all");
-  const [showPassword, setShowPassword] = useState(false);
   const [name, setName] = useState("");
   const [phone, setPhone] = useState("");
   const [email, setEmail] = useState("");
@@ -77,9 +45,7 @@ export default function AdminUsers() {
   const itemsPerPage = 10;
 
   const { data, isError, isLoading } = useGetAllUserQuery();
-//   const [deleteAdmin, { isLoading: isDeleting }] = useDeleteAdminMutation();
-//   const [blockAdmin] = useBlockAdminMutation();
-//   const [addNewAdmin, { isLoading: isPosting }] = useAddNewAdminMutation();
+
 
   if (isLoading) return <h1>Loading...</h1>;
   if (isError || !Array.isArray(data))
@@ -109,62 +75,7 @@ export default function AdminUsers() {
     startIndex + itemsPerPage
   );
 
-//   const handleSubmit = async (e) => {
-//     e.preventDefault();
-//     if (
-//       email.trim() === "" ||
-//       password.trim() === "" ||
-//       phone.trim() === "" ||
-//       name.trim() === ""
-//     )
-//       return;
 
-//     try {
-//       const { status } = await addNewAdmin({
-//         email,
-//         password,
-//         name,
-//         phone,
-//         superAdminId: "682598d1adb06a35c127291f",
-//         role: "admin",
-//       }).unwrap();
-//       if (status === 201) {
-//         setEmail("");
-//         setPassword("");
-//         setName("");
-//         setPhone("");
-//         setIsAddHostelOpen(false);
-//         refetch();
-//       }
-//     } catch (error) {
-//       console.error("Admin create failed:", error);
-//     }
-//   };
-
-  // delete admin
-
-//   const handleDelete = async (id) => {
-//     try {
-//       const { status } = await deleteAdmin(id).unwrap();
-//       if (status === 200) {
-//         refetch();
-//       }
-//     } catch (error) {
-//       console.error("Failed to delete admin:", error);
-//     }
-//   };
-
-  //  block & unblock admin
-//   const handleBlocUnblock = async (id) => {
-//     try {
-//       const { status } = await blockAdmin(id).unwrap();
-//       if (status === 200) {
-//         refetch();
-//       }
-//     } catch (error) {
-//       console.error("Failed to block admin:", error);
-//     }
-//   };
 
   return (
     <div className="flex h-screen bg-gray-50">
@@ -175,106 +86,7 @@ export default function AdminUsers() {
           <div className="max-w-7xl mx-auto space-y-6">
             <div className="flex items-center justify-between mt-10">
               <h1 className="text-lg sm:text-xl md:text-2xl font-bold">Manage Users</h1>
-              {/* <div className="flex items-center gap-2">
-                <Dialog
-                  open={isAddHostelOpen}
-                  onOpenChange={setIsAddHostelOpen}
-                >
-                  <DialogTrigger asChild>
-                    <Button
-                      size="sm"
-                      className="bg-rose-600 hover:bg-rose-700 gap-2 cursor-pointer"
-                    >
-                      <Plus className="h-4 w-4" />
-                      Add admin
-                    </Button>
-                  </DialogTrigger>
-                  <DialogContent className="sm:max-w-[600px]">
-                    <DialogHeader>
-                      <DialogTitle>Add New Admin</DialogTitle>
-                    </DialogHeader>
-                    <div className="grid gap-4 py-4">
-                      <div className="grid grid-cols-2 gap-4">
-                        <div className="space-y-2">
-                          <Label htmlFor="-name">Name</Label>
-                          <Input
-                            id="name"
-                            placeholder="Enter admin name"
-                            value={name}
-                            onChange={(e) => setName(e.target.value)}
-                            required
-                          />
-                        </div>
-                        <div className="space-y-2">
-                          <Label htmlFor="email">Email</Label>
-                          <Input
-                            id="email"
-                            placeholder="Enter admin email"
-                            value={email}
-                            onChange={(e) => setEmail(e.target.value)}
-                            required
-                          />
-                        </div>
-                      </div>
-                      <div className="grid grid-cols-2 gap-4">
-                        <div className="space-y-2">
-                          <Label htmlFor="password">Password</Label>
-
-                          <div className="relative">
-                            <Input
-                              id="password"
-                              type={showPassword ? "text" : "password"}
-                              placeholder="••••••••"
-                              value={password}
-                              onChange={(e) => setPassword(e.target.value)}
-                              required
-                            />
-                            <Button
-                              type="button"
-                              variant="ghost"
-                              size="icon"
-                              className="absolute right-2 top-1/2 -translate-y-1/2"
-                              onClick={() => setShowPassword(!showPassword)}
-                            >
-                              {showPassword ? (
-                                <EyeOff className="h-4 w-4 text-muted-foreground cursor-pointer" />
-                              ) : (
-                                <Eye className="h-4 w-4 text-muted-foreground cursor-pointer" />
-                              )}
-                            </Button>
-                          </div>
-                        </div>
-
-                        <div className="space-y-2">
-                          <Label htmlFor="phone">Phone</Label>
-                          <Input
-                            id="phone"
-                            placeholder="+91 0000000"
-                            value={phone}
-                            onChange={(e) => setPhone(e.target.value)}
-                            required
-                          />
-                        </div>
-                      </div>
-                    </div>
-                    <DialogFooter>
-                      <Button
-                        variant="outline"
-                        onClick={() => setIsAddHostelOpen(false)}
-                        className={"cursor-pointer"}
-                      >
-                        Cancel
-                      </Button>
-                      <Button
-                        className="bg-rose-600 hover:bg-rose-700 cursor-pointer"
-                        onClick={handleSubmit}
-                      >
-                        {isPosting ? "Creating..." : "Create"}
-                      </Button>
-                    </DialogFooter>
-                  </DialogContent>
-                </Dialog>
-              </div> */}
+              
             </div>
 
             <motion.div
@@ -308,43 +120,6 @@ export default function AdminUsers() {
                       />
                     </div>
 
-                    {/* <div className="flex flex-col sm:flex-row items-start sm:items-center gap-2 w-full sm:w-auto">
-                      <Button
-                        variant="outline"
-                        size="sm"
-                        className="gap-2 w-full sm:w-auto"
-                      >
-                        <Filter className="h-4 w-4" />
-                        Filter
-                        <ChevronDown className="h-3 w-3 opacity-50" />
-                      </Button>
-
-                      <Tabs
-                        value={statusFilter}
-                        onValueChange={setStatusFilter}
-                      >
-                        <TabsList className="w-full sm:w-auto">
-                          <TabsTrigger
-                            className="cursor-pointer w-full sm:w-auto"
-                            value="all"
-                          >
-                            All
-                          </TabsTrigger>
-                          <TabsTrigger
-                            className="cursor-pointer w-full sm:w-auto"
-                            value="active"
-                          >
-                            Active
-                          </TabsTrigger>
-                          <TabsTrigger
-                            className="cursor-pointer w-full sm:w-auto"
-                            value="inactive"
-                          >
-                            Inactive
-                          </TabsTrigger>
-                        </TabsList>
-                      </Tabs>
-                    </div> */}
                   </div>
 
                   <div className="overflow-x-auto">

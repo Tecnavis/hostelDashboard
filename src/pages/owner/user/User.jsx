@@ -30,40 +30,41 @@ import {
   CardHeader,
   CardTitle,
 } from "@/components/ui/card";
-import {
-  Dialog,
-  DialogContent,
-  DialogDescription,
-  DialogFooter,
-  DialogHeader,
-  DialogTitle,
-  DialogTrigger,
-} from "@/components/ui/dialog";
-import {
-  DropdownMenu,
-  DropdownMenuContent,
-  DropdownMenuItem,
-  DropdownMenuTrigger,
-} from "@/components/ui/dropdown-menu";
+// import {
+//   Dialog,
+//   DialogContent,
+//   DialogDescription,
+//   DialogFooter,
+//   DialogHeader,
+//   DialogTitle,
+//   DialogTrigger,
+// } from "@/components/ui/dialog";
+// import {
+//   DropdownMenu,
+//   DropdownMenuContent,
+//   DropdownMenuItem,
+//   DropdownMenuTrigger,
+// } from "@/components/ui/dropdown-menu";
 import { Input } from "@/components/ui/input";
-import { Label } from "@/components/ui/label";
-import {
-  Select,
-  SelectContent,
-  SelectItem,
-  SelectTrigger,
-  SelectValue,
-} from "@/components/ui/select";
-import { Tabs, TabsList, TabsTrigger } from "@/components/ui/tabs";
-import { Textarea } from "@/components/ui/textarea";
+// import { Label } from "@/components/ui/label";
+// import {
+//   Select,
+//   SelectContent,
+//   SelectItem,
+//   SelectTrigger,
+//   SelectValue,
+// } from "@/components/ui/select";
+// import { Tabs, TabsList, TabsTrigger } from "@/components/ui/tabs";
+// import { Textarea } from "@/components/ui/textarea";
 import {
   useAddNewAdminMutation,
   useBlockAdminMutation,
   useDeleteAdminMutation,
   useGetAllAdminQuery,
 } from "@/app/service/admin";
+import { useGetAllUserQuery } from "@/app/service/user";
 
-export default function AdminAdmins() {
+export default function OwnerUsers() {
   const [isAddHostelOpen, setIsAddHostelOpen] = useState(false);
   const [statusFilter, setStatusFilter] = useState("all");
   const [showPassword, setShowPassword] = useState(false);
@@ -75,12 +76,10 @@ export default function AdminAdmins() {
   const [currentPage, setCurrentPage] = useState(1);
   const itemsPerPage = 10;
 
-  const admin = JSON.parse(localStorage.getItem("admin"));
-
-  const { data, isError, isLoading, refetch } = useGetAllAdminQuery(admin?.adminDetails?._id);
-  const [deleteAdmin, { isLoading: isDeleting }] = useDeleteAdminMutation();
-  const [blockAdmin] = useBlockAdminMutation();
-  const [addNewAdmin, { isLoading: isPosting }] = useAddNewAdminMutation();
+  const { data, isError, isLoading } = useGetAllUserQuery();
+//   const [deleteAdmin, { isLoading: isDeleting }] = useDeleteAdminMutation();
+//   const [blockAdmin] = useBlockAdminMutation();
+//   const [addNewAdmin, { isLoading: isPosting }] = useAddNewAdminMutation();
 
   if (isLoading) return <h1>Loading...</h1>;
   if (isError || !Array.isArray(data))
@@ -90,15 +89,15 @@ export default function AdminAdmins() {
 
   const filteredUsers = data
     ?.filter(
-      (admin) =>
-        admin.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
-        admin.email.toLowerCase().includes(searchTerm.toLowerCase()) ||
-        admin.phone.toLowerCase().includes(searchTerm.toLowerCase())
+      (user) =>
+        user.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
+        user.email.toLowerCase().includes(searchTerm.toLowerCase()) ||
+        user.phone.toLowerCase().includes(searchTerm.toLowerCase())
     )
-    ?.filter((admin) => {
+    ?.filter((user) => {
       if (statusFilter === "all") return true;
-      if (statusFilter === "active") return admin.isActive;
-      if (statusFilter === "inactive") return !admin.isActive;
+      if (statusFilter === "active") return user.isActive;
+      if (statusFilter === "inactive") return !user.isActive;
       return true;
     });
 
@@ -110,62 +109,62 @@ export default function AdminAdmins() {
     startIndex + itemsPerPage
   );
 
-  const handleSubmit = async (e) => {
-    e.preventDefault();
-    if (
-      email.trim() === "" ||
-      password.trim() === "" ||
-      phone.trim() === "" ||
-      name.trim() === ""
-    )
-      return;
+//   const handleSubmit = async (e) => {
+//     e.preventDefault();
+//     if (
+//       email.trim() === "" ||
+//       password.trim() === "" ||
+//       phone.trim() === "" ||
+//       name.trim() === ""
+//     )
+//       return;
 
-    try {
-      const { status } = await addNewAdmin({
-        email,
-        password,
-        name,
-        phone,
-        superAdminId: admin?.adminDetails?._id,
-        role: "admin",
-      }).unwrap();
-      if (status === 201) {
-        setEmail("");
-        setPassword("");
-        setName("");
-        setPhone("");
-        setIsAddHostelOpen(false);
-        refetch();
-      }
-    } catch (error) {
-      console.error("Admin create failed:", error);
-    }
-  };
+//     try {
+//       const { status } = await addNewAdmin({
+//         email,
+//         password,
+//         name,
+//         phone,
+//         superAdminId: "682598d1adb06a35c127291f",
+//         role: "admin",
+//       }).unwrap();
+//       if (status === 201) {
+//         setEmail("");
+//         setPassword("");
+//         setName("");
+//         setPhone("");
+//         setIsAddHostelOpen(false);
+//         refetch();
+//       }
+//     } catch (error) {
+//       console.error("Admin create failed:", error);
+//     }
+//   };
 
   // delete admin
 
-  const handleDelete = async (id) => {
-    try {
-      const { status } = await deleteAdmin(id).unwrap();
-      if (status === 200) {
-        refetch();
-      }
-    } catch (error) {
-      console.error("Failed to delete admin:", error);
-    }
-  };
+//   const handleDelete = async (id) => {
+//     try {
+//       const { status } = await deleteAdmin(id).unwrap();
+//       if (status === 200) {
+//         refetch();
+//       }
+//     } catch (error) {
+//       console.error("Failed to delete admin:", error);
+//     }
+//   };
 
   //  block & unblock admin
-  const handleBlocUnblock = async (id) => {
-    try {
-      const { status } = await blockAdmin(id).unwrap();
-      if (status === 200) {
-        refetch();
-      }
-    } catch (error) {
-      console.error("Failed to block admin:", error);
-    }
-  };
+//   const handleBlocUnblock = async (id) => {
+//     try {
+//       const { status } = await blockAdmin(id).unwrap();
+//       if (status === 200) {
+//         refetch();
+//       }
+//     } catch (error) {
+//       console.error("Failed to block admin:", error);
+//     }
+//   };
 
   return (
     <div className="flex h-screen bg-gray-50">
@@ -175,8 +174,8 @@ export default function AdminAdmins() {
         <main className="flex-1 overflow-y-auto p-6">
           <div className="max-w-7xl mx-auto space-y-6">
             <div className="flex items-center justify-between mt-10">
-              <h1 className="text-lg sm:text-xl md:text-2xl font-bold">Manage Admins</h1>
-              <div className="flex items-center gap-2">
+              <h1 className="text-lg sm:text-xl md:text-2xl font-bold">Manage Users</h1>
+              {/* <div className="flex items-center gap-2">
                 <Dialog
                   open={isAddHostelOpen}
                   onOpenChange={setIsAddHostelOpen}
@@ -275,7 +274,7 @@ export default function AdminAdmins() {
                     </DialogFooter>
                   </DialogContent>
                 </Dialog>
-              </div>
+              </div> */}
             </div>
 
             <motion.div
@@ -287,9 +286,9 @@ export default function AdminAdmins() {
                 <CardHeader className="pb-2">
                   <div className="flex items-center justify-between">
                     <div>
-                      <CardTitle>All Admins</CardTitle>
+                      <CardTitle>All Users</CardTitle>
                       <CardDescription>
-                        Manage and monitor all registered admins
+                        Manage and monitor all registered Users
                       </CardDescription>
                     </div>
                   </div>
@@ -300,7 +299,7 @@ export default function AdminAdmins() {
                       <Search className="absolute left-2 top-2.5 h-4 w-4 text-gray-400" />
                       <Input
                         type="search"
-                        placeholder="Search admins..."
+                        placeholder="Search Users..."
                         className="pl-8"
                         value={searchTerm}
                         onChange={(e) => {
@@ -309,7 +308,7 @@ export default function AdminAdmins() {
                       />
                     </div>
 
-                    <div className="flex flex-col sm:flex-row items-start sm:items-center gap-2 w-full sm:w-auto">
+                    {/* <div className="flex flex-col sm:flex-row items-start sm:items-center gap-2 w-full sm:w-auto">
                       <Button
                         variant="outline"
                         size="sm"
@@ -345,7 +344,7 @@ export default function AdminAdmins() {
                           </TabsTrigger>
                         </TabsList>
                       </Tabs>
-                    </div>
+                    </div> */}
                   </div>
 
                   <div className="overflow-x-auto">
@@ -361,15 +360,15 @@ export default function AdminAdmins() {
                           <th className="text-left py-3 px-4 font-medium text-gray-500">
                             Phone
                           </th>
-                          <th className="text-left py-3 px-4 font-medium text-gray-500">
+                          {/* <th className="text-left py-3 px-4 font-medium text-gray-500">
                             Role
-                          </th>
-                          <th className="text-left py-3 px-4 font-medium text-gray-500">
+                          </th> */}
+                          {/* <th className="text-left py-3 px-4 font-medium text-gray-500">
                             Status
-                          </th>
-                          <th className="text-left py-3 px-4 font-medium text-gray-500">
+                          </th> */}
+                          {/* <th className="text-left py-3 px-4 font-medium text-gray-500">
                             Actions
-                          </th>
+                          </th> */}
                         </tr>
                       </thead>
                       <tbody>
@@ -387,8 +386,8 @@ export default function AdminAdmins() {
                             </td>
                             <td className="py-3 px-4">{admin.email}</td>
                             <td className="py-3 px-4">{admin.phone}</td>
-                            <td className="py-3 px-4">{admin.role}</td>
-                            <td className="py-3 px-4">
+                            {/* <td className="py-3 px-4">{admin.role}</td> */}
+                            {/* <td className="py-3 px-4">
                               <Badge
                                 variant={
                                   admin.isActive ? "success" : "secondary"
@@ -396,8 +395,8 @@ export default function AdminAdmins() {
                               >
                                 {admin.isActive ? "Active" : "Inactive"}
                               </Badge>
-                            </td>
-                            <td className="py-3 px-4">
+                            </td> */}
+                            {/* <td className="py-3 px-4">
                               <DropdownMenu>
                                 <DropdownMenuTrigger asChild>
                                   <Button
@@ -440,7 +439,7 @@ export default function AdminAdmins() {
                                   </DropdownMenuItem>
                                 </DropdownMenuContent>
                               </DropdownMenu>
-                            </td>
+                            </td> */}
                           </tr>
                         ))}
                       </tbody>

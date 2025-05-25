@@ -1,15 +1,41 @@
-"use client"
+"use client";
 
-import { useState } from "react"
-import { motion } from "framer-motion"
-import { CalendarIcon, ChevronDown, Download, Eye, Filter, MoreHorizontal, Search, Trash2 } from "lucide-react"
-import { Bar, BarChart, CartesianGrid, ResponsiveContainer, Tooltip, XAxis, YAxis } from "recharts"
+import { useState } from "react";
+import { motion } from "framer-motion";
+import {
+  CalendarIcon,
+  CheckCircle,
+  ChevronDown,
+  ChevronLeft,
+  ChevronRight,
+  Download,
+  Eye,
+  Filter,
+  MoreHorizontal,
+  Search,
+  Trash2,
+} from "lucide-react";
+import {
+  Bar,
+  BarChart,
+  CartesianGrid,
+  ResponsiveContainer,
+  Tooltip,
+  XAxis,
+  YAxis,
+} from "recharts";
 
-import { Sidebar } from "@/components/Sidebar"
-import { Badge } from "@/components/ui/badge"
-import { Button } from "@/components/ui/button"
-import { Calendar } from "@/components/ui/calendar"
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card"
+import { Sidebar } from "@/components/Sidebar";
+import { Badge } from "@/components/ui/badge";
+import { Button } from "@/components/ui/button";
+import { Calendar } from "@/components/ui/calendar";
+import {
+  Card,
+  CardContent,
+  CardDescription,
+  CardHeader,
+  CardTitle,
+} from "@/components/ui/card";
 import {
   Dialog,
   DialogContent,
@@ -17,48 +43,137 @@ import {
   DialogFooter,
   DialogHeader,
   DialogTitle,
-} from "@/components/ui/dialog"
-import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger } from "@/components/ui/dropdown-menu"
-import { Input } from "@/components/ui/input"
-import { Label } from "@/components/ui/label"
-import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover"
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select"
-import { Tabs, TabsList, TabsTrigger } from "@/components/ui/tabs"
+} from "@/components/ui/dialog";
+import {
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuTrigger,
+} from "@/components/ui/dropdown-menu";
+import { Input } from "@/components/ui/input";
+import { Label } from "@/components/ui/label";
+import {
+  Popover,
+  PopoverContent,
+  PopoverTrigger,
+} from "@/components/ui/popover";
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select";
+import { Tabs, TabsList, TabsTrigger } from "@/components/ui/tabs";
+import {
+  useGetAllAdminbookingQuery,
+  useGetAllOwnerbookingQuery,
+  useUpdatebookingMutation,
+} from "@/app/service/bookings";
 
 const bookingsByDayData = [
-  { day: "Mon", bookings: 3 },
-  { day: "Tue", bookings: 2 },
-  { day: "Wed", bookings: 4 },
-  { day: "Thu", bookings: 5 },
-  { day: "Fri", bookings: 7 },
-  { day: "Sat", bookings: 8 },
-  { day: "Sun", bookings: 6 },
-]
+  { day: "Mon", bookings: 12 },
+  { day: "Tue", bookings: 8 },
+  { day: "Wed", bookings: 15 },
+  { day: "Thu", bookings: 18 },
+  { day: "Fri", bookings: 25 },
+  { day: "Sat", bookings: 32 },
+  { day: "Sun", bookings: 20 },
+];
 
 export default function OwnerBookings() {
-  const [isViewBookingOpen, setIsViewBookingOpen] = useState(false)
-  const [selectedBooking, setSelectedBooking] = useState(null)
-  const [date, setDate] = useState(new Date())
+  const [isViewBookingOpen, setIsViewBookingOpen] = useState(false);
+  const [selectedBooking, setSelectedBooking] = useState(null);
+  const [searchTerm, setSearchTerm] = useState("");
+  const [statusFilter, setStatusFilter] = useState("all");
 
-  const handleViewBooking = (booking) => {
-    setSelectedBooking(booking)
-    setIsViewBookingOpen(true)
-  }
+  const [date, setDate] = useState(new Date());
+  const [currentPage, setCurrentPage] = useState(1);
+
+  const itemsPerPage = 10;
+
+  // const handleViewBooking = (booking) => {
+  //   setSelectedBooking(booking);
+  //   setIsViewBookingOpen(true);
+  // };
+
+
+ const owner = JSON.parse(localStorage.getItem("owner"));
+    const  ownerId = owner?.ownerDetails?.role == "staff" ?  owner?.ownerDetails?.ownerId : owner?.ownerDetails?._id ;
+    
+
+  const { data, isError, isLoading, refetch } =
+    useGetAllOwnerbookingQuery(ownerId);
+  const [updatebooking, { isLoading: isPosting }] = useUpdatebookingMutation();
+
+  if (isLoading) return <h1>Loading...</h1>;
+  if (isError || !Array.isArray(data))
+    return <h1>Oops! Something went wrong.</h1>;
+
+  // searching
+
+const today = new Date();
+today.setHours(0, 0, 0, 0); 
+
+const selectedDate = date ? new Date(date) : today;
+selectedDate.setHours(0, 0, 0, 0); 
+
+const nextDate = new Date(selectedDate);
+nextDate.setDate(nextDate.getDate() + 1); 
+
+const filteredUsers = data
+  ?.filter((booking) =>
+    booking.hostelId?.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
+    booking.userId?.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
+    booking.roomId?.roomType.toLowerCase().includes(searchTerm.toLowerCase())
+  )
+  ?.filter((booking) => {
+    if (statusFilter === "all") return true;
+    if (statusFilter === "pending") return booking.status === "pending";
+    if (statusFilter === "confirmed") return booking.status === "confirmed";
+    if (statusFilter === "cancelled") return booking.status === "cancelled";
+    return true;
+  })
+  ?.filter((booking) => {
+    const created = new Date(booking.createdAt);
+    return created >= selectedDate && created < nextDate;
+  });
+
+  // Calculate pagination
+  const totalPages = Math.ceil(filteredUsers.length / itemsPerPage);
+  const startIndex = (currentPage - 1) * itemsPerPage;
+  const paginatedBookings = filteredUsers.slice(
+    startIndex,
+    startIndex + itemsPerPage
+  );
+
+  //  block & unblock admin
+  const handleBooking = async (id, status) => {
+    try {
+      const response = await updatebooking({
+        id,
+        updatebooking: { status },
+      }).unwrap();
+      if (response?.status === 200) {
+        refetch();
+      }
+    } catch (error) {
+      console.error("Failed to bookin status:", error);
+    }
+  };
 
   return (
     <div className="flex h-screen bg-gray-50">
-      <Sidebar role="owner" />
+      <Sidebar role="admin" />
 
       <div className="flex-1 flex flex-col overflow-hidden">
         <main className="flex-1 overflow-y-auto p-6">
           <div className="max-w-7xl mx-auto space-y-6">
-            <div className="flex items-center justify-between">
-              <h1 className="text-2xl font-bold">Manage Bookings</h1>
+            <div className="flex items-center justify-between mt-10">
+              <h1 className="text-lg sm:text-xl md:text-2xl font-bold">
+                Manage Bookings
+              </h1>
               <div className="flex items-center gap-2">
-                <Button variant="outline" size="sm" className="gap-2">
-                  <Download className="h-4 w-4" />
-                  Export
-                </Button>
                 <Popover>
                   <PopoverTrigger asChild>
                     <Button variant="outline" size="sm" className="gap-2">
@@ -67,81 +182,16 @@ export default function OwnerBookings() {
                     </Button>
                   </PopoverTrigger>
                   <PopoverContent className="w-auto p-0" align="end">
-                    <Calendar mode="single" selected={date} onSelect={setDate} initialFocus />
+                    <Calendar
+                      mode="single"
+                      selected={date}
+                      onSelect={setDate}
+                      initialFocus
+                    />
                   </PopoverContent>
                 </Popover>
               </div>
             </div>
-
-            <motion.div
-              initial={{ opacity: 0, y: 20 }}
-              animate={{ opacity: 1, y: 0 }}
-              transition={{ duration: 0.5 }}
-              className="grid grid-cols-1 md:grid-cols-3 gap-6"
-            >
-              <Card>
-                <CardHeader className="pb-2">
-                  <CardTitle className="text-2xl">18</CardTitle>
-                  <CardDescription>Active Bookings</CardDescription>
-                </CardHeader>
-                <CardContent>
-                  <div className="text-sm text-red-600 font-medium">-2 from last month</div>
-                </CardContent>
-              </Card>
-
-              <Card>
-                <CardHeader className="pb-2">
-                  <CardTitle className="text-2xl">$8,245</CardTitle>
-                  <CardDescription>Total Revenue</CardDescription>
-                </CardHeader>
-                <CardContent>
-                  <div className="text-sm text-green-600 font-medium">+12% from last month</div>
-                </CardContent>
-              </Card>
-
-              <Card>
-                <CardHeader className="pb-2">
-                  <CardTitle className="text-2xl">78%</CardTitle>
-                  <CardDescription>Average Occupancy</CardDescription>
-                </CardHeader>
-                <CardContent>
-                  <div className="text-sm text-green-600 font-medium">+5% from last month</div>
-                </CardContent>
-              </Card>
-            </motion.div>
-
-            <motion.div
-              initial={{ opacity: 0, y: 20 }}
-              animate={{ opacity: 1, y: 0 }}
-              transition={{ duration: 0.5, delay: 0.2 }}
-            >
-              <Card>
-                <CardHeader>
-                  <CardTitle>Bookings by Day</CardTitle>
-                  <CardDescription>Number of bookings per day this week</CardDescription>
-                </CardHeader>
-                <CardContent>
-                  <div className="h-80">
-                    <ResponsiveContainer width="100%" height="100%">
-                      <BarChart data={bookingsByDayData} margin={{ top: 20, right: 20, bottom: 20, left: 20 }}>
-                        <CartesianGrid strokeDasharray="3 3" stroke="#f0f0f0" />
-                        <XAxis dataKey="day" />
-                        <YAxis />
-                        <Tooltip
-                          contentStyle={{
-                            backgroundColor: "white",
-                            borderRadius: "8px",
-                            boxShadow: "0 4px 12px rgba(0, 0, 0, 0.1)",
-                            border: "none",
-                          }}
-                        />
-                        <Bar dataKey="bookings" fill="#f97316" radius={[4, 4, 0, 0]} />
-                      </BarChart>
-                    </ResponsiveContainer>
-                  </div>
-                </CardContent>
-              </Card>
-            </motion.div>
 
             <motion.div
               initial={{ opacity: 0, y: 20 }}
@@ -153,177 +203,189 @@ export default function OwnerBookings() {
                   <div className="flex items-center justify-between">
                     <div>
                       <CardTitle>All Bookings</CardTitle>
-                      <CardDescription>Manage all bookings across your hostels</CardDescription>
+                      <CardDescription>
+                        Manage all bookings across all hostels
+                      </CardDescription>
                     </div>
-                    <Tabs defaultValue="all" className="w-[400px]">
-                      <TabsList>
-                        <TabsTrigger value="all">All</TabsTrigger>
-                        <TabsTrigger value="confirmed">Confirmed</TabsTrigger>
-                        <TabsTrigger value="pending">Pending</TabsTrigger>
-                        <TabsTrigger value="cancelled">Cancelled</TabsTrigger>
-                      </TabsList>
-                    </Tabs>
                   </div>
                 </CardHeader>
                 <CardContent>
-                  <div className="flex items-center justify-between mb-6">
-                    <div className="relative w-64">
+                  <div className="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between mb-6">
+                    <div className="relative w-full sm:w-64">
                       <Search className="absolute left-2 top-2.5 h-4 w-4 text-gray-400" />
-                      <Input placeholder="Search bookings..." className="pl-8" />
+                      <Input
+                        type="search"
+                        placeholder="Search staffs..."
+                        className="pl-8"
+                        value={searchTerm}
+                        onChange={(e) => {
+                          setSearchTerm(e.target.value);
+                        }}
+                      />
                     </div>
-                    <div className="flex items-center gap-2">
-                      <Button variant="outline" size="sm" className="gap-2">
+
+                    <div className="flex flex-col sm:flex-row items-start sm:items-center gap-2 w-full sm:w-auto">
+                      <Button
+                        variant="outline"
+                        size="sm"
+                        className="gap-2 w-full sm:w-auto"
+                      >
                         <Filter className="h-4 w-4" />
                         Filter
                         <ChevronDown className="h-3 w-3 opacity-50" />
                       </Button>
-                      <Select defaultValue="newest">
-                        <SelectTrigger className="w-[180px]">
-                          <SelectValue placeholder="Sort by" />
-                        </SelectTrigger>
-                        <SelectContent>
-                          <SelectItem value="newest">Newest First</SelectItem>
-                          <SelectItem value="oldest">Oldest First</SelectItem>
-                          <SelectItem value="check-in">Check-in Date</SelectItem>
-                          <SelectItem value="check-out">Check-out Date</SelectItem>
-                          <SelectItem value="price-high">Price (High to Low)</SelectItem>
-                          <SelectItem value="price-low">Price (Low to High)</SelectItem>
-                        </SelectContent>
-                      </Select>
+
+                      <Tabs
+                        value={statusFilter}
+                        onValueChange={setStatusFilter}
+                      >
+                        <TabsList className="w-full sm:w-auto">
+                          <TabsTrigger
+                            className="cursor-pointer w-full sm:w-auto"
+                            value="all"
+                          >
+                            All
+                          </TabsTrigger>
+                          <TabsTrigger
+                            className="cursor-pointer w-full sm:w-auto"
+                            value="pending"
+                          >
+                            Pending
+                          </TabsTrigger>
+                          <TabsTrigger
+                            className="cursor-pointer w-full sm:w-auto"
+                            value="confirmed"
+                          >
+                            Confirmed
+                          </TabsTrigger>
+                          <TabsTrigger
+                            className="cursor-pointer w-full sm:w-auto"
+                            value="cancelled"
+                          >
+                            Cancelled
+                          </TabsTrigger>
+                        </TabsList>
+                      </Tabs>
                     </div>
                   </div>
-
                   <div className="overflow-x-auto">
                     <table className="w-full">
                       <thead>
                         <tr className="border-b">
-                          <th className="text-left py-3 px-4 font-medium text-gray-500">Booking ID</th>
-                          <th className="text-left py-3 px-4 font-medium text-gray-500">Guest</th>
-                          <th className="text-left py-3 px-4 font-medium text-gray-500">Hostel</th>
-                          <th className="text-left py-3 px-4 font-medium text-gray-500">Room Type</th>
-                          <th className="text-left py-3 px-4 font-medium text-gray-500">Check In</th>
-                          <th className="text-left py-3 px-4 font-medium text-gray-500">Check Out</th>
-                          <th className="text-left py-3 px-4 font-medium text-gray-500">Amount</th>
-                          <th className="text-left py-3 px-4 font-medium text-gray-500">Status</th>
-                          <th className="text-left py-3 px-4 font-medium text-gray-500">Actions</th>
+                          <th className="text-left py-3 px-4 font-medium text-gray-500">
+                            Guest
+                          </th>
+                          <th className="text-left py-3 px-4 font-medium text-gray-500">
+                            Hostel
+                          </th>
+                          <th className="text-left py-3 px-4 font-medium text-gray-500">
+                            Room Type
+                          </th>
+                          <th className="text-left py-3 px-4 font-medium text-gray-500">
+                            Check In
+                          </th>
+                          <th className="text-left py-3 px-4 font-medium text-gray-500">
+                            Check Out
+                          </th>
+                          <th className="text-left py-3 px-4 font-medium text-gray-500">
+                            Amount
+                          </th>
+                          <th className="text-left py-3 px-4 font-medium text-gray-500">
+                            Status
+                          </th>
+                          <th className="text-left py-3 px-4 font-medium text-gray-500">
+                            Actions
+                          </th>
                         </tr>
                       </thead>
                       <tbody>
-                        {[
-                          {
-                            id: "B-1234",
-                            guest: "John Smith",
-                            email: "john.smith@example.com",
-                            phone: "+1 (555) 123-4567",
-                            hostel: "Sunset Beach Hostel",
-                            roomType: "Deluxe Private Double",
-                            checkIn: "May 12, 2025",
-                            checkOut: "May 15, 2025",
-                            status: "Confirmed",
-                            amount: "$240",
-                            paymentMethod: "Credit Card",
-                            specialRequests: "Late check-in",
-                          },
-                          {
-                            id: "B-1235",
-                            guest: "Emma Johnson",
-                            email: "emma.johnson@example.com",
-                            phone: "+1 (555) 234-5678",
-                            hostel: "Downtown Backpackers",
-                            roomType: "4-Bed Mixed Dorm",
-                            checkIn: "May 15, 2025",
-                            checkOut: "May 18, 2025",
-                            status: "Pending",
-                            amount: "$90",
-                            paymentMethod: "PayPal",
-                            specialRequests: "Bottom bunk",
-                          },
-                          {
-                            id: "B-1236",
-                            guest: "Michael Brown",
-                            email: "michael.brown@example.com",
-                            phone: "+1 (555) 345-6789",
-                            hostel: "Mountain View Lodge",
-                            roomType: "Mountain View Suite",
-                            checkIn: "May 20, 2025",
-                            checkOut: "May 25, 2025",
-                            status: "Confirmed",
-                            amount: "$450",
-                            paymentMethod: "Credit Card",
-                            specialRequests: "Early check-in",
-                          },
-                          {
-                            id: "B-1237",
-                            guest: "Sarah Wilson",
-                            email: "sarah.wilson@example.com",
-                            phone: "+1 (555) 456-7890",
-                            hostel: "Sunset Beach Hostel",
-                            roomType: "Standard Private Single",
-                            checkIn: "May 22, 2025",
-                            checkOut: "May 24, 2025",
-                            status: "Confirmed",
-                            amount: "$130",
-                            paymentMethod: "Credit Card",
-                            specialRequests: "None",
-                          },
-                          {
-                            id: "B-1238",
-                            guest: "David Lee",
-                            email: "david.lee@example.com",
-                            phone: "+1 (555) 567-8901",
-                            hostel: "Downtown Backpackers",
-                            roomType: "8-Bed Mixed Dorm",
-                            checkIn: "May 25, 2025",
-                            checkOut: "May 28, 2025",
-                            status: "Pending",
-                            amount: "$66",
-                            paymentMethod: "PayPal",
-                            specialRequests: "None",
-                          },
-                        ].map((booking, index) => (
-                          <tr key={booking.id} className="border-b">
-                            <td className="py-3 px-4 font-medium">{booking.id}</td>
-                            <td className="py-3 px-4">{booking.guest}</td>
-                            <td className="py-3 px-4">{booking.hostel}</td>
-                            <td className="py-3 px-4">{booking.roomType}</td>
-                            <td className="py-3 px-4">{booking.checkIn}</td>
-                            <td className="py-3 px-4">{booking.checkOut}</td>
-                            <td className="py-3 px-4 font-medium">{booking.amount}</td>
+                        {paginatedBookings?.map((booking) => (
+                          <tr key={booking._id} className="border-b">
                             <td className="py-3 px-4">
-                              <Badge
-                                variant={
-                                  booking.status === "Confirmed"
-                                    ? "success"
-                                    : booking.status === "Pending"
-                                      ? "outline"
-                                      : "destructive"
-                                }
-                              >
-                                {booking.status}
-                              </Badge>
+                              {booking?.userId?.name}
                             </td>
                             <td className="py-3 px-4">
+                              {booking?.hostelId?.name}
+                            </td>
+                            <td className="py-3 px-4">
+                              {booking?.roomId?.roomType}
+                            </td>
+                            <td className="py-3 px-4">
+                              {new Date(booking.checkInDate).toLocaleDateString(
+                                "en-US",
+                                {
+                                  year: "numeric",
+                                  month: "long",
+                                  day: "numeric",
+                                }
+                              )}
+                            </td>
+                            <td className="py-3 px-4">
+                              {new Date(
+                                booking?.checkOutDate
+                              ).toLocaleDateString("en-US", {
+                                year: "numeric",
+                                month: "long",
+                                day: "numeric",
+                              })}
+                            </td>
+                            <td className="py-3 px-4 font-medium">
+                              {booking?.roomId.price}
+                            </td>
+                            <td className="py-3 px-4">
+                              <Badge
+                                className={`px-2 py-1 rounded text-sm font-medium ${
+                                  booking.status === "confirmed"
+                                    ? "bg-green-100 text-green-800"
+                                    : booking.status === "pending"
+                                    ? "bg-yellow-100 text-yellow-800"
+                                    : "bg-red-100 text-red-800"
+                                }`}
+                              >
+                                {booking.status.charAt(0).toUpperCase() +
+                                  booking.status.slice(1)}
+                              </Badge>
+                            </td>
+
+                            <td className="py-3 px-4">
                               <div className="flex items-center gap-2">
-                                <Button
+                                {/* <Button
                                   variant="ghost"
                                   size="icon"
                                   className="h-8 w-8"
                                   onClick={() => handleViewBooking(booking)}
                                 >
                                   <Eye className="h-4 w-4" />
-                                </Button>
+                                </Button> */}
                                 <DropdownMenu>
                                   <DropdownMenuTrigger asChild>
-                                    <Button variant="ghost" size="icon" className="h-8 w-8">
+                                    <Button
+                                      variant="ghost"
+                                      size="icon"
+                                      className="h-8 w-8"
+                                    >
                                       <MoreHorizontal className="h-4 w-4" />
                                     </Button>
                                   </DropdownMenuTrigger>
                                   <DropdownMenuContent align="end">
-                                    <DropdownMenuItem>Edit Booking</DropdownMenuItem>
-                                    <DropdownMenuItem>Send Reminder</DropdownMenuItem>
-                                    <DropdownMenuItem className="text-red-600">
+                                    <DropdownMenuItem
+                                      onClick={() =>
+                                        handleBooking(booking?._id, "confirmed")
+                                      }
+                                    >
+                                      <CheckCircle />
+                                      {isPosting
+                                        ? "  Confirming..."
+                                        : "Confirmed"}
+                                    </DropdownMenuItem>
+                                    <DropdownMenuItem
+                                      className="text-red-600"
+                                      onClick={() =>
+                                        handleBooking(booking?._id, "cancelled")
+                                      }
+                                    >
                                       <Trash2 className="h-4 w-4 mr-2" />
-                                      Cancel Booking
+                                      {isPosting ? "Canceling..." : "Cancel"}
                                     </DropdownMenuItem>
                                   </DropdownMenuContent>
                                 </DropdownMenu>
@@ -335,95 +397,54 @@ export default function OwnerBookings() {
                     </table>
                   </div>
 
-                  <div className="flex items-center justify-between mt-6">
-                    <div className="text-sm text-gray-500">Showing 5 of 18 bookings</div>
-                    <div className="flex items-center gap-2">
-                      <Button variant="outline" size="sm" disabled>
-                        Previous
-                      </Button>
-                      <Button variant="outline" size="sm" className="bg-gray-100">
-                        1
-                      </Button>
-                      <Button variant="outline" size="sm">
-                        2
-                      </Button>
-                      <Button variant="outline" size="sm">
-                        Next
-                      </Button>
+                  {/* Pagination */}
+                  {filteredUsers.length > 0 && (
+                    <div className="flex items-center justify-between">
+                      <div className="text-sm text-muted-foreground">
+                        Showing{" "}
+                        <span className="font-medium">{startIndex + 1}</span> to{" "}
+                        <span className="font-medium">
+                          {Math.min(
+                            startIndex + itemsPerPage,
+                            filteredUsers.length
+                          )}
+                        </span>{" "}
+                        of{" "}
+                        <span className="font-medium">
+                          {filteredUsers.length}
+                        </span>{" "}
+                        admins
+                      </div>
+                      <div className="flex items-center gap-2">
+                        <Button
+                          variant="outline"
+                          size="icon"
+                          onClick={() =>
+                            setCurrentPage((prev) => Math.max(prev - 1, 1))
+                          }
+                          disabled={currentPage === 1}
+                          className={"cursor-pointer"}
+                        >
+                          <ChevronLeft className="h-4 w-4" />
+                          <span className="sr-only">Previous page</span>
+                        </Button>
+                        <Button
+                          variant="outline"
+                          size="icon"
+                          onClick={() =>
+                            setCurrentPage((prev) =>
+                              Math.min(prev + 1, totalPages)
+                            )
+                          }
+                          disabled={currentPage === totalPages}
+                          className={"cursor-pointer"}
+                        >
+                          <ChevronRight className="h-4 w-4" />
+                          <span className="sr-only">Next page</span>
+                        </Button>
+                      </div>
                     </div>
-                  </div>
-                </CardContent>
-              </Card>
-            </motion.div>
-
-            <motion.div
-              initial={{ opacity: 0, y: 20 }}
-              animate={{ opacity: 1, y: 0 }}
-              transition={{ duration: 0.5, delay: 0.4 }}
-            >
-              <Card>
-                <CardHeader>
-                  <CardTitle>Upcoming Check-ins</CardTitle>
-                  <CardDescription>Guests arriving in the next 7 days</CardDescription>
-                </CardHeader>
-                <CardContent>
-                  <div className="overflow-x-auto">
-                    <table className="w-full">
-                      <thead>
-                        <tr className="border-b">
-                          <th className="text-left py-3 px-4 font-medium text-gray-500">Guest</th>
-                          <th className="text-left py-3 px-4 font-medium text-gray-500">Hostel</th>
-                          <th className="text-left py-3 px-4 font-medium text-gray-500">Room Type</th>
-                          <th className="text-left py-3 px-4 font-medium text-gray-500">Check In</th>
-                          <th className="text-left py-3 px-4 font-medium text-gray-500">Check Out</th>
-                          <th className="text-left py-3 px-4 font-medium text-gray-500">Special Requests</th>
-                          <th className="text-left py-3 px-4 font-medium text-gray-500">Actions</th>
-                        </tr>
-                      </thead>
-                      <tbody>
-                        {[
-                          {
-                            guest: "John Smith",
-                            hostel: "Sunset Beach Hostel",
-                            roomType: "Deluxe Private Double",
-                            checkIn: "May 12, 2025",
-                            checkOut: "May 15, 2025",
-                            requests: "Late check-in",
-                          },
-                          {
-                            guest: "Emma Johnson",
-                            hostel: "Downtown Backpackers",
-                            roomType: "4-Bed Mixed Dorm",
-                            checkIn: "May 15, 2025",
-                            checkOut: "May 18, 2025",
-                            requests: "Bottom bunk",
-                          },
-                          {
-                            guest: "Michael Brown",
-                            hostel: "Mountain View Lodge",
-                            roomType: "Mountain View Suite",
-                            checkIn: "May 20, 2025",
-                            checkOut: "May 25, 2025",
-                            requests: "Early check-in",
-                          },
-                        ].map((checkin, index) => (
-                          <tr key={index} className="border-b">
-                            <td className="py-3 px-4 font-medium">{checkin.guest}</td>
-                            <td className="py-3 px-4">{checkin.hostel}</td>
-                            <td className="py-3 px-4">{checkin.roomType}</td>
-                            <td className="py-3 px-4">{checkin.checkIn}</td>
-                            <td className="py-3 px-4">{checkin.checkOut}</td>
-                            <td className="py-3 px-4">{checkin.requests}</td>
-                            <td className="py-3 px-4">
-                              <Button size="sm" variant="outline">
-                                Details
-                              </Button>
-                            </td>
-                          </tr>
-                        ))}
-                      </tbody>
-                    </table>
-                  </div>
+                  )}
                 </CardContent>
               </Card>
             </motion.div>
@@ -431,12 +452,14 @@ export default function OwnerBookings() {
         </main>
       </div>
 
-      {selectedBooking && (
+      {/* {selectedBooking && (
         <Dialog open={isViewBookingOpen} onOpenChange={setIsViewBookingOpen}>
           <DialogContent className="sm:max-w-[600px]">
             <DialogHeader>
               <DialogTitle>Booking Details</DialogTitle>
-              <DialogDescription>Booking ID: {selectedBooking.id}</DialogDescription>
+              <DialogDescription>
+                Booking ID: {selectedBooking.id}
+              </DialogDescription>
             </DialogHeader>
             <div className="grid gap-4 py-4">
               <div className="grid grid-cols-2 gap-4">
@@ -492,8 +515,8 @@ export default function OwnerBookings() {
                         selectedBooking.status === "Confirmed"
                           ? "success"
                           : selectedBooking.status === "Pending"
-                            ? "outline"
-                            : "destructive"
+                          ? "outline"
+                          : "destructive"
                       }
                     >
                       {selectedBooking.status}
@@ -507,14 +530,19 @@ export default function OwnerBookings() {
               </div>
             </div>
             <DialogFooter>
-              <Button variant="outline" onClick={() => setIsViewBookingOpen(false)}>
+              <Button
+                variant="outline"
+                onClick={() => setIsViewBookingOpen(false)}
+              >
                 Close
               </Button>
-              <Button className="bg-orange-600 hover:bg-orange-700">Edit Booking</Button>
+              <Button className="bg-rose-600 hover:bg-rose-700">
+                Edit Booking
+              </Button>
             </DialogFooter>
           </DialogContent>
         </Dialog>
-      )}
+      )} */}
     </div>
-  )
+  );
 }

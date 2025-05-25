@@ -65,6 +65,7 @@ import {
   useBlockownerMutation,
   useDeleteownerMutation,
   useGetAllownerQuery,
+  useGetAllSuperAdminownerQuery,
 } from "@/app/service/owner";
 import { useNavigate } from "react-router-dom";
 
@@ -88,7 +89,12 @@ export default function AdminOwners() {
   const itemsPerPage = 10;
   const navigate = useNavigate();
 
-  const { data, isError, isLoading, refetch } = useGetAllownerQuery();
+
+    const admin = JSON.parse(localStorage.getItem("admin"));
+
+    const  superAdminId = admin?.adminDetails?.role == "admin" ?  admin?.adminDetails?.superAdminId : admin?.adminDetails?._id ;
+  
+  const { data, isError, isLoading, refetch } =   useGetAllSuperAdminownerQuery(superAdminId);
   const [deleteAdmin, { isLoading: isDeleting }] = useDeleteownerMutation();
   const [blockAdmin] = useBlockownerMutation();
   const [addNewAdmin, { isLoading: isPosting }] = useAddNewownerMutation();
@@ -142,6 +148,7 @@ export default function AdminOwners() {
         name,
         phone,
         role: "owner",
+         superAdminId
       }).unwrap();
 
       if (status === 201) {

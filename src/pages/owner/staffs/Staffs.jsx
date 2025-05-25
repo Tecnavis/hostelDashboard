@@ -7,7 +7,6 @@ import {
   ChevronDown,
   ChevronLeft,
   ChevronRight,
-  Download,
   Eye,
   EyeOff,
   Filter,
@@ -47,23 +46,16 @@ import {
 } from "@/components/ui/dropdown-menu";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
-import {
-  Select,
-  SelectContent,
-  SelectItem,
-  SelectTrigger,
-  SelectValue,
-} from "@/components/ui/select";
 import { Tabs, TabsList, TabsTrigger } from "@/components/ui/tabs";
-import { Textarea } from "@/components/ui/textarea";
 import {
-  useAddNewAdminMutation,
-  useBlockAdminMutation,
-  useDeleteAdminMutation,
-  useGetAllAdminQuery,
-} from "@/app/service/admin";
+  useAddNewownerMutation,
+  useBlockownerMutation,
+  useDeleteownerMutation,
+  useGetAllownerQuery,
+  useGetAllownerStaffQuery,
+} from "@/app/service/owner";
 
-export default function AdminAdmins() {
+export default function OwnerStaffs() {
   const [isAddHostelOpen, setIsAddHostelOpen] = useState(false);
   const [statusFilter, setStatusFilter] = useState("all");
   const [showPassword, setShowPassword] = useState(false);
@@ -75,12 +67,14 @@ export default function AdminAdmins() {
   const [currentPage, setCurrentPage] = useState(1);
   const itemsPerPage = 10;
 
-  const admin = JSON.parse(localStorage.getItem("admin"));
+  const owner = JSON.parse(localStorage.getItem("owner"));
 
-  const { data, isError, isLoading, refetch } = useGetAllAdminQuery(admin?.adminDetails?._id);
-  const [deleteAdmin, { isLoading: isDeleting }] = useDeleteAdminMutation();
-  const [blockAdmin] = useBlockAdminMutation();
-  const [addNewAdmin, { isLoading: isPosting }] = useAddNewAdminMutation();
+  const { data, isError, isLoading, refetch } =  useGetAllownerStaffQuery(
+    owner?.ownerDetails?._id
+  );
+  const [deleteowner, { isLoading: isDeleting }] = useDeleteownerMutation();
+  const [blockowner] = useBlockownerMutation();
+  const [addNewowner, { isLoading: isPosting }] = useAddNewownerMutation();
 
   if (isLoading) return <h1>Loading...</h1>;
   if (isError || !Array.isArray(data))
@@ -90,15 +84,15 @@ export default function AdminAdmins() {
 
   const filteredUsers = data
     ?.filter(
-      (admin) =>
-        admin.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
-        admin.email.toLowerCase().includes(searchTerm.toLowerCase()) ||
-        admin.phone.toLowerCase().includes(searchTerm.toLowerCase())
+      (staff) =>
+        staff.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
+        staff.email.toLowerCase().includes(searchTerm.toLowerCase()) ||
+        staff.phone.toLowerCase().includes(searchTerm.toLowerCase())
     )
-    ?.filter((admin) => {
+    ?.filter((staff) => {
       if (statusFilter === "all") return true;
-      if (statusFilter === "active") return admin.isActive;
-      if (statusFilter === "inactive") return !admin.isActive;
+      if (statusFilter === "active") return staff.isActive;
+      if (statusFilter === "inactive") return !staff.isActive;
       return true;
     });
 
@@ -121,13 +115,14 @@ export default function AdminAdmins() {
       return;
 
     try {
-      const { status } = await addNewAdmin({
+      const { status } = await addNewowner({
         email,
         password,
         name,
         phone,
-        superAdminId: admin?.adminDetails?._id,
-        role: "admin",
+        ownerId: owner?.ownerDetails?._id,
+        superAdminId: owner?.ownerDetails?.superAdminId,
+        role: "staff",
       }).unwrap();
       if (status === 201) {
         setEmail("");
@@ -138,7 +133,7 @@ export default function AdminAdmins() {
         refetch();
       }
     } catch (error) {
-      console.error("Admin create failed:", error);
+      console.error("Staff create failed:", error);
     }
   };
 
@@ -146,24 +141,24 @@ export default function AdminAdmins() {
 
   const handleDelete = async (id) => {
     try {
-      const { status } = await deleteAdmin(id).unwrap();
+      const { status } = await deleteowner(id).unwrap();
       if (status === 200) {
         refetch();
       }
     } catch (error) {
-      console.error("Failed to delete admin:", error);
+      console.error("Failed to delete staff:", error);
     }
   };
 
   //  block & unblock admin
   const handleBlocUnblock = async (id) => {
     try {
-      const { status } = await blockAdmin(id).unwrap();
+      const { status } = await blockowner(id).unwrap();
       if (status === 200) {
         refetch();
       }
     } catch (error) {
-      console.error("Failed to block admin:", error);
+      console.error("Failed to block staff:", error);
     }
   };
 
@@ -175,7 +170,9 @@ export default function AdminAdmins() {
         <main className="flex-1 overflow-y-auto p-6">
           <div className="max-w-7xl mx-auto space-y-6">
             <div className="flex items-center justify-between mt-10">
-              <h1 className="text-lg sm:text-xl md:text-2xl font-bold">Manage Admins</h1>
+              <h1 className="text-lg sm:text-xl md:text-2xl font-bold">
+                Manage Staffs
+              </h1>
               <div className="flex items-center gap-2">
                 <Dialog
                   open={isAddHostelOpen}
@@ -287,9 +284,9 @@ export default function AdminAdmins() {
                 <CardHeader className="pb-2">
                   <div className="flex items-center justify-between">
                     <div>
-                      <CardTitle>All Admins</CardTitle>
+                      <CardTitle>All Staffs</CardTitle>
                       <CardDescription>
-                        Manage and monitor all registered admins
+                        Manage and monitor all registered staffs
                       </CardDescription>
                     </div>
                   </div>
@@ -300,7 +297,7 @@ export default function AdminAdmins() {
                       <Search className="absolute left-2 top-2.5 h-4 w-4 text-gray-400" />
                       <Input
                         type="search"
-                        placeholder="Search admins..."
+                        placeholder="Search staffs..."
                         className="pl-8"
                         value={searchTerm}
                         onChange={(e) => {
@@ -373,28 +370,28 @@ export default function AdminAdmins() {
                         </tr>
                       </thead>
                       <tbody>
-                        {paginatedUsers?.map((admin) => (
-                          <tr key={admin._id} className="border-b">
+                        {paginatedUsers?.map((staff) => (
+                          <tr key={staff._id} className="border-b">
                             <td className="py-3 px-4">
                               <div className="flex items-center gap-3">
                                 <div className="h-10 w-10 bg-gray-100 rounded-md flex items-center justify-center">
                                   <Building className="h-5 w-5 text-gray-500" />
                                 </div>
                                 <span className="font-medium">
-                                  {admin.name}
+                                  {staff.name}
                                 </span>
                               </div>
                             </td>
-                            <td className="py-3 px-4">{admin.email}</td>
-                            <td className="py-3 px-4">{admin.phone}</td>
-                            <td className="py-3 px-4">{admin.role}</td>
+                            <td className="py-3 px-4">{staff.email}</td>
+                            <td className="py-3 px-4">{staff.phone}</td>
+                            <td className="py-3 px-4">{staff.role}</td>
                             <td className="py-3 px-4">
                               <Badge
                                 variant={
-                                  admin.isActive ? "success" : "secondary"
+                                  staff.isActive ? "success" : "secondary"
                                 }
                               >
-                                {admin.isActive ? "Active" : "Inactive"}
+                                {staff.isActive ? "Active" : "Inactive"}
                               </Badge>
                             </td>
                             <td className="py-3 px-4">
@@ -411,9 +408,9 @@ export default function AdminAdmins() {
                                 <DropdownMenuContent align="end">
                                   <DropdownMenuItem
                                     className={"cursor-pointer"}
-                                    onClick={() => handleBlocUnblock(admin._id)}
+                                    onClick={() => handleBlocUnblock(staff._id)}
                                   >
-                                    {admin.isActive ? (
+                                    {staff.isActive ? (
                                       <>
                                         <UserX className="h-4 w-4 mr-2" />
                                         Block
@@ -433,7 +430,7 @@ export default function AdminAdmins() {
                                   </DropdownMenuItem>
                                   <DropdownMenuItem
                                     className="text-red-600 cursor-pointer"
-                                    onClick={() => handleDelete(admin._id)}
+                                    onClick={() => handleDelete(staff._id)}
                                   >
                                     <Trash2 className="h-4 w-4 mr-2" />
                                     {isDeleting ? "Deleting..." : "Delete"}
@@ -463,7 +460,7 @@ export default function AdminAdmins() {
                         <span className="font-medium">
                           {filteredUsers.length}
                         </span>{" "}
-                        admins
+                        staffs
                       </div>
                       <div className="flex items-center gap-2">
                         <Button

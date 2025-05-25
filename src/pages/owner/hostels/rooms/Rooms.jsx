@@ -3,6 +3,7 @@
 import { useState } from "react";
 import { motion } from "framer-motion";
 import {
+  Bed,
   Building,
   ChevronDown,
   ChevronLeft,
@@ -46,49 +47,201 @@ import {
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Tabs, TabsList, TabsTrigger } from "@/components/ui/tabs";
-import { Textarea } from "@/components/ui/textarea";
-import {  useGetAllSuperAdminownerQuery } from "@/app/service/owner";
 import {
-  useAddNewhostelMutation,
-  useBlockhostelMutation,
-  useDeletehostelMutation,
-  useGetAllSuperAdminhostelQuery,
-} from "@/app/service/hostel";
-import { useNavigate } from "react-router-dom";
+  useAddNewroomMutation,
+  useBlockroomMutation,
+  useDeleteroomMutation,
+  useGetAllHostelRoomQuery,
+} from "@/app/service/room";
+import { useParams } from "react-router-dom";
+import { Switch } from "@radix-ui/react-switch";
 
-export default function AdminHostels() {
+export default function OwnerHostelsRooms() {
+  const rooms = [
+    {
+      id: 1,
+      name: "Deluxe Private Double",
+      hostel: "Sunset Beach Hostel",
+      type: "Private",
+      capacity: 2,
+      beds: "1 Queen Bed",
+      price: 85,
+      status: "Available",
+      amenities: [
+        "En-suite Bathroom",
+        "Air Conditioning",
+        "Sea View",
+        "TV",
+        "Mini Fridge",
+      ],
+      description:
+        "Spacious private room with a queen-sized bed and en-suite bathroom. Features a beautiful sea view.",
+      image: "/placeholder.svg?height=200&width=300",
+      occupancy: "75%",
+      bookings: 42,
+    },
+    {
+      id: 2,
+      name: "Standard Private Single",
+      hostel: "Sunset Beach Hostel",
+      type: "Private",
+      capacity: 1,
+      beds: "1 Single Bed",
+      price: 65,
+      status: "Available",
+      amenities: ["Shared Bathroom", "Air Conditioning", "Desk", "Locker"],
+      description:
+        "Cozy private room with a single bed. Shared bathroom facilities.",
+      image: "/placeholder.svg?height=200&width=300",
+      occupancy: "80%",
+      bookings: 38,
+    },
+    {
+      id: 3,
+      name: "4-Bed Mixed Dorm",
+      hostel: "Sunset Beach Hostel",
+      type: "Dorm",
+      capacity: 4,
+      beds: "4 Single Beds",
+      price: 30,
+      status: "Available",
+      amenities: [
+        "Shared Bathroom",
+        "Air Conditioning",
+        "Lockers",
+        "Reading Lights",
+      ],
+      description:
+        "Comfortable 4-bed mixed dorm with individual lockers and reading lights for each bed.",
+      image: "/placeholder.svg?height=200&width=300",
+      occupancy: "90%",
+      bookings: 65,
+    },
+    {
+      id: 4,
+      name: "6-Bed Female Dorm",
+      hostel: "Sunset Beach Hostel",
+      type: "Dorm",
+      capacity: 6,
+      beds: "6 Single Beds",
+      price: 25,
+      status: "Available",
+      amenities: [
+        "Shared Bathroom",
+        "Air Conditioning",
+        "Lockers",
+        "Reading Lights",
+        "Female Only",
+      ],
+      description:
+        "Female-only dorm with 6 single beds, individual lockers, and reading lights.",
+      image: "/placeholder.svg?height=200&width=300",
+      occupancy: "85%",
+      bookings: 58,
+    },
+    {
+      id: 5,
+      name: "Premium Private Double",
+      hostel: "Downtown Backpackers",
+      type: "Private",
+      capacity: 2,
+      beds: "1 Queen Bed",
+      price: 75,
+      status: "Available",
+      amenities: ["En-suite Bathroom", "Air Conditioning", "City View", "TV"],
+      description:
+        "Modern private room with a queen-sized bed and en-suite bathroom. Features a city view.",
+      image: "/placeholder.svg?height=200&width=300",
+      occupancy: "85%",
+      bookings: 45,
+    },
+    {
+      id: 6,
+      name: "8-Bed Mixed Dorm",
+      hostel: "Downtown Backpackers",
+      type: "Dorm",
+      capacity: 8,
+      beds: "8 Single Beds",
+      price: 22,
+      status: "Available",
+      amenities: [
+        "Shared Bathroom",
+        "Air Conditioning",
+        "Lockers",
+        "Reading Lights",
+      ],
+      description:
+        "Spacious 8-bed mixed dorm with individual lockers and reading lights for each bed.",
+      image: "/placeholder.svg?height=200&width=300",
+      occupancy: "95%",
+      bookings: 72,
+    },
+    {
+      id: 7,
+      name: "Mountain View Suite",
+      hostel: "Mountain View Lodge",
+      type: "Private",
+      capacity: 2,
+      beds: "1 King Bed",
+      price: 95,
+      status: "Available",
+      amenities: [
+        "En-suite Bathroom",
+        "Fireplace",
+        "Mountain View",
+        "TV",
+        "Mini Kitchen",
+      ],
+      description:
+        "Luxurious private suite with a king-sized bed, en-suite bathroom, and a fireplace. Features a stunning mountain view.",
+      image: "/placeholder.svg?height=200&width=300",
+      occupancy: "70%",
+      bookings: 32,
+    },
+    {
+      id: 8,
+      name: "4-Bed Mixed Dorm",
+      hostel: "Mountain View Lodge",
+      type: "Dorm",
+      capacity: 4,
+      beds: "4 Single Beds",
+      price: 35,
+      status: "Available",
+      amenities: ["Shared Bathroom", "Heating", "Lockers", "Reading Lights"],
+      description:
+        "Cozy 4-bed mixed dorm with individual lockers and reading lights for each bed.",
+      image: "/placeholder.svg?height=200&width=300",
+      occupancy: "60%",
+      bookings: 28,
+    },
+  ];
+
   const [isAddHostelOpen, setIsAddHostelOpen] = useState(false);
   const [statusFilter, setStatusFilter] = useState("all");
-  const [name, setName] = useState("");
-  const [phone, setPhone] = useState("");
-  const [location, setLocation] = useState({
-    street: "",
-    place: "",
-    pincode: "",
-  });
+  const [roomNumber, setRoomNumber] = useState("");
+  const [capacity, setCapacity] = useState("");
   const [selectedImages, setSelectedImages] = useState([]);
-  const [amenities, setAmenities] = useState([""]);
-  const [description, setDescription] = useState("");
-  const [category, setCategory] = useState("");
-  const [ownerId, setOwnerId] = useState("");
-  const [accommodationType, setAccommodationType] = useState("");
+  const [features, setFeatures] = useState([""]);
+  const [currentOccupancy, setCurrentOccupancy] = useState("");
   const [price, setPrice] = useState("");
+  const [roomType, setRoomType] = useState("");
+  const [payment, setPayment] = useState("");
+  const [charge, setCharge] = useState("");
+  const [gardianInfo, setGardianInfo] = useState({
+    name: "",
+    email: "",
+    phone: "",
+  });
+  const [visitTimes, setVisitTimes] = useState([""]);
   const [searchTerm, setSearchTerm] = useState("");
   const [currentPage, setCurrentPage] = useState(1);
   const itemsPerPage = 10;
-  const navigate = useNavigate();
+  const { id } = useParams();
 
-      const admin = JSON.parse(localStorage.getItem("admin"));
-
-    const  superAdminId = admin?.adminDetails?.role == "admin" ?  admin?.adminDetails?.superAdminId : admin?.adminDetails?._id ;
-
-
-
-  const { data, isError, isLoading, refetch } = useGetAllSuperAdminhostelQuery(superAdminId);
-  const [deletehostel, { isLoading: isDeleting }] = useDeletehostelMutation();
-  const [blockhostel] = useBlockhostelMutation();
-  const [addNewhostel, { isLoading: isPosting }] = useAddNewhostelMutation();
-  const { data: owners = [] } =  useGetAllSuperAdminownerQuery(superAdminId);
+  const { data, isError, isLoading, refetch } = useGetAllHostelRoomQuery(id);
+  const [deleteroom, { isLoading: isDeleting }] = useDeleteroomMutation();
+  const [blockroom] = useBlockroomMutation();
+  const [addNewroom, { isLoading: isPosting }] = useAddNewroomMutation();
 
   if (isLoading) return <h1>Loading...</h1>;
   if (isError || !Array.isArray(data))
@@ -97,16 +250,19 @@ export default function AdminHostels() {
   // searching
 
   const filteredUsers = data
-    ?.filter(
-      (hostel) =>
-        hostel?.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
-        hostel?.category.toLowerCase().includes(searchTerm.toLowerCase()) ||
-        hostel?.phone.toLowerCase().includes(searchTerm.toLowerCase()) ||
-        hostel?.ownerId?.name
-          .toLowerCase()
-          .includes(searchTerm.toLowerCase()) ||
-        hostel?.location?.place.toLowerCase().includes(searchTerm.toLowerCase())
-    )
+    .filter((room) => {
+      const price = String(room?.price || "").toLowerCase();
+      const roomNumber = String(room?.roomNumber || "").toLowerCase();
+      const hostelName = String(room?.hostelId?.name || "").toLowerCase();
+      const capacity = String(room?.capacity || "").toLowerCase();
+
+      return (
+        price.includes(searchTerm.toLowerCase()) ||
+        roomNumber.includes(searchTerm.toLowerCase()) ||
+        hostelName.includes(searchTerm.toLowerCase()) ||
+        capacity.includes(searchTerm.toLowerCase())
+      );
+    })
     ?.filter((user) => {
       if (statusFilter === "all") return true;
       if (statusFilter === "active") return user.isActive;
@@ -122,19 +278,34 @@ export default function AdminHostels() {
     startIndex + itemsPerPage
   );
 
-  const handleFacilities = (index, value) => {
-    const newAmenities = [...amenities];
-    newAmenities[index] = value;
-    setAmenities(newAmenities);
+  const handleFeatures = (index, value) => {
+    const newFeatures = [...features];
+    newFeatures[index] = value;
+    setFeatures(newFeatures);
   };
 
-  const addFacilities = () => {
-    setAmenities([...amenities, ""]);
+  const addFeatures = () => {
+    setFeatures([...features, ""]);
   };
 
-  const removeFacilities = (index) => {
-    const newAmenities = amenities.filter((_, i) => i !== index);
-    setAmenities(newAmenities);
+  const removeFeatures = (index) => {
+    const newFeatures = features.filter((_, i) => i !== index);
+    setFeatures(newFeatures);
+  };
+
+  const handleVisitTime = (index, value) => {
+    const newVisitTime = [...visitTimes];
+    newVisitTime[index] = value;
+    setVisitTimes(newVisitTime);
+  };
+
+  const addVisitTime = () => {
+    setVisitTimes([...visitTimes, ""]);
+  };
+
+  const removeVisitTime = (index) => {
+    const newVisitTime = visitTimes.filter((_, i) => i !== index);
+    setVisitTimes(newVisitTime);
   };
 
   // create  hostel
@@ -143,37 +314,37 @@ export default function AdminHostels() {
     e.preventDefault();
 
     if (
-      category.trim() === "" ||
+      roomNumber.trim() === "" ||
       selectedImages.length === 0 ||
-      ownerId.trim() === "" ||
-      description.trim() === "" ||
-      name.trim() === "" ||
-      phone.trim() === "" ||
-      location.street.trim() === "" ||
-      location.place.trim() === "" ||
-      location.pincode.trim() === "" ||
-      accommodationType.trim() === "" ||
-      price.trim() === ""
+      price.trim() === "" ||
+      capacity.trim() === "" ||
+      currentOccupancy.trim() === ""
     ) {
       return;
     }
 
     // Prepare FormData
     const formData = new FormData();
-    formData.append("ownerId", ownerId);
-    formData.append("category", category);
-    formData.append("description", description);
-    formData.append("name", name);
-    formData.append("phone", phone);
-    formData.append("accommodationType", accommodationType);
+    formData.append("hostelId", id);
+    formData.append("roomNumber", roomNumber);
+    formData.append("capacity", capacity);
     formData.append("price", price);
-    formData.append("location[street]", location.street);
-    formData.append("location[place]", location.place);
-    formData.append("location[pincode]", location.pincode);
-    formData.append("superAdminId", superAdminId)
-    amenities.forEach((a, i) => {
+    formData.append("currentOccupancy", currentOccupancy);
+    formData.append("gardianInfo[name]", gardianInfo.name);
+    formData.append("gardianInfo[email]", gardianInfo.email);
+    formData.append("gardianInfo[phone]", gardianInfo.phone);
+    formData.append("roomType", roomType);
+    formData.append("payment", payment);
+    formData.append("charge", charge);
+
+    features.forEach((a, i) => {
       if (a.trim() !== "") {
-        formData.append(`amenities[${i}]`, a);
+        formData.append(`features[${i}]`, a);
+      }
+    });
+    visitTimes.forEach((a, i) => {
+      if (a.trim() !== "") {
+        formData.append(`visitTimes[${i}]`, a);
       }
     });
     selectedImages.forEach((file) => {
@@ -181,48 +352,56 @@ export default function AdminHostels() {
     });
 
     try {
-      const response = await addNewhostel(formData).unwrap();
+      const response = await addNewroom(formData).unwrap();
       if (response?.status === 201) {
         // Reset form state
-        setCategory("");
-        setOwnerId("");
-        setName("");
-        setPhone("");
+        setRoomNumber("");
+        setCapacity("");
+        setFeatures([""]);
+        setCurrentOccupancy("");
         setSelectedImages([]);
-        setAmenities([""]);
-        setDescription("");
         setPrice("");
-        setAccommodationType("");
-        setLocation({ street: "", place: "", pincode: "" });
         setIsAddHostelOpen(false);
+        setGardianInfo({
+          name: "",
+          email: "",
+          phone: "",
+        });
+        setRoomType("");
+        setPayment("");
+        setCharge("");
+        setVisitTimes([""]);
         refetch();
       }
     } catch (error) {
-      console.error("Hostel create failed:", error);
+      console.error("Room create failed:", error);
     }
   };
   // delete admin
 
-  const handleDelete = async (id) => {
+  const handleDelete = async (roomId) => {
     try {
-      const { status } = await deletehostel(id).unwrap();
+      const { status } = await deleteroom({
+        id: roomId,
+        hostelId: id,
+      }).unwrap();
       if (status === 200) {
         refetch();
       }
     } catch (error) {
-      console.error("Failed to delete admin:", error);
+      console.error("Failed to delete room:", error);
     }
   };
 
   //  block & unblock admin
   const handleBlocUnblock = async (id) => {
     try {
-      const { status } = await blockhostel(id).unwrap();
+      const { status } = await blockroom(id).unwrap();
       if (status === 200) {
         refetch();
       }
     } catch (error) {
-      console.error("Failed to block admin:", error);
+      console.error("Failed to block room:", error);
     }
   };
 
@@ -235,7 +414,7 @@ export default function AdminHostels() {
           <div className="max-w-7xl mx-auto space-y-6">
             <div className="flex items-center justify-between mt-10">
               <h1 className="text-lg sm:text-xl md:text-2xl font-bold">
-                Manage Hostels
+                Manage Rooms
               </h1>
               <div className="flex items-center gap-2">
                 <Dialog
@@ -253,7 +432,7 @@ export default function AdminHostels() {
                   </DialogTrigger>
                   <DialogContent className="sm:max-w-[600px]">
                     <DialogHeader>
-                      <DialogTitle>Add New Hostel</DialogTitle>
+                      <DialogTitle>Add New Room</DialogTitle>
                     </DialogHeader>
                     {/* <div className="grid gap-4 py-4"> */}
                     <div
@@ -262,121 +441,150 @@ export default function AdminHostels() {
                     >
                       <div className="grid grid-cols-2 gap-4">
                         <div className="space-y-2">
-                          <Label htmlFor="-name">Name</Label>
+                          <Label htmlFor="roomNumber">Room Number</Label>
                           <Input
-                            id="name"
-                            placeholder="Enter admin name"
-                            value={name}
-                            onChange={(e) => setName(e.target.value)}
+                            id="roomNumber"
+                            placeholder="Enter room number"
+                            value={roomNumber}
+                            onChange={(e) => setRoomNumber(e.target.value)}
                             required
                           />
                         </div>
                         <div className="space-y-2">
-                          <Label htmlFor="phone">Phone</Label>
+                          <Label htmlFor="capacity">Capacity</Label>
+                          <Input
+                            id="capacity"
+                            placeholder="Enter room capacity"
+                            value={capacity}
+                            onChange={(e) => setCapacity(e.target.value)}
+                            required
+                          />
+                        </div>
+
+                        <div className="space-y-2">
+                          <Label htmlFor="roomtype">Room Type</Label>
+                          <Input
+                            id="roomtype"
+                            placeholder="Enter room type"
+                            value={roomType}
+                            onChange={(e) => setRoomType(e.target.value)}
+                            required
+                          />
+                        </div>
+
+                        <div className="space-y-2">
+                          <Label htmlFor="charge">Charge</Label>
+                          <Input
+                            id="charge"
+                            placeholder="Enter room Charge"
+                            value={charge}
+                            onChange={(e) => setCharge(e.target.value)}
+                            required
+                          />
+                        </div>
+
+                        <div className="space-y-2">
+                          <Label htmlFor="payment">Payment</Label>
+                          <Input
+                            id="payment"
+                            placeholder="Enter payment"
+                            value={payment}
+                            onChange={(e) => setPayment(e.target.value)}
+                            required
+                          />
+                        </div>
+
+                        <div className="space-y-2">
+                          <Label htmlFor="name">Gardian Name</Label>
+                          <Input
+                            id="name"
+                            placeholder="Enter street"
+                            value={gardianInfo.name}
+                            onChange={(e) =>
+                              setGardianInfo({
+                                ...gardianInfo,
+                                name: e.target.value,
+                              })
+                            }
+                          />
+                        </div>
+                        <div className="space-y-2">
+                          <Label htmlFor="email">Gardian Email</Label>
+                          <Input
+                            id="email"
+                            placeholder="Enter gardian email"
+                            value={gardianInfo.email}
+                            onChange={(e) =>
+                              setGardianInfo({
+                                ...gardianInfo,
+                                email: e.target.value,
+                              })
+                            }
+                          />
+                        </div>
+                        <div className="space-y-2">
+                          <Label htmlFor="phone">Gardian Phone</Label>
                           <Input
                             id="phone"
-                            placeholder="+91 0000000"
-                            value={phone}
-                            onChange={(e) => setPhone(e.target.value)}
-                            required
+                            placeholder="Enter gardian phone"
+                            value={gardianInfo.phone}
+                            onChange={(e) =>
+                              setGardianInfo({
+                                ...gardianInfo,
+                                phone: e.target.value,
+                              })
+                            }
                           />
                         </div>
                       </div>
                       <div className="grid grid-cols-2 gap-4">
                         <div className="space-y-2">
+                          <Label htmlFor="currentOccupancy">
+                            Current Occupancy
+                          </Label>
+
+                          <Input
+                            id="currentOccupancy"
+                            placeholder="Enter number of people currently in the room"
+                            value={currentOccupancy}
+                            onChange={(e) =>
+                              setCurrentOccupancy(e.target.value)
+                            }
+                            required
+                          />
+                        </div>
+                        <div className="space-y-2">
                           <Label htmlFor="price">Price</Label>
+
                           <Input
                             id="price"
-                            placeholder="Price"
+                            placeholder="Enter room price"
                             value={price}
                             onChange={(e) => setPrice(e.target.value)}
                             required
                           />
                         </div>
-                        <div className="space-y-2">
-                          <Label htmlFor="accommodation">Accommodation</Label>
-                          <Input
-                            id="accommodation"
-                            placeholder="Accommodation"
-                            value={accommodationType}
-                            onChange={(e) =>
-                              setAccommodationType(e.target.value)
-                            }
-                            required
-                          />
-                        </div>
-                        <div className="space-y-2">
-                          <Label htmlFor="street">Street</Label>
-                          <Input
-                            id="street"
-                            placeholder="Enter street"
-                            value={location.street}
-                            onChange={(e) =>
-                              setLocation({
-                                ...location,
-                                street: e.target.value,
-                              })
-                            }
-                          />
-                        </div>
-                        <div className="space-y-2">
-                          <Label htmlFor="place">Place</Label>
-                          <Input
-                            id="place"
-                            placeholder="Enter place"
-                            value={location.place}
-                            onChange={(e) =>
-                              setLocation({
-                                ...location,
-                                place: e.target.value,
-                              })
-                            }
-                          />
-                        </div>
-                        <div className="space-y-2">
-                          <Label htmlFor="pincode">Pincode</Label>
-                          <Input
-                            id="pincode"
-                            placeholder="Enter pincode"
-                            value={location.pincode}
-                            onChange={(e) =>
-                              setLocation({
-                                ...location,
-                                pincode: e.target.value,
-                              })
-                            }
-                          />
-                        </div>
-                        <div className="space-y-2">
-                          <Label htmlFor="pincode">Description</Label>
-                          <Textarea
-                            id="description"
-                            placeholder="Enter description"
-                            value={description}
-                            onChange={(e) => setDescription(e.target.value)}
-                          />
-                        </div>
 
                         <div className="space-y-2">
-                          <Label>Facilites</Label>
-                          {amenities.map((link, index) => (
+                          <Label>Features</Label>
+                          {features.map((feature, index) => (
                             <div
                               key={index}
                               className="flex gap-2 items-center"
                             >
                               <Input
-                                value={link}
+                                value={feature}
                                 onChange={(e) =>
-                                  handleFacilities(index, e.target.value)
+                                  handleFeatures(index, e.target.value)
                                 }
-                                placeholder={`Enter facilities ${index + 1}`}
+                                placeholder={`Enter feature ${index + 1}`}
                               />
-                              {amenities.length > 1 && (
+                              {features.length > 1 && (
                                 <Button
                                   type="button"
                                   variant="ghost"
                                   size="sm"
-                                  onClick={() => removeFacilities(index)}
+                                  onClick={() => removeFeatures(index)}
                                 >
                                   ✕
                                 </Button>
@@ -387,50 +595,46 @@ export default function AdminHostels() {
                             type="button"
                             variant="outline"
                             size="sm"
-                            onClick={addFacilities}
+                            onClick={addFeatures}
                           >
-                            + Add Facilities
+                            + Add Feature
                           </Button>
                         </div>
+
                         <div className="space-y-2">
-                          <Label htmlFor="category">Category</Label>
-                          <Input
-                            id="category"
-                            placeholder="Enter Category"
-                            value={category}
-                            onChange={(e) => setCategory(e.target.value)}
-                            required
-                          />
-                          {/* <select
-                            id="category"
-                            value={category}
-                            onChange={(e) => setCategory(e.target.value)}
-                            className="w-full border border-gray-300 rounded px-3 py-2"
+                          <Label>Visit Times</Label>
+                          {visitTimes.map((time, index) => (
+                            <div
+                              key={index}
+                              className="flex gap-2 items-center"
+                            >
+                              <Input
+                                value={time}
+                                onChange={(e) =>
+                                  handleVisitTime(index, e.target.value)
+                                }
+                                placeholder={`Enter visit time ${index + 1}`}
+                              />
+                              {visitTimes.length > 1 && (
+                                <Button
+                                  type="button"
+                                  variant="ghost"
+                                  size="sm"
+                                  onClick={() => removeVisitTime(index)}
+                                >
+                                  ✕
+                                </Button>
+                              )}
+                            </div>
+                          ))}
+                          <Button
+                            type="button"
+                            variant="outline"
+                            size="sm"
+                            onClick={addVisitTime}
                           >
-                            <option value="">Select category</option>
-                            <option value="boys">Boys</option>
-                            <option value="girls">Girls</option>
-                            <option value="co-ed">Co-ed</option>
-                            <option value="family">Family</option>
-                          </select> */}
-                        </div>
-                        <div className="space-y-2">
-                          <Label htmlFor="owner">Owners</Label>
-                          <select
-                            id="owner"
-                            value={ownerId}
-                            onChange={(e) => setOwnerId(e.target.value)}
-                            className="w-full border border-gray-300 rounded px-3 py-2 text-sm text-gray-700 focus:outline-none  "
-                          >
-                            <option className="ml-2" value="">
-                              Select owner
-                            </option>
-                            {owners.map((owner) => (
-                              <option key={owner._id} value={owner._id}>
-                                {owner.name}
-                              </option>
-                            ))}
-                          </select>
+                            + Add Visit Time
+                          </Button>
                         </div>
                       </div>
                       <div className="space-y-2">
@@ -504,9 +708,9 @@ export default function AdminHostels() {
                 <CardHeader className="pb-2">
                   <div className="flex items-center justify-between">
                     <div>
-                      <CardTitle>All Hostels</CardTitle>
+                      <CardTitle>All Rooms</CardTitle>
                       <CardDescription>
-                        Manage and monitor all registered admins
+                        Manage and monitor all registered rooms
                       </CardDescription>
                     </div>
                   </div>
@@ -570,28 +774,28 @@ export default function AdminHostels() {
                       <thead>
                         <tr className="border-b">
                           <th className="text-left py-3 px-4 font-medium text-gray-500">
-                            Name
+                            Room No
                           </th>
                           <th className="text-left py-3 px-4 font-medium text-gray-500">
-                            Owner
-                          </th>
-                          <th className="text-left py-3 px-4 font-medium text-gray-500">
-                            Phone
-                          </th>
-                          <th className="text-left py-3 px-4 font-medium text-gray-500">
-                            Location
-                          </th>
-                          <th className="text-left py-3 px-4 font-medium text-gray-500">
-                            Facilities
-                          </th>
-                          <th className="text-left py-3 px-4 font-medium text-gray-500">
-                            Accommodation
+                            Capacity
                           </th>
                           <th className="text-left py-3 px-4 font-medium text-gray-500">
                             Price
                           </th>
                           <th className="text-left py-3 px-4 font-medium text-gray-500">
-                            Category
+                            Features
+                          </th>
+                          <th className="text-left py-3 px-4 font-medium text-gray-500">
+                            Room Type
+                          </th>
+                          <th className="text-left py-3 px-4 font-medium text-gray-500">
+                            Charge
+                          </th>
+                          <th className="text-left py-3 px-4 font-medium text-gray-500">
+                            Payment
+                          </th>
+                          <th className="text-left py-3 px-4 font-medium text-gray-500">
+                            Occupancy
                           </th>
                           <th className="text-left py-3 px-4 font-medium text-gray-500">
                             Status
@@ -602,34 +806,22 @@ export default function AdminHostels() {
                         </tr>
                       </thead>
                       <tbody>
-                        {paginatedUsers?.map((hostel) => (
-                          <tr key={hostel._id} className="border-b">
+                        {paginatedUsers?.map((room) => (
+                          <tr key={room._id} className="border-b">
                             <td className="py-3 px-4">
                               <div className="flex items-center gap-3">
                                 <div className="h-10 w-10 bg-gray-100 rounded-md flex items-center justify-center">
                                   <Building className="h-5 w-5 text-gray-500" />
                                 </div>
-                                <span
-                                  className="font-medium cursor-pointer"
-                                  onClick={() =>
-                                    navigate(
-                                      `/admin/hostels/rooms/${hostel._id}`
-                                    )
-                                  }
-                                >
-                                  {hostel.name}
+                                <span className="font-medium">
+                                  {room.roomNumber}
                                 </span>
                               </div>
                             </td>
-                            <td className="py-3 px-4">
-                              {hostel?.ownerId?.name}
-                            </td>
-                            <td className="py-3 px-4">{hostel.phone}</td>
-                            <td className="py-3 px-4">
-                              {hostel?.location?.place}
-                            </td>
+                            <td className="py-3 px-4">{room.capacity}</td>
+                            <td className="py-3 px-4">{room.price}</td>
                             <td className="py-3 px-4 space-x-2">
-                              {hostel?.amenities?.map((a, i) => (
+                              {room?.features?.map((a, i) => (
                                 <span
                                   key={i}
                                   className="bg-gray-100 px-2 py-1 rounded text-sm"
@@ -638,20 +830,19 @@ export default function AdminHostels() {
                                 </span>
                               ))}
                             </td>
+                            <td className="py-3 px-4">{room?.roomType}</td>
+                            <td className="py-3 px-4">{room?.charge}</td>
+                            <td className="py-3 px-4">{room?.payment}</td>
                             <td className="py-3 px-4">
-                              {hostel?.accommodationType}
+                              {room.currentOccupancy}
                             </td>
-                            <td className="py-3 px-4">{hostel?.price}</td>
-
-                            <td className="py-3 px-4">{hostel?.category}</td>
-
                             <td className="py-3 px-4">
                               <Badge
                                 variant={
-                                  hostel.isActive ? "success" : "secondary"
+                                  room.isActive ? "success" : "secondary"
                                 }
                               >
-                                {hostel.isActive ? "Active" : "Inactive"}
+                                {room.isActive ? "Active" : "Inactive"}
                               </Badge>
                             </td>
                             <td className="py-3 px-4">
@@ -668,11 +859,9 @@ export default function AdminHostels() {
                                 <DropdownMenuContent align="end">
                                   <DropdownMenuItem
                                     className={"cursor-pointer"}
-                                    onClick={() =>
-                                      handleBlocUnblock(hostel._id)
-                                    }
+                                    onClick={() => handleBlocUnblock(room._id)}
                                   >
-                                    {hostel.isActive ? (
+                                    {room.isActive ? (
                                       <>
                                         <UserX className="h-4 w-4 mr-2" />
                                         Block
@@ -692,7 +881,7 @@ export default function AdminHostels() {
                                   </DropdownMenuItem>
                                   <DropdownMenuItem
                                     className="text-red-600 cursor-pointer"
-                                    onClick={() => handleDelete(hostel._id)}
+                                    onClick={() => handleDelete(room._id)}
                                   >
                                     <Trash2 className="h-4 w-4 mr-2" />
                                     {isDeleting ? "Deleting..." : "Delete"}
@@ -754,6 +943,95 @@ export default function AdminHostels() {
                       </div>
                     </div>
                   )}
+                </CardContent>
+              </Card>
+            </motion.div>
+
+            <motion.div
+              initial={{ opacity: 0, y: 20 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ duration: 0.5, delay: 0.2 }}
+              className="grid grid-cols-1 md:grid-cols-3 gap-6"
+            >
+              <Card>
+                <CardHeader>
+                  <CardTitle>Room Availability</CardTitle>
+                  <CardDescription>
+                    Quick availability management
+                  </CardDescription>
+                </CardHeader>
+                <CardContent>
+                  <div className="space-y-4">
+                    {rooms.slice(0, 5).map((room) => (
+                      <div
+                        key={room.id}
+                        className="flex items-center justify-between p-3 border rounded-lg"
+                      >
+                        <div className="flex items-center gap-3">
+                          <Bed className="h-5 w-5 text-gray-400" />
+                          <div>
+                            <div className="font-medium">{room.name}</div>
+                            <div className="text-sm text-gray-500">
+                              {room.hostel}
+                            </div>
+                          </div>
+                        </div>
+                        <div className="flex items-center gap-2">
+                          <span className="text-sm text-gray-500">
+                            Available
+                          </span>
+                          <Switch defaultChecked />
+                        </div>
+                      </div>
+                    ))}
+                  </div>
+                </CardContent>
+              </Card>
+
+              <Card className="md:col-span-2">
+                <CardHeader>
+                  <CardTitle>Room Performance</CardTitle>
+                  <CardDescription>
+                    Top performing rooms by bookings
+                  </CardDescription>
+                </CardHeader>
+                <CardContent>
+                  <div className="space-y-4">
+                    {rooms
+                      .sort((a, b) => b.bookings - a.bookings)
+                      .slice(0, 5)
+                      .map((room, index) => (
+                        <div
+                          key={room.id}
+                          className="flex items-center gap-4 p-3 border rounded-lg"
+                        >
+                          <div className="flex items-center justify-center h-8 w-8 rounded-full bg-orange-100 text-orange-600 font-medium">
+                            {index + 1}
+                          </div>
+                          <div className="h-12 w-12 rounded-md overflow-hidden">
+                            <img
+                              src={room.image || "/placeholder.svg"}
+                              alt={room.name}
+                              className="h-full w-full object-cover"
+                            />
+                          </div>
+                          <div className="flex-1">
+                            <div className="font-medium">{room.name}</div>
+                            <div className="text-sm text-gray-500">
+                              {room.hostel}
+                            </div>
+                          </div>
+                          <div className="text-right">
+                            <div className="font-medium">
+                              {room.bookings} bookings
+                            </div>
+                            <div className="text-sm text-gray-500">
+                              ${room.price} / night
+                            </div>
+                          </div>
+                        </div>
+                      ))}
+                  </div>
                 </CardContent>
               </Card>
             </motion.div>

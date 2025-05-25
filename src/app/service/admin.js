@@ -8,7 +8,7 @@ export const adminApi = createApi({
     //  Get all admin (reading)
 
     getAllAdmin: builder.query({
-      query: (id) => `/admins/super-admins/682598d1adb06a35c127291f`,
+      query: (id) => `/admins/super-admins/${id}`,
     }),
 
     // Get admin by id
@@ -16,6 +16,18 @@ export const adminApi = createApi({
     getAadminById: builder.query({
       query: (id) => `/admins/${id}`,
     }),
+
+      // Post admin login
+
+    loginAdmin: builder.mutation({
+        query: (logadmin) => ({
+          url: `/admins/login`,
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: logadmin,
+        }),
+      }),
+
 
     // Add new admin
 
@@ -71,6 +83,7 @@ export const adminApi = createApi({
 });
 
 export const {
+  useLoginAdminMutation,
     useGetAllAdminQuery, 
     useGetAadminByIdQuery,
     useAddNewAdminMutation, 

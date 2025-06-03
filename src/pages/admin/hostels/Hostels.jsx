@@ -47,11 +47,12 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Tabs, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Textarea } from "@/components/ui/textarea";
-import {  useGetAllSuperAdminownerQuery } from "@/app/service/owner";
+import {  useGetAllownerQuery} from "@/app/service/owner";
 import {
   useAddNewhostelMutation,
   useBlockhostelMutation,
   useDeletehostelMutation,
+  useGetAllhostelQuery,
   useGetAllSuperAdminhostelQuery,
 } from "@/app/service/hostel";
 import { useNavigate } from "react-router-dom";
@@ -84,11 +85,11 @@ export default function AdminHostels() {
 
 
 
-  const { data, isError, isLoading, refetch } = useGetAllSuperAdminhostelQuery(superAdminId);
+  const { data, isError, isLoading, refetch } = useGetAllhostelQuery();
   const [deletehostel, { isLoading: isDeleting }] = useDeletehostelMutation();
   const [blockhostel] = useBlockhostelMutation();
   const [addNewhostel, { isLoading: isPosting }] = useAddNewhostelMutation();
-  const { data: owners = [] } =  useGetAllSuperAdminownerQuery(superAdminId);
+  const { data: owners = [] } =   useGetAllownerQuery();
 
   if (isLoading) return <h1>Loading...</h1>;
   if (isError || !Array.isArray(data))

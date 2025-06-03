@@ -67,6 +67,7 @@ import {
 import { Tabs, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import {
   useGetAllAdminbookingQuery,
+  useGetAllbookingQuery,
   useUpdatebookingMutation,
 } from "@/app/service/bookings";
 
@@ -96,15 +97,8 @@ export default function AdminBookings() {
   //   setIsViewBookingOpen(true);
   // };
 
-  const admin = JSON.parse(localStorage.getItem("admin"));
 
-  const superAdminId =
-    admin?.adminDetails?.role == "admin"
-      ? admin?.adminDetails?.superAdminId
-      : admin?.adminDetails?._id;
-
-  const { data, isError, isLoading, refetch } =
-    useGetAllAdminbookingQuery(superAdminId);
+  const { data, isError, isLoading, refetch } =  useGetAllbookingQuery();
   const [updatebooking, { isLoading: isPosting }] = useUpdatebookingMutation();
 
   if (isLoading) return <h1>Loading...</h1>;

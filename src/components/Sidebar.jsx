@@ -73,7 +73,7 @@ export function Sidebar() {
     localStorage.removeItem("admin");
     localStorage.removeItem("owner");
 
-    navigate("/login");
+    navigate("/");
   };
 
   return (

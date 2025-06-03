@@ -9,6 +9,7 @@ import AdminOwners from "@/pages/admin/owners/Owners";
 import AdminOwnersStaffs from "@/pages/admin/owners/ownersStaff/OwnersStaff";
 import AdminUsers from "@/pages/admin/user/User";
 import HomePage from "@/pages/Home";
+import AdminLoginPage from "@/pages/login/AdminLogin";
 import LoginPage from "@/pages/login/Login";
 import SignupPage from "@/pages/login/Signup";
 import OwnerAnalytics from "@/pages/owner/analytics/Analytics";
@@ -30,6 +31,7 @@ export default function AppRoutes() {
       <Route path="/" element={<HomePage />} />
       <Route path="/login" element={<LoginPage />} />
       <Route path="/signup" element={<SignupPage />} />
+            <Route path="/admin-login" element={<AdminLoginPage />} />
 
       {/* admin dashboard */}
 

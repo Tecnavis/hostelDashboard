@@ -15,28 +15,29 @@ import {
 import { Input } from "@/components/ui/input"
 import { Label } from "@/components/ui/label"
 import { Link, useNavigate } from "react-router-dom"
-import { useLoginOwnerMutation } from "@/app/service/owner"
+import { useLoginAdminMutation } from "@/app/service/admin"
 
-export default function LoginPage() {
+export default function AdminLoginPage() {
   const navigate = useNavigate()
 
   const [email, setEmail] = useState("")
   const [password, setPassword] = useState("")
   const [showPassword, setShowPassword] = useState(false)
 
-  const [loginOwner, { isLoading }] = useLoginOwnerMutation()
+    const [loginAdmin, { isLoading: isAdminLoading }] = useLoginAdminMutation()
+  
 
   const handleLogin = async (e) => {
     e.preventDefault()
     if (!email.trim() || !password.trim()) return
 
     try {
-      const response = await loginOwner({ email, password })
+      const response = await loginAdmin ({ email, password })
       if (response?.data?.status === 200) {
-        localStorage.setItem("owner", JSON.stringify(response.data))
+        localStorage.setItem("admin", JSON.stringify(response.data))
         setEmail("")
         setPassword("")
-        navigate("/owner/dashboard")
+        navigate("/admin/dashboard")
       }
     } catch (error) {
       console.error("Login failed:", error)
@@ -66,7 +67,7 @@ export default function LoginPage() {
         <form onSubmit={handleLogin}>
           <Card className="border-0 shadow-xl">
             <CardHeader>
-              <CardTitle>Hostel Owner Login</CardTitle>
+              <CardTitle>Admin Login</CardTitle>
               <CardDescription>
                 Login to manage your hostel properties and bookings.
               </CardDescription>
@@ -118,27 +119,16 @@ export default function LoginPage() {
               <Button
                 type="submit"
                 className="w-full bg-orange-600 hover:bg-orange-700"
-                disabled={isLoading}
+                disabled={isAdminLoading}
               >
-                {isLoading ? "Logging in..." : "Login as Hostel Owner"}
+                {isAdminLoading  ? "Logging in..." : "Login"}
               </Button>
             </CardFooter>
           </Card>
         </form>
       </motion.div>
 
-      {/* Footer */}
-      <motion.p
-        initial={{ opacity: 0 }}
-        animate={{ opacity: 1 }}
-        transition={{ duration: 0.5, delay: 0.4 }}
-        className="mt-8 text-gray-600 text-center"
-      >
-        Don&apos;t have an account? Contact the administrator.{" "}
-        <Link to="/signup" className="text-rose-600 underline">
-          Signup
-        </Link>
-      </motion.p>
+      
     </div>
   )
 }

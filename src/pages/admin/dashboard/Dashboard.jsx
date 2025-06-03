@@ -37,6 +37,12 @@ const hostelDistribution = [
   { name: "Other", value: 7 },
 ]
 
+
+
+
+      const admin = JSON.parse(localStorage.getItem("admin"));
+    const  superAdminId = admin?.adminDetails;
+
 export default function AdminDashboard() {
   return (
     <div className="flex h-screen bg-gray-50">
@@ -60,11 +66,11 @@ export default function AdminDashboard() {
             <div className="flex items-center gap-3">
               <Avatar>
                 <AvatarImage src="/placeholder.svg?height=40&width=40" />
-                <AvatarFallback>AD</AvatarFallback>
+                <AvatarFallback>{superAdminId?.name?.charAt(0)}</AvatarFallback>
               </Avatar>
               <div className="hidden md:block">
-                <div className="text-sm font-medium">Admin User</div>
-                <div className="text-xs text-gray-500">admin@hostelhub.com</div>
+                <div className="text-sm font-medium">{superAdminId?.name}</div>
+                <div className="text-xs text-gray-500">{superAdminId.email}</div>
               </div>
             </div>
           </div>

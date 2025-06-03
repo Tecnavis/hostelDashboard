@@ -60,6 +60,10 @@ const roomTypeData = [
 
 const COLORS = ["#ec4899", "#f97316", "#8b5cf6", "#06b6d4", "#10b981"]
 
+
+ const owner = JSON.parse(localStorage.getItem("owner"));
+    const  ownerId = owner?.ownerDetails;
+
 export default function OwnerDashboard() {
   return (
     <div className="flex h-screen bg-gray-50">
@@ -83,11 +87,11 @@ export default function OwnerDashboard() {
             <div className="flex items-center gap-3">
               <Avatar>
                 <AvatarImage src="/placeholder.svg?height=40&width=40" />
-                <AvatarFallback>OW</AvatarFallback>
+                <AvatarFallback>{ownerId.name?.charAt(0)}</AvatarFallback>
               </Avatar>
               <div className="hidden md:block">
-                <div className="text-sm font-medium">John Smith</div>
-                <div className="text-xs text-gray-500">owner@example.com</div>
+                <div className="text-sm font-medium">{ownerId?.name}</div>
+                <div className="text-xs text-gray-500">{ownerId?.email}</div>
               </div>
             </div>
           </div>

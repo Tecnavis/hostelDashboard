@@ -447,7 +447,7 @@ const filteredUsers = data
         </main>
       </div>
 
-      {/* {selectedBooking && (
+      {selectedBooking && (
         <Dialog open={isViewBookingOpen} onOpenChange={setIsViewBookingOpen}>
           <DialogContent className="sm:max-w-[600px]">
             <DialogHeader>
@@ -537,7 +537,7 @@ const filteredUsers = data
             </DialogFooter>
           </DialogContent>
         </Dialog>
-      )} */}
+      )}
     </div>
   );
 }

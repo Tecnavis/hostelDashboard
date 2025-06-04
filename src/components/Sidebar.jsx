@@ -15,6 +15,7 @@ import {
   Shield,
   Users,
   User,
+  Bell,
 } from "lucide-react";
 
 import { cn } from "@/lib/utils";
@@ -43,7 +44,7 @@ export function Sidebar() {
     { title: "Bookings", href: "/admin/bookings", icon: Hotel },
     { title: "Analytics", href: "/admin/analytics", icon: BarChart3 },
     { title: "Messages", href: "/admin/messages", icon: MessageSquare },
-    // { title: "Settings", href: "/admin/settings", icon: Settings },
+    { title: "Notifications", href: "/admin/notifications", icon: Bell },
   ];
 
   const ownerNavItems = [
@@ -53,9 +54,11 @@ export function Sidebar() {
       : []),
     { title: "My Hostels", href: "/owner/hostels", icon: Building },
     { title: "Users", href: "/owner/users", icon: User },
-    { title: "Bookings", href: "/owner/bookings", icon:  Hotel  },
+    { title: "Bookings", href: "/owner/bookings", icon: Hotel },
     { title: "Analytics", href: "/owner/analytics", icon: BarChart3 },
     { title: "Messages", href: "/owner/messages", icon: MessageSquare },
+    { title: "Notifications", href: "/owner/notifications", icon: Bell },
+
     // { title: "Settings", href: "/owner/settings", icon: Settings },
   ];
 

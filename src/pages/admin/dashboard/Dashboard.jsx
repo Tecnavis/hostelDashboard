@@ -1,16 +1,17 @@
 "use client"
 
 import { motion } from "framer-motion"
-import { ArrowDown, ArrowUp, Bell, Building, Calendar, DollarSign, Hotel, Search, Users } from "lucide-react"
+import { ArrowDown, ArrowUp, Building, Calendar, DollarSign, Hotel, Search, Users } from "lucide-react"
 import { Area, Bar, CartesianGrid, ComposedChart, Line, ResponsiveContainer, Tooltip, XAxis, YAxis } from "recharts"
 
+import { Sidebar } from "@/components/Sidebar"
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar"
 import { Badge } from "@/components/ui/badge"
 import { Button } from "@/components/ui/button"
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card"
 import { Input } from "@/components/ui/input"
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs"
-import { Sidebar } from "@/components/Sidebar"
+import   { AdminNotifications }  from "@/components/AdminNotification"
 
 const bookingData = [
   { name: "Jan", bookings: 65, revenue: 4200, occupancy: 72 },
@@ -38,8 +39,6 @@ const hostelDistribution = [
 ]
 
 
-
-
       const admin = JSON.parse(localStorage.getItem("admin"));
     const  superAdminId = admin?.adminDetails;
 
@@ -56,21 +55,16 @@ export default function AdminDashboard() {
           </div>
 
           <div className="flex items-center gap-4">
-            <Button variant="outline" size="icon" className="relative">
-              <Bell className="h-5 w-5" />
-              <span className="absolute -top-1 -right-1 h-4 w-4 rounded-full bg-rose-600 text-[10px] font-medium text-white flex items-center justify-center">
-                3
-              </span>
-            </Button>
+            <AdminNotifications variant="admin" />
 
-            <div className="flex items-center gap-3">
+                <div className="flex items-center gap-3">
               <Avatar>
                 <AvatarImage src="/placeholder.svg?height=40&width=40" />
                 <AvatarFallback>{superAdminId?.name?.charAt(0)}</AvatarFallback>
               </Avatar>
               <div className="hidden md:block">
                 <div className="text-sm font-medium">{superAdminId?.name}</div>
-                <div className="text-xs text-gray-500">{superAdminId.email}</div>
+                <div className="text-xs text-gray-500">{superAdminId?.email}</div>
               </div>
             </div>
           </div>
@@ -500,3 +494,4 @@ export default function AdminDashboard() {
     </div>
   )
 }
+

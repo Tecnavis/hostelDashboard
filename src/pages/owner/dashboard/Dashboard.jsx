@@ -1,7 +1,7 @@
 "use client"
 
 import { motion } from "framer-motion"
-import { ArrowDown, ArrowUp, Bell, Building, Calendar, DollarSign, Hotel, Plus, Search, Users } from "lucide-react"
+import { ArrowDown, ArrowUp, Building, Calendar, DollarSign, Hotel, Plus, Search, Users } from "lucide-react"
 import {
   Area,
   AreaChart,
@@ -24,6 +24,7 @@ import { Badge } from "@/components/ui/badge"
 import { Button } from "@/components/ui/button"
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card"
 import { Input } from "@/components/ui/input"
+import   { OwnerNotifications }  from "@/components/OwnerNotification"
 
 const revenueData = [
   { name: "Jan", revenue: 2100 },
@@ -60,7 +61,6 @@ const roomTypeData = [
 
 const COLORS = ["#ec4899", "#f97316", "#8b5cf6", "#06b6d4", "#10b981"]
 
-
  const owner = JSON.parse(localStorage.getItem("owner"));
     const  ownerId = owner?.ownerDetails;
 
@@ -77,24 +77,19 @@ export default function OwnerDashboard() {
           </div>
 
           <div className="flex items-center gap-4">
-            <Button variant="outline" size="icon" className="relative">
-              <Bell className="h-5 w-5" />
-              <span className="absolute -top-1 -right-1 h-4 w-4 rounded-full bg-orange-600 text-[10px] font-medium text-white flex items-center justify-center">
-                5
-              </span>
-            </Button>
+            <OwnerNotifications variant="owner" />
 
-            <div className="flex items-center gap-3">
-              <Avatar>
-                <AvatarImage src="/placeholder.svg?height=40&width=40" />
-                <AvatarFallback>{ownerId.name?.charAt(0)}</AvatarFallback>
-              </Avatar>
-              <div className="hidden md:block">
-                <div className="text-sm font-medium">{ownerId?.name}</div>
-                <div className="text-xs text-gray-500">{ownerId?.email}</div>
-              </div>
-            </div>
-          </div>
+        <div className="flex items-center gap-3">
+               <Avatar>
+                 <AvatarImage src="/placeholder.svg?height=40&width=40" />
+                 <AvatarFallback>{ownerId.name?.charAt(0)}</AvatarFallback>
+               </Avatar>
+               <div className="hidden md:block">
+                 <div className="text-sm font-medium">{ownerId?.name}</div>
+                 <div className="text-xs text-gray-500">{ownerId?.email}</div>
+               </div>
+             </div>
+           </div>
         </header>
 
         <main className="flex-1 overflow-y-auto p-6">

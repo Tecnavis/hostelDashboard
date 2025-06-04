@@ -5,6 +5,7 @@ import AdminDashboard from "@/pages/admin/dashboard/Dashboard";
 import AdminHostels from "@/pages/admin/hostels/Hostels";
 import AdminHostelsRooms from "@/pages/admin/hostels/rooms/Rooms";
 import AdminMessages from "@/pages/admin/messages/Messages";
+import AdminNotificationsPage from "@/pages/admin/notifications/Notifications";
 import AdminOwners from "@/pages/admin/owners/Owners";
 import AdminOwnersStaffs from "@/pages/admin/owners/ownersStaff/OwnersStaff";
 import AdminUsers from "@/pages/admin/user/User";
@@ -18,6 +19,7 @@ import OwnerDashboard from "@/pages/owner/dashboard/Dashboard";
 import OwnerHostels from "@/pages/owner/hostels/Hostels";
 import OwnerHostelsRooms from "@/pages/owner/hostels/rooms/Rooms";
 import OwnerMessages from "@/pages/owner/messages/Messages";
+import OwnerNotificationsPage from "@/pages/owner/notifications/Notfications";
 import OwnerStaffs from "@/pages/owner/staffs/Staffs";
 import OwnerRooms from "@/pages/owner/staffs/Staffs";
 import OwnerUsers from "@/pages/owner/user/User";
@@ -31,7 +33,7 @@ export default function AppRoutes() {
       <Route path="/" element={<HomePage />} />
       <Route path="/login" element={<LoginPage />} />
       <Route path="/signup" element={<SignupPage />} />
-            <Route path="/admin-login" element={<AdminLoginPage />} />
+      <Route path="/admin-login" element={<AdminLoginPage />} />
 
       {/* admin dashboard */}
 
@@ -52,6 +54,10 @@ export default function AppRoutes() {
         <Route path="/admin/bookings" element={<AdminBookings />} />
         <Route path="/admin/admins" element={<AdminAdmins />} />
         <Route path="/admin/users" element={<AdminUsers />} />
+        <Route
+          path="/admin/notifications"
+          element={<AdminNotificationsPage />}
+        />
 
         {/* owner dashboard */}
 
@@ -67,6 +73,10 @@ export default function AppRoutes() {
         <Route path="/owner/users" element={<AdminUsers />} />
         <Route path="/owner/messages" element={<OwnerMessages />} />
         <Route path="/owner/bookings" element={<OwnerBookings />} />
+             <Route
+          path="/owner/notifications"
+          element={<OwnerNotificationsPage />}
+        />
       </Route>
     </Routes>
   );

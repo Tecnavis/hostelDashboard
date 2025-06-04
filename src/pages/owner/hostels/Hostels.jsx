@@ -78,20 +78,34 @@ export default function OwnerHostels() {
   const [currentPage, setCurrentPage] = useState(1);
   const itemsPerPage = 10;
   const navigate = useNavigate();
+  const [selectedPlace, setSelectedPlace] = useState("");
+  const [selectedStreet, setSelectedStreet] = useState("");
 
-    const owner = JSON.parse(localStorage.getItem("owner"));
-    const  ownerId = owner?.ownerDetails?.role == "staff" ?  owner?.ownerDetails?.ownerId : owner?.ownerDetails?._id ;
-    
+  const owner = JSON.parse(localStorage.getItem("owner"));
+  const ownerId =
+    owner?.ownerDetails?.role == "staff"
+      ? owner?.ownerDetails?.ownerId
+      : owner?.ownerDetails?._id;
 
-  const { data, isError, isLoading, refetch } = useGetAllOwnerhostelQuery(ownerId);
+  const { data, isError, isLoading, refetch } =
+    useGetAllOwnerhostelQuery(ownerId);
   const [deletehostel, { isLoading: isDeleting }] = useDeletehostelMutation();
   const [blockhostel] = useBlockhostelMutation();
   const [addNewhostel, { isLoading: isPosting }] = useAddNewhostelMutation();
-  // const { data: owners = [] } = useGetAllownerQuery();
 
   if (isLoading) return <h1>Loading...</h1>;
   if (isError || !Array.isArray(data))
     return <h1>Oops! Something went wrong.</h1>;
+
+  const places = [...new Set(data?.map((h) => h.location.place))];
+
+  const streetsByPlace = (place) => [
+    ...new Set(
+      data
+        ?.filter((h) => h.location.place === place)
+        .map((h) => h.location.street)
+    ),
+  ];
 
   // searching
 
@@ -106,10 +120,17 @@ export default function OwnerHostels() {
           .includes(searchTerm.toLowerCase()) ||
         hostel?.location?.place.toLowerCase().includes(searchTerm.toLowerCase())
     )
-    ?.filter((hostel) => {
+    ?.filter((user) => {
       if (statusFilter === "all") return true;
-      if (statusFilter === "active") return hostel.isActive;
-      if (statusFilter === "inactive") return !hostel.isActive;
+      if (statusFilter === "active") return user.isActive;
+      if (statusFilter === "inactive") return !user.isActive;
+      return true;
+    })
+    ?.filter((user) => {
+      // Apply place and street filter
+      if (selectedPlace && user.location.place !== selectedPlace) return false;
+      if (selectedStreet && user.location.street !== selectedStreet)
+        return false;
       return true;
     });
 
@@ -605,6 +626,41 @@ export default function OwnerHostels() {
                         Filter
                         <ChevronDown className="h-3 w-3 opacity-50" />
                       </Button>
+
+                      <div className="flex flex-wrap gap-2 items-center">
+                        {/* Place Dropdown */}
+                        <select
+                          value={selectedPlace}
+                          onChange={(e) => {
+                            setSelectedPlace(e.target.value);
+                            setSelectedStreet(""); // reset street
+                          }}
+                          className="border rounded p-1"
+                        >
+                          <option value="">Select Place</option>
+                          {places.map((place) => (
+                            <option key={place} value={place}>
+                              {place}
+                            </option>
+                          ))}
+                        </select>
+
+                        {/* Street Dropdown */}
+                        {selectedPlace && (
+                          <select
+                            value={selectedStreet}
+                            onChange={(e) => setSelectedStreet(e.target.value)}
+                            className="border rounded p-1"
+                          >
+                            <option value="">Select Street</option>
+                            {streetsByPlace(selectedPlace).map((street) => (
+                              <option key={street} value={street}>
+                                {street}
+                              </option>
+                            ))}
+                          </select>
+                        )}
+                      </div>
 
                       <Tabs
                         value={statusFilter}

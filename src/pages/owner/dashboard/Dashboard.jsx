@@ -82,7 +82,7 @@ export default function OwnerDashboard() {
         <div className="flex items-center gap-3">
                <Avatar>
                  <AvatarImage src="/placeholder.svg?height=40&width=40" />
-                 <AvatarFallback>{ownerId.name?.charAt(0)}</AvatarFallback>
+                 <AvatarFallback>{ownerId?.name?.charAt(0)}</AvatarFallback>
                </Avatar>
                <div className="hidden md:block">
                  <div className="text-sm font-medium">{ownerId?.name}</div>

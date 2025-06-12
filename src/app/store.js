@@ -6,6 +6,7 @@ import { hostelApi } from "./service/hostel";
 import { roomApi } from "./service/room";
 import { userApi } from "./service/user";
 import { bookingApi } from "./service/bookings";
+import { notificationApi } from "./service/notification";
 
 export const store = configureStore({
   reducer: {
@@ -15,6 +16,7 @@ export const store = configureStore({
     [roomApi.reducerPath]: roomApi.reducer,
     [userApi.reducerPath]: userApi.reducer,
     [bookingApi.reducerPath]: bookingApi.reducer,
+    [notificationApi.reducerPath]: notificationApi.reducer,
   },
 
   middleware: (getDefaultMiddleware) =>
@@ -24,7 +26,8 @@ export const store = configureStore({
       .concat(hostelApi.middleware)
       .concat(roomApi.middleware)
       .concat(bookingApi.middleware)
-      .concat(userApi.middleware),
+      .concat(userApi.middleware)
+      .concat(notificationApi.middleware),
 });
 
 setupListeners(store.dispatch);

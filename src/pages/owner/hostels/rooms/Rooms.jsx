@@ -427,7 +427,7 @@ export default function OwnerHostelsRooms() {
                       className="bg-rose-600 hover:bg-rose-700 gap-2 cursor-pointer"
                     >
                       <Plus className="h-4 w-4" />
-                      Add hostel
+                      Add room
                     </Button>
                   </DialogTrigger>
                   <DialogContent className="sm:max-w-[600px]">

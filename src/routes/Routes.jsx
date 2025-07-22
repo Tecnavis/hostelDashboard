@@ -50,7 +50,7 @@ export default function AppRoutes() {
           path="/admin/owners/staffs/:id"
           element={<AdminOwnersStaffs />}
         />
-        <Route path="/admin/messages" element={<AdminMessages />} />
+        {/* <Route path="/admin/messages" element={<AdminMessages />} /> */}
         <Route path="/admin/bookings" element={<AdminBookings />} />
         <Route path="/admin/admins" element={<AdminAdmins />} />
         <Route path="/admin/users" element={<AdminUsers />} />
@@ -71,7 +71,7 @@ export default function AppRoutes() {
         <Route path="/owner/analytics" element={<OwnerAnalytics />} />
         <Route path="/owner/staffs" element={<OwnerStaffs />} />
         <Route path="/owner/users" element={<AdminUsers />} />
-        <Route path="/owner/messages" element={<OwnerMessages />} />
+        {/* <Route path="/owner/messages" element={<OwnerMessages />} /> */}
         <Route path="/owner/bookings" element={<OwnerBookings />} />
              <Route
           path="/owner/notifications"

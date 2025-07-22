@@ -4,28 +4,20 @@ import { useState } from "react";
 import { motion } from "framer-motion";
 import {
   Building,
-  Check,
   ChevronDown,
   ChevronLeft,
   ChevronRight,
-  Download,
-  Eye,
-  EyeOff,
   Filter,
-  Mail,
   MoreHorizontal,
   Pencil,
-  Phone,
   Plus,
   Search,
   Trash2,
   UserCheck,
   UserX,
-  X,
 } from "lucide-react";
 
 import { Sidebar } from "@/components/Sidebar";
-import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import {
@@ -38,8 +30,6 @@ import {
 import {
   Dialog,
   DialogContent,
-  DialogDescription,
-  DialogFooter,
   DialogHeader,
   DialogTitle,
   DialogTrigger,
@@ -51,32 +41,25 @@ import {
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
 import { Input } from "@/components/ui/input";
-import { Label } from "@/components/ui/label";
-import {
-  Select,
-  SelectContent,
-  SelectItem,
-  SelectTrigger,
-  SelectValue,
-} from "@/components/ui/select";
 import { Tabs, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import {
   useAddNewownerMutation,
   useBlockownerMutation,
   useDeleteownerMutation,
-  useGetAllownerQuery,
   useGetAllSuperAdminownerQuery,
 } from "@/app/service/owner";
 import { useNavigate } from "react-router-dom";
+import {  OwnerPOST, OwnerPUT } from "./OwnerAU";
 
 export default function AdminOwners() {
-  const [isAddOwnerOpen, setIsAddOwnerOpen] = useState(false);
 
   const [isAddHostelOpen, setIsAddHostelOpen] = useState(false);
   const [statusFilter, setStatusFilter] = useState("all");
-  const [showPassword, setShowPassword] = useState(false);
   const [name, setName] = useState("");
   const [phone, setPhone] = useState("");
+  const [selectedOwner, setSelectedOwner] = useState(null);
+  const [openEditDialog, setOpenEditDialog] = useState(false);
+
   // const [location, setLocation] = useState({
   //   street: "",
   //   place: "",
@@ -89,12 +72,15 @@ export default function AdminOwners() {
   const itemsPerPage = 10;
   const navigate = useNavigate();
 
+  const admin = JSON.parse(localStorage.getItem("admin"));
 
-    const admin = JSON.parse(localStorage.getItem("admin"));
+  const superAdminId =
+    admin?.adminDetails?.role == "admin"
+      ? admin?.adminDetails?.superAdminId
+      : admin?.adminDetails?._id;
 
-    const  superAdminId = admin?.adminDetails?.role == "admin" ?  admin?.adminDetails?.superAdminId : admin?.adminDetails?._id ;
-  
-  const { data, isError, isLoading, refetch } =   useGetAllSuperAdminownerQuery(superAdminId);
+  const { data, isError, isLoading, refetch } =
+    useGetAllSuperAdminownerQuery(superAdminId);
   const [deleteAdmin, { isLoading: isDeleting }] = useDeleteownerMutation();
   const [blockAdmin] = useBlockownerMutation();
   const [addNewAdmin, { isLoading: isPosting }] = useAddNewownerMutation();
@@ -148,7 +134,7 @@ export default function AdminOwners() {
         name,
         phone,
         role: "owner",
-         superAdminId
+        superAdminId,
       }).unwrap();
 
       if (status === 201) {
@@ -219,127 +205,31 @@ export default function AdminOwners() {
                     <DialogHeader>
                       <DialogTitle>Add New Owner</DialogTitle>
                     </DialogHeader>
-                    <div className="grid gap-4 py-4">
-                      <div className="grid grid-cols-2 gap-4">
-                        <div className="space-y-2">
-                          <Label htmlFor="owner-name">Name</Label>
-                          <Input
-                            id="owner-name"
-                            placeholder="Enter admin name"
-                            value={name}
-                            onChange={(e) => setName(e.target.value)}
-                            required
-                          />
-                        </div>
-                        <div className="space-y-2">
-                          <Label htmlFor="email">Email</Label>
-                          <Input
-                            id="email"
-                            placeholder="Enter admin email"
-                            value={email}
-                            onChange={(e) => setEmail(e.target.value)}
-                            required
-                          />
-                        </div>
-                      </div>
-                      <div className="grid grid-cols-2 gap-4">
-                        <div className="space-y-2">
-                          <Label htmlFor="password">Password</Label>
+                    <OwnerPOST
+                      isPosting={isPosting}
+                      name={name}
+                      email={email}
+                      password={password}
+                      phone={phone}
+                      setName={setName}
+                      setEmail={setEmail}
+                      setPassword={setPassword}
+                      setPhone={setPhone}
+                      handleSubmit={handleSubmit}
+                    />
+                  </DialogContent>
+                </Dialog>
 
-                          <div className="relative">
-                            <Input
-                              id="password"
-                              type={showPassword ? "text" : "password"}
-                              placeholder="••••••••"
-                              value={password}
-                              onChange={(e) => setPassword(e.target.value)}
-                              required
-                            />
-                            <Button
-                              type="button"
-                              variant="ghost"
-                              size="icon"
-                              className="absolute right-2 top-1/2 -translate-y-1/2"
-                              onClick={() => setShowPassword(!showPassword)}
-                            >
-                              {showPassword ? (
-                                <EyeOff className="h-4 w-4 text-muted-foreground cursor-pointer" />
-                              ) : (
-                                <Eye className="h-4 w-4 text-muted-foreground cursor-pointer" />
-                              )}
-                            </Button>
-                          </div>
-                        </div>
-
-                        <div className="space-y-2">
-                          <Label htmlFor="phone">Phone</Label>
-                          <Input
-                            id="phone"
-                            placeholder="+91 0000000"
-                            value={phone}
-                            onChange={(e) => setPhone(e.target.value)}
-                            required
-                          />
-                        </div>
-                        {/* <div className="space-y-2">
-                          <Label htmlFor="street">Street</Label>
-                          <Input
-                            id="street"
-                            placeholder="Enter street"
-                            value={location.street}
-                            onChange={(e) =>
-                              setLocation({
-                                ...location,
-                                street: e.target.value,
-                              })
-                            }
-                          />
-                        </div>
-                        <div className="space-y-2">
-                          <Label htmlFor="place">Place</Label>
-                          <Input
-                            id="place"
-                            placeholder="Enter place"
-                            value={location.place}
-                            onChange={(e) =>
-                              setLocation({
-                                ...location,
-                                place: e.target.value,
-                              })
-                            }
-                          />
-                        </div> */}
-                        {/* <div className="space-y-2">
-                          <Label htmlFor="pincode">Pincode</Label>
-                          <Input
-                            id="pincode"
-                            placeholder="Enter pincode"
-                            value={location.pincode}
-                            onChange={(e) =>
-                              setLocation({
-                                ...location,
-                                pincode: e.target.value,
-                              })
-                            }
-                          />
-                        </div> */}
-                      </div>
-                    </div>
-                    <DialogFooter>
-                      <Button
-                        variant="outline"
-                        onClick={() => setIsAddHostelOpen(false)}
-                        className={"cursor-pointer"}
-                      >
-                        Cancel
-                      </Button>
-                      <Button
-                        className="bg-rose-600 hover:bg-rose-700 cursor-pointer"
-                        onClick={handleSubmit}
-                      >
-                        {isPosting ? "Creating..." : "Create"}
-                      </Button>
-                    </DialogFooter>
+                <Dialog open={openEditDialog} onOpenChange={setOpenEditDialog}>
+                  <DialogContent>
+                    <DialogHeader>
+                      <DialogTitle>Edit Admin</DialogTitle>
+                    </DialogHeader>
+                    <OwnerPUT
+                      owner={selectedOwner}
+                      onClose={() => setOpenEditDialog(false)}
+                      onUpdated={refetch}
+                    />
                   </DialogContent>
                 </Dialog>
               </div>
@@ -451,7 +341,9 @@ export default function AdminOwners() {
                                 <span
                                   className="font-medium cursor-pointer"
                                   onClick={() =>
-                                    navigate(`/admin/owners/staffs/${owner._id}`)
+                                    navigate(
+                                      `/admin/owners/staffs/${owner._id}`
+                                    )
                                   }
                                 >
                                   {owner?.name}
@@ -500,6 +392,10 @@ export default function AdminOwners() {
                                   </DropdownMenuItem>
                                   <DropdownMenuItem
                                     className={"cursor-pointer"}
+                                    onClick={() => {
+                                      setSelectedOwner(owner);
+                                      setOpenEditDialog(true);
+                                    }}
                                   >
                                     <Pencil className="h-4 w-4 mr-2" />
                                     Edit

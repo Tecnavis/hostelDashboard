@@ -33,14 +33,16 @@ export const roomApi = createApi({
 
     // Update a room
 
-    updateroom: builder.mutation({
-        query: ({id, updateroom}) => ({
-            url: `/rooms/${id}`,
-            method: 'PUT',
-            headers: { "Content-Type": "application/json" },
-            body: updateroom
-        })
-    }),
+// roomApi.js (or wherever your API slice is)
+
+updateroom: builder.mutation({
+  query: ({ id, updateroom }) => ({
+    url: `/rooms/${id}`,
+    method: "PUT",
+    body: updateroom,
+  }),
+}),
+
 
     // Delete a room
 

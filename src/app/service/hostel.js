@@ -41,14 +41,13 @@ export const hostelApi = createApi({
 
     // Update a hostel
 
-    updatehostel: builder.mutation({
-        query: ({id, updatehostel}) => ({
-            url: `/hostels/${id}`,
-            method: 'PUT',
-            headers: { "Content-Type": "application/json" },
-            body: updatehostel
-        })
-    }),
+updatehostel: builder.mutation({
+  query: ({ id, updateData }) => ({
+    url: `/hostels/${id}`,
+    method: 'PUT',
+    body: updateData,
+  }),
+}),
 
     // Delete a hostel
 

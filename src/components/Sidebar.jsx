@@ -43,7 +43,7 @@ export function Sidebar() {
     { title: "Users", href: "/admin/users", icon: User },
     { title: "Bookings", href: "/admin/bookings", icon: Hotel },
     // { title: "Analytics", href: "/admin/analytics", icon: BarChart3 },
-    { title: "Messages", href: "/admin/messages", icon: MessageSquare },
+    // { title: "Messages", href: "/admin/messages", icon: MessageSquare },
     { title: "Notifications", href: "/admin/notifications", icon: Bell },
   ];
 
@@ -56,7 +56,7 @@ export function Sidebar() {
     { title: "Users", href: "/owner/users", icon: User },
     { title: "Bookings", href: "/owner/bookings", icon: Hotel },
     // { title: "Analytics", href: "/owner/analytics", icon: BarChart3 },
-    { title: "Messages", href: "/owner/messages", icon: MessageSquare },
+    // { title: "Messages", href: "/owner/messages", icon: MessageSquare },
     { title: "Notifications", href: "/owner/notifications", icon: Bell },
 
     // { title: "Settings", href: "/owner/settings", icon: Settings },

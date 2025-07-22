@@ -31,7 +31,6 @@ export default function OwnerNotificationsPage() {
       refetchOnMountOrArgChange: true,
     });
 
-  console.log(data, "uioo");
 
   const [updateNotification] = useUpdatenotficationOwnerMutation();
 

@@ -53,6 +53,7 @@ import {
   useGetAllHostelRoomQuery,
 } from "@/app/service/room";
 import { useParams } from "react-router-dom";
+import { RoomPOST, RoomPUT, ShowImagesIcon } from "./RoomAU";
 
 export default function AdminHostelsRooms() {
   const [isAddHostelOpen, setIsAddHostelOpen] = useState(false);
@@ -81,6 +82,9 @@ export default function AdminHostelsRooms() {
   const [deleteroom, { isLoading: isDeleting }] = useDeleteroomMutation();
   const [blockroom] = useBlockroomMutation();
   const [addNewroom, { isLoading: isPosting }] = useAddNewroomMutation();
+  const [openEditDialog, setOpenEditDialog] = useState(false);
+  const [selectedRoom, setSelectedRoom] = useState(null);
+  const [open, setOpen] = useState(false);
 
   if (isLoading) return <h1>Loading...</h1>;
   if (isError || !Array.isArray(data))
@@ -269,270 +273,61 @@ export default function AdminHostelsRooms() {
                       Add hostel
                     </Button>
                   </DialogTrigger>
-                  <DialogContent className="sm:max-w-[600px]">
+                  <RoomPOST
+                    isPosting={isPosting}
+                    roomNumber={roomNumber}
+                    setRoomNumber={setRoomNumber}
+                    capacity={capacity}
+                    setCapacity={setCapacity}
+                    price={price}
+                    setPrice={setPrice}
+                    currentOccupancy={currentOccupancy}
+                    setCurrentOccupancy={setCurrentOccupancy}
+                    roomType={roomType}
+                    setRoomType={setRoomType}
+                    payment={payment}
+                    setPayment={setPayment}
+                    charge={charge}
+                    setCharge={setCharge}
+                    gardianInfo={gardianInfo}
+                    setGardianInfo={setGardianInfo}
+                    features={features}
+                    handleFeatures={handleFeatures}
+                    addFeatures={addFeatures}
+                    removeFeatures={removeFeatures}
+                    visitTimes={visitTimes}
+                    handleVisitTime={handleVisitTime}
+                    addVisitTime={addVisitTime}
+                    removeVisitTime={removeVisitTime}
+                    selectedImages={selectedImages}
+                    setSelectedImages={setSelectedImages}
+                    handleSubmit={handleSubmit}
+                    setIsAddHostelOpen={setIsAddHostelOpen}
+                  />
+                </Dialog>
+
+                <Dialog open={openEditDialog} onOpenChange={setOpenEditDialog}>
+                  <DialogContent>
                     <DialogHeader>
-                      <DialogTitle>Add New Room</DialogTitle>
+                      <DialogTitle>Edit Admin</DialogTitle>
                     </DialogHeader>
-                    {/* <div className="grid gap-4 py-4"> */}
-                    <div
-                      className="overflow-y-auto pr-2 mt-2 space-y-4"
-                      style={{ maxHeight: "calc(90vh - 130px)" }}
-                    >
-                      <div className="grid grid-cols-2 gap-4">
-                        <div className="space-y-2">
-                          <Label htmlFor="roomNumber">Room Number</Label>
-                          <Input
-                            id="roomNumber"
-                            placeholder="Enter room number"
-                            value={roomNumber}
-                            onChange={(e) => setRoomNumber(e.target.value)}
-                            required
-                          />
-                        </div>
-                        <div className="space-y-2">
-                          <Label htmlFor="capacity">Capacity</Label>
-                          <Input
-                            id="capacity"
-                            placeholder="Enter room capacity"
-                            value={capacity}
-                            onChange={(e) => setCapacity(e.target.value)}
-                            required
-                          />
-                        </div>
+                    <RoomPUT
+                      room={selectedRoom}
+                      onClose={() => setOpenEditDialog(false)}
+                      onUpdated={refetch}
+                    />
+                  </DialogContent>
+                </Dialog>
 
-                        <div className="space-y-2">
-                          <Label htmlFor="roomtype">Room Type</Label>
-                          <Input
-                            id="roomtype"
-                            placeholder="Enter room type"
-                            value={roomType}
-                            onChange={(e) => setRoomType(e.target.value)}
-                            required
-                          />
-                        </div>
-
-                        <div className="space-y-2">
-                          <Label htmlFor="charge">Charge</Label>
-                          <Input
-                            id="charge"
-                            placeholder="Enter room Charge"
-                            value={charge}
-                            onChange={(e) => setCharge(e.target.value)}
-                            required
-                          />
-                        </div>
-
-                        <div className="space-y-2">
-                          <Label htmlFor="payment">Payment</Label>
-                          <Input
-                            id="payment"
-                            placeholder="Enter payment"
-                            value={payment}
-                            onChange={(e) => setPayment(e.target.value)}
-                            required
-                          />
-                        </div>
-
-                        <div className="space-y-2">
-                          <Label htmlFor="name">Gardian Name</Label>
-                          <Input
-                            id="name"
-                            placeholder="Enter street"
-                            value={gardianInfo.name}
-                            onChange={(e) =>
-                              setGardianInfo({
-                                ...gardianInfo,
-                                name: e.target.value,
-                              })
-                            }
-                          />
-                        </div>
-                        <div className="space-y-2">
-                          <Label htmlFor="email">Gardian Email</Label>
-                          <Input
-                            id="email"
-                            placeholder="Enter gardian email"
-                            value={gardianInfo.email}
-                            onChange={(e) =>
-                              setGardianInfo({
-                                ...gardianInfo,
-                                email: e.target.value,
-                              })
-                            }
-                          />
-                        </div>
-                        <div className="space-y-2">
-                          <Label htmlFor="phone">Gardian Phone</Label>
-                          <Input
-                            id="phone"
-                            placeholder="Enter gardian phone"
-                            value={gardianInfo.phone}
-                            onChange={(e) =>
-                              setGardianInfo({
-                                ...gardianInfo,
-                                phone: e.target.value,
-                              })
-                            }
-                          />
-                        </div>
-                      </div>
-                      <div className="grid grid-cols-2 gap-4">
-                        <div className="space-y-2">
-                          <Label htmlFor="currentOccupancy">
-                            Current Occupancy
-                          </Label>
-
-                          <Input
-                            id="currentOccupancy"
-                            placeholder="Enter number of people currently in the room"
-                            value={currentOccupancy}
-                            onChange={(e) =>
-                              setCurrentOccupancy(e.target.value)
-                            }
-                            required
-                          />
-                        </div>
-                        <div className="space-y-2">
-                          <Label htmlFor="price">Price</Label>
-
-                          <Input
-                            id="price"
-                            placeholder="Enter room price"
-                            value={price}
-                            onChange={(e) => setPrice(e.target.value)}
-                            required
-                          />
-                        </div>
-
-                        <div className="space-y-2">
-                          <Label>Features</Label>
-                          {features.map((feature, index) => (
-                            <div
-                              key={index}
-                              className="flex gap-2 items-center"
-                            >
-                              <Input
-                                value={feature}
-                                onChange={(e) =>
-                                  handleFeatures(index, e.target.value)
-                                }
-                                placeholder={`Enter feature ${index + 1}`}
-                              />
-                              {features.length > 1 && (
-                                <Button
-                                  type="button"
-                                  variant="ghost"
-                                  size="sm"
-                                  onClick={() => removeFeatures(index)}
-                                >
-                                  ✕
-                                </Button>
-                              )}
-                            </div>
-                          ))}
-                          <Button
-                            type="button"
-                            variant="outline"
-                            size="sm"
-                            onClick={addFeatures}
-                          >
-                            + Add Feature
-                          </Button>
-                        </div>
-
-                        <div className="space-y-2">
-                          <Label>Visit Times</Label>
-                          {visitTimes.map((time, index) => (
-                            <div
-                              key={index}
-                              className="flex gap-2 items-center"
-                            >
-                              <Input
-                                value={time}
-                                onChange={(e) =>
-                                  handleVisitTime(index, e.target.value)
-                                }
-                                placeholder={`Enter visit time ${index + 1}`}
-                              />
-                              {visitTimes.length > 1 && (
-                                <Button
-                                  type="button"
-                                  variant="ghost"
-                                  size="sm"
-                                  onClick={() => removeVisitTime(index)}
-                                >
-                                  ✕
-                                </Button>
-                              )}
-                            </div>
-                          ))}
-                          <Button
-                            type="button"
-                            variant="outline"
-                            size="sm"
-                            onClick={addVisitTime}
-                          >
-                            + Add Visit Time
-                          </Button>
-                        </div>
-                      </div>
-                      <div className="space-y-2">
-                        <Label htmlFor="images">Upload Images</Label>
-                        <label className="border-2 border-dashed rounded-md p-6 flex flex-col items-center justify-center gap-2 cursor-pointer">
-                          <ImagePlus className="h-8 w-8 text-muted-foreground" />
-                          <p className="text-sm text-muted-foreground">
-                            Click to upload
-                          </p>
-                          <Upload className="h-4 w-4" />
-
-                          <Input
-                            type="file"
-                            accept="image/*"
-                            multiple
-                            className="hidden"
-                            onChange={(e) => {
-                              if (e.target.files) {
-                                setSelectedImages((prevImages) => [
-                                  ...prevImages,
-                                  ...Array.from(e.target.files),
-                                ]);
-                              }
-                            }}
-                          />
-                        </label>
-
-                        {selectedImages.length > 0 && (
-                          <div className="grid gap-2 mt-4">
-                            <Label>Preview</Label>
-                            <div className="grid grid-cols-2 gap-2">
-                              {selectedImages.map((file, index) => (
-                                <img
-                                  key={index}
-                                  src={URL.createObjectURL(file)}
-                                  alt="preview"
-                                  className="w-full h-32 object-cover rounded-md"
-                                />
-                              ))}
-                            </div>
-                          </div>
-                        )}
-                      </div>
-                    </div>
-                    <DialogFooter>
-                      <Button
-                        variant="outline"
-                        onClick={() => setIsAddHostelOpen(false)}
-                        className={"cursor-pointer"}
-                      >
-                        Cancel
-                      </Button>
-                      <Button
-                        className="bg-rose-600 hover:bg-rose-700 cursor-pointer"
-                        onClick={handleSubmit}
-                      >
-                        {isPosting ? "Creating..." : "Create"}
-                      </Button>
-                    </DialogFooter>
+                <Dialog open={open} onOpenChange={setOpen}>
+                  <DialogContent>
+                    <DialogHeader>
+                      <DialogTitle>Room Images</DialogTitle>
+                    </DialogHeader>
+                    <ShowImagesIcon
+                      images={selectedRoom?.photos}
+                      onClose={() => setOpen(false)}
+                    />
                   </DialogContent>
                 </Dialog>
               </div>
@@ -650,7 +445,13 @@ export default function AdminHostelsRooms() {
                             <td className="py-3 px-4">
                               <div className="flex items-center gap-3">
                                 <div className="h-10 w-10 bg-gray-100 rounded-md flex items-center justify-center">
-                                  <Building className="h-5 w-5 text-gray-500" />
+                                  <Building
+                                    className="h-5 w-5 text-gray-500"
+                                    onClick={() => {
+                                      setOpen(true);
+                                      setSelectedRoom(room);
+                                    }}
+                                  />
                                 </div>
                                 <span className="font-medium">
                                   {room.roomNumber}
@@ -669,15 +470,9 @@ export default function AdminHostelsRooms() {
                                 </span>
                               ))}
                             </td>
-                            <td className="py-3 px-4">
-                              {room?.roomType}
-                            </td>
-                            <td className="py-3 px-4">
-                              {room?.charge}
-                            </td>
-                            <td className="py-3 px-4">
-                              {room?.payment}
-                            </td>
+                            <td className="py-3 px-4">{room?.roomType}</td>
+                            <td className="py-3 px-4">{room?.charge}</td>
+                            <td className="py-3 px-4">{room?.payment}</td>
                             <td className="py-3 px-4">
                               {room.currentOccupancy}
                             </td>
@@ -720,6 +515,10 @@ export default function AdminHostelsRooms() {
                                   </DropdownMenuItem>
                                   <DropdownMenuItem
                                     className={"cursor-pointer"}
+                                    onClick={() => {
+                                      setSelectedRoom(room);
+                                      setOpenEditDialog(true);
+                                    }}
                                   >
                                     <Pencil className="h-4 w-4 mr-2" />
                                     Edit

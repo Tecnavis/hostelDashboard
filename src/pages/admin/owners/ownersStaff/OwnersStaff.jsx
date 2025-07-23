@@ -59,6 +59,7 @@ import {
   useGetAllownerStaffQuery,
 } from "@/app/service/owner";
 import { useParams } from "react-router-dom";
+import { OwnerStaffPOST, StaffPUT } from "./OwnerStaffAU";
 
 export default function AdminOwnersStaffs() {
   const [isAddOwnerOpen, setIsAddOwnerOpen] = useState(false);
@@ -75,11 +76,15 @@ export default function AdminOwnersStaffs() {
   const [currentPage, setCurrentPage] = useState(1);
   const itemsPerPage = 10;
   const { id } = useParams();
+  const [openEditDialog, setOpenEditDialog] = useState(false);
+  const [selectedStaff, setSelectedStaff] = useState(null);
 
-    const admin = JSON.parse(localStorage.getItem("admin"));
+  const admin = JSON.parse(localStorage.getItem("admin"));
 
-     const  superAdminId = admin?.adminDetails?.role == "admin" ?  admin?.adminDetails?.superAdminId : admin?.adminDetails?._id ;
-
+  const superAdminId =
+    admin?.adminDetails?.role == "admin"
+      ? admin?.adminDetails?.superAdminId
+      : admin?.adminDetails?._id;
 
   const { data, isError, isLoading, refetch } = useGetAllownerStaffQuery(id);
   const [deleteAdmin, { isLoading: isDeleting }] = useDeleteownerMutation();
@@ -132,7 +137,7 @@ export default function AdminOwnersStaffs() {
         phone,
         role: "staff",
         ownerId: id,
-         superAdminId
+        superAdminId,
       }).unwrap();
 
       if (status === 201) {
@@ -181,7 +186,7 @@ export default function AdminOwnersStaffs() {
           <div className="max-w-7xl mx-auto space-y-6">
             <div className="flex items-center justify-between mt-10">
               <h1 className="text-lg sm:text-xl md:text-2xl font-bold">
-                Manage Owners
+                Manage Owner Staffs
               </h1>
 
               <div className="flex items-center gap-2">
@@ -195,134 +200,33 @@ export default function AdminOwnersStaffs() {
                       className="bg-rose-600 hover:bg-rose-700 gap-2 cursor-pointer"
                     >
                       <Plus className="h-4 w-4" />
-                      Add owner
+                      Add owner Staff
                     </Button>
                   </DialogTrigger>
-                  <DialogContent className="sm:max-w-[600px]">
+                  <OwnerStaffPOST
+                    isPosting={isPosting}
+                    name={name}
+                    email={email}
+                    password={password}
+                    phone={phone}
+                    setName={setName}
+                    setEmail={setEmail}
+                    setPassword={setPassword}
+                    setPhone={setPhone}
+                    handleSubmit={handleSubmit}
+                  />
+                </Dialog>
+
+                <Dialog open={openEditDialog} onOpenChange={setOpenEditDialog}>
+                  <DialogContent>
                     <DialogHeader>
-                      <DialogTitle>Add New Owner</DialogTitle>
+                      <DialogTitle>Edit Staff</DialogTitle>
                     </DialogHeader>
-                    <div className="grid gap-4 py-4">
-                      <div className="grid grid-cols-2 gap-4">
-                        <div className="space-y-2">
-                          <Label htmlFor="owner-name">Name</Label>
-                          <Input
-                            id="owner-name"
-                            placeholder="Enter admin name"
-                            value={name}
-                            onChange={(e) => setName(e.target.value)}
-                            required
-                          />
-                        </div>
-                        <div className="space-y-2">
-                          <Label htmlFor="email">Email</Label>
-                          <Input
-                            id="email"
-                            placeholder="Enter admin email"
-                            value={email}
-                            onChange={(e) => setEmail(e.target.value)}
-                            required
-                          />
-                        </div>
-                      </div>
-                      <div className="grid grid-cols-2 gap-4">
-                        <div className="space-y-2">
-                          <Label htmlFor="password">Password</Label>
-
-                          <div className="relative">
-                            <Input
-                              id="password"
-                              type={showPassword ? "text" : "password"}
-                              placeholder="••••••••"
-                              value={password}
-                              onChange={(e) => setPassword(e.target.value)}
-                              required
-                            />
-                            <Button
-                              type="button"
-                              variant="ghost"
-                              size="icon"
-                              className="absolute right-2 top-1/2 -translate-y-1/2"
-                              onClick={() => setShowPassword(!showPassword)}
-                            >
-                              {showPassword ? (
-                                <EyeOff className="h-4 w-4 text-muted-foreground cursor-pointer" />
-                              ) : (
-                                <Eye className="h-4 w-4 text-muted-foreground cursor-pointer" />
-                              )}
-                            </Button>
-                          </div>
-                        </div>
-
-                        <div className="space-y-2">
-                          <Label htmlFor="phone">Phone</Label>
-                          <Input
-                            id="phone"
-                            placeholder="+91 0000000"
-                            value={phone}
-                            onChange={(e) => setPhone(e.target.value)}
-                            required
-                          />
-                        </div>
-                        {/* <div className="space-y-2">
-                            <Label htmlFor="street">Street</Label>
-                            <Input
-                              id="street"
-                              placeholder="Enter street"
-                              value={location.street}
-                              onChange={(e) =>
-                                setLocation({
-                                  ...location,
-                                  street: e.target.value,
-                                })
-                              }
-                            />
-                          </div>
-                          <div className="space-y-2">
-                            <Label htmlFor="place">Place</Label>
-                            <Input
-                              id="place"
-                              placeholder="Enter place"
-                              value={location.place}
-                              onChange={(e) =>
-                                setLocation({
-                                  ...location,
-                                  place: e.target.value,
-                                })
-                              }
-                            />
-                          </div> */}
-                        {/* <div className="space-y-2">
-                            <Label htmlFor="pincode">Pincode</Label>
-                            <Input
-                              id="pincode"
-                              placeholder="Enter pincode"
-                              value={location.pincode}
-                              onChange={(e) =>
-                                setLocation({
-                                  ...location,
-                                  pincode: e.target.value,
-                                })
-                              }
-                            />
-                          </div> */}
-                      </div>
-                    </div>
-                    <DialogFooter>
-                      <Button
-                        variant="outline"
-                        onClick={() => setIsAddHostelOpen(false)}
-                        className={"cursor-pointer"}
-                      >
-                        Cancel
-                      </Button>
-                      <Button
-                        className="bg-rose-600 hover:bg-rose-700 cursor-pointer"
-                        onClick={handleSubmit}
-                      >
-                        {isPosting ? "Creating..." : "Create"}
-                      </Button>
-                    </DialogFooter>
+                    <StaffPUT
+                      staff={selectedStaff}
+                      onClose={() => setOpenEditDialog(false)}
+                      onUpdated={refetch}
+                    />
                   </DialogContent>
                 </Dialog>
               </div>
@@ -337,9 +241,9 @@ export default function AdminOwnersStaffs() {
                 <CardHeader className="pb-2">
                   <div className="flex items-center justify-between">
                     <div>
-                      <CardTitle>All Owners</CardTitle>
+                      <CardTitle>All Owner Staffs</CardTitle>
                       <CardDescription>
-                        Manage and monitor all registered owners
+                        Manage and monitor all registered owner Staffs
                       </CardDescription>
                     </div>
                   </div>
@@ -478,6 +382,10 @@ export default function AdminOwnersStaffs() {
                                   </DropdownMenuItem>
                                   <DropdownMenuItem
                                     className={"cursor-pointer"}
+                                    onClick={() => {
+                                      setSelectedStaff(owner);
+                                      setOpenEditDialog(true);
+                                    }}
                                   >
                                     <Pencil className="h-4 w-4 mr-2" />
                                     Edit

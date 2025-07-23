@@ -309,7 +309,7 @@ export default function AdminHostelsRooms() {
                 <Dialog open={openEditDialog} onOpenChange={setOpenEditDialog}>
                   <DialogContent>
                     <DialogHeader>
-                      <DialogTitle>Edit Admin</DialogTitle>
+                      <DialogTitle>Edit Room</DialogTitle>
                     </DialogHeader>
                     <RoomPUT
                       room={selectedRoom}
@@ -446,7 +446,7 @@ export default function AdminHostelsRooms() {
                               <div className="flex items-center gap-3">
                                 <div className="h-10 w-10 bg-gray-100 rounded-md flex items-center justify-center">
                                   <Building
-                                    className="h-5 w-5 text-gray-500"
+                                    className="h-5 w-5 text-gray-500 cursor-pointer"
                                     onClick={() => {
                                       setOpen(true);
                                       setSelectedRoom(room);

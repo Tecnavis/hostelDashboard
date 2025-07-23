@@ -118,7 +118,6 @@ export function OwnerPOST({
 }
 
 export function OwnerPUT({ owner, onClose, onUpdated }) {
-    console.log(owner, "hooio");
     
   const [name, setName] = useState(owner.name || "");
   const [email, setEmail] = useState(owner.email || "");

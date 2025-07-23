@@ -54,11 +54,11 @@ import {
   useGetAllownerQuery,
   useGetAllownerStaffQuery,
 } from "@/app/service/owner";
+import { StaffPOST, StaffPUT } from "./StaffAU";
 
 export default function OwnerStaffs() {
   const [isAddHostelOpen, setIsAddHostelOpen] = useState(false);
   const [statusFilter, setStatusFilter] = useState("all");
-  const [showPassword, setShowPassword] = useState(false);
   const [name, setName] = useState("");
   const [phone, setPhone] = useState("");
   const [email, setEmail] = useState("");
@@ -66,10 +66,12 @@ export default function OwnerStaffs() {
   const [searchTerm, setSearchTerm] = useState("");
   const [currentPage, setCurrentPage] = useState(1);
   const itemsPerPage = 10;
+  const [openEditDialog, setOpenEditDialog] = useState(false);
+  const [selectedStaff, setSelectedStaff] = useState(null);
 
   const owner = JSON.parse(localStorage.getItem("owner"));
 
-  const { data, isError, isLoading, refetch } =  useGetAllownerStaffQuery(
+  const { data, isError, isLoading, refetch } = useGetAllownerStaffQuery(
     owner?.ownerDetails?._id
   );
   const [deleteowner, { isLoading: isDeleting }] = useDeleteownerMutation();
@@ -187,89 +189,30 @@ export default function OwnerStaffs() {
                       Add admin
                     </Button>
                   </DialogTrigger>
-                  <DialogContent className="sm:max-w-[600px]">
+                  <StaffPOST
+                    isPosting={isPosting}
+                    name={name}
+                    email={email}
+                    password={password}
+                    phone={phone}
+                    setName={setName}
+                    setEmail={setEmail}
+                    setPassword={setPassword}
+                    setPhone={setPhone}
+                    handleSubmit={handleSubmit}
+                    setIsAddHostelOpen={setIsAddHostelOpen}
+                  />
+                </Dialog>
+                <Dialog open={openEditDialog} onOpenChange={setOpenEditDialog}>
+                  <DialogContent>
                     <DialogHeader>
-                      <DialogTitle>Add New Admin</DialogTitle>
+                      <DialogTitle>Edit Admin</DialogTitle>
                     </DialogHeader>
-                    <div className="grid gap-4 py-4">
-                      <div className="grid grid-cols-2 gap-4">
-                        <div className="space-y-2">
-                          <Label htmlFor="-name">Name</Label>
-                          <Input
-                            id="name"
-                            placeholder="Enter admin name"
-                            value={name}
-                            onChange={(e) => setName(e.target.value)}
-                            required
-                          />
-                        </div>
-                        <div className="space-y-2">
-                          <Label htmlFor="email">Email</Label>
-                          <Input
-                            id="email"
-                            placeholder="Enter admin email"
-                            value={email}
-                            onChange={(e) => setEmail(e.target.value)}
-                            required
-                          />
-                        </div>
-                      </div>
-                      <div className="grid grid-cols-2 gap-4">
-                        <div className="space-y-2">
-                          <Label htmlFor="password">Password</Label>
-
-                          <div className="relative">
-                            <Input
-                              id="password"
-                              type={showPassword ? "text" : "password"}
-                              placeholder="••••••••"
-                              value={password}
-                              onChange={(e) => setPassword(e.target.value)}
-                              required
-                            />
-                            <Button
-                              type="button"
-                              variant="ghost"
-                              size="icon"
-                              className="absolute right-2 top-1/2 -translate-y-1/2"
-                              onClick={() => setShowPassword(!showPassword)}
-                            >
-                              {showPassword ? (
-                                <EyeOff className="h-4 w-4 text-muted-foreground cursor-pointer" />
-                              ) : (
-                                <Eye className="h-4 w-4 text-muted-foreground cursor-pointer" />
-                              )}
-                            </Button>
-                          </div>
-                        </div>
-
-                        <div className="space-y-2">
-                          <Label htmlFor="phone">Phone</Label>
-                          <Input
-                            id="phone"
-                            placeholder="+91 0000000"
-                            value={phone}
-                            onChange={(e) => setPhone(e.target.value)}
-                            required
-                          />
-                        </div>
-                      </div>
-                    </div>
-                    <DialogFooter>
-                      <Button
-                        variant="outline"
-                        onClick={() => setIsAddHostelOpen(false)}
-                        className={"cursor-pointer"}
-                      >
-                        Cancel
-                      </Button>
-                      <Button
-                        className="bg-rose-600 hover:bg-rose-700 cursor-pointer"
-                        onClick={handleSubmit}
-                      >
-                        {isPosting ? "Creating..." : "Create"}
-                      </Button>
-                    </DialogFooter>
+                    <StaffPUT
+                      staff={selectedStaff}
+                      onClose={() => setOpenEditDialog(false)}
+                      onUpdated={refetch}
+                    />
                   </DialogContent>
                 </Dialog>
               </div>
@@ -424,6 +367,10 @@ export default function OwnerStaffs() {
                                   </DropdownMenuItem>
                                   <DropdownMenuItem
                                     className={"cursor-pointer"}
+                                    onClick={() => {
+                                      setSelectedStaff(staff);
+                                      setOpenEditDialog(true);
+                                    }}
                                   >
                                     <Pencil className="h-4 w-4 mr-2" />
                                     Edit

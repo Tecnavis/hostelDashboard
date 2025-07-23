@@ -482,7 +482,7 @@ export default function AdminHostels() {
                               <div className="flex items-center gap-3">
                                 <div className="h-10 w-10 bg-gray-100 rounded-md flex items-center justify-center">
                                   <Building
-                                    className="h-5 w-5 text-gray-500"
+                                    className="h-5 w-5 text-gray-500 cursor-pointer"
                                     onClick={() => {
                                       setOpen(true);
                                       setSelectedHostel(hostel);

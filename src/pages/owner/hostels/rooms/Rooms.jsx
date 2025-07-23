@@ -55,166 +55,167 @@ import {
 } from "@/app/service/room";
 import { useParams } from "react-router-dom";
 import { Switch } from "@radix-ui/react-switch";
+import { RoomsPOST, RoomsPUT, ShowImagesIcon  } from "./RoomAU";
 
 export default function OwnerHostelsRooms() {
-  const rooms = [
-    {
-      id: 1,
-      name: "Deluxe Private Double",
-      hostel: "Sunset Beach Hostel",
-      type: "Private",
-      capacity: 2,
-      beds: "1 Queen Bed",
-      price: 85,
-      status: "Available",
-      amenities: [
-        "En-suite Bathroom",
-        "Air Conditioning",
-        "Sea View",
-        "TV",
-        "Mini Fridge",
-      ],
-      description:
-        "Spacious private room with a queen-sized bed and en-suite bathroom. Features a beautiful sea view.",
-      image: "/placeholder.svg?height=200&width=300",
-      occupancy: "75%",
-      bookings: 42,
-    },
-    {
-      id: 2,
-      name: "Standard Private Single",
-      hostel: "Sunset Beach Hostel",
-      type: "Private",
-      capacity: 1,
-      beds: "1 Single Bed",
-      price: 65,
-      status: "Available",
-      amenities: ["Shared Bathroom", "Air Conditioning", "Desk", "Locker"],
-      description:
-        "Cozy private room with a single bed. Shared bathroom facilities.",
-      image: "/placeholder.svg?height=200&width=300",
-      occupancy: "80%",
-      bookings: 38,
-    },
-    {
-      id: 3,
-      name: "4-Bed Mixed Dorm",
-      hostel: "Sunset Beach Hostel",
-      type: "Dorm",
-      capacity: 4,
-      beds: "4 Single Beds",
-      price: 30,
-      status: "Available",
-      amenities: [
-        "Shared Bathroom",
-        "Air Conditioning",
-        "Lockers",
-        "Reading Lights",
-      ],
-      description:
-        "Comfortable 4-bed mixed dorm with individual lockers and reading lights for each bed.",
-      image: "/placeholder.svg?height=200&width=300",
-      occupancy: "90%",
-      bookings: 65,
-    },
-    {
-      id: 4,
-      name: "6-Bed Female Dorm",
-      hostel: "Sunset Beach Hostel",
-      type: "Dorm",
-      capacity: 6,
-      beds: "6 Single Beds",
-      price: 25,
-      status: "Available",
-      amenities: [
-        "Shared Bathroom",
-        "Air Conditioning",
-        "Lockers",
-        "Reading Lights",
-        "Female Only",
-      ],
-      description:
-        "Female-only dorm with 6 single beds, individual lockers, and reading lights.",
-      image: "/placeholder.svg?height=200&width=300",
-      occupancy: "85%",
-      bookings: 58,
-    },
-    {
-      id: 5,
-      name: "Premium Private Double",
-      hostel: "Downtown Backpackers",
-      type: "Private",
-      capacity: 2,
-      beds: "1 Queen Bed",
-      price: 75,
-      status: "Available",
-      amenities: ["En-suite Bathroom", "Air Conditioning", "City View", "TV"],
-      description:
-        "Modern private room with a queen-sized bed and en-suite bathroom. Features a city view.",
-      image: "/placeholder.svg?height=200&width=300",
-      occupancy: "85%",
-      bookings: 45,
-    },
-    {
-      id: 6,
-      name: "8-Bed Mixed Dorm",
-      hostel: "Downtown Backpackers",
-      type: "Dorm",
-      capacity: 8,
-      beds: "8 Single Beds",
-      price: 22,
-      status: "Available",
-      amenities: [
-        "Shared Bathroom",
-        "Air Conditioning",
-        "Lockers",
-        "Reading Lights",
-      ],
-      description:
-        "Spacious 8-bed mixed dorm with individual lockers and reading lights for each bed.",
-      image: "/placeholder.svg?height=200&width=300",
-      occupancy: "95%",
-      bookings: 72,
-    },
-    {
-      id: 7,
-      name: "Mountain View Suite",
-      hostel: "Mountain View Lodge",
-      type: "Private",
-      capacity: 2,
-      beds: "1 King Bed",
-      price: 95,
-      status: "Available",
-      amenities: [
-        "En-suite Bathroom",
-        "Fireplace",
-        "Mountain View",
-        "TV",
-        "Mini Kitchen",
-      ],
-      description:
-        "Luxurious private suite with a king-sized bed, en-suite bathroom, and a fireplace. Features a stunning mountain view.",
-      image: "/placeholder.svg?height=200&width=300",
-      occupancy: "70%",
-      bookings: 32,
-    },
-    {
-      id: 8,
-      name: "4-Bed Mixed Dorm",
-      hostel: "Mountain View Lodge",
-      type: "Dorm",
-      capacity: 4,
-      beds: "4 Single Beds",
-      price: 35,
-      status: "Available",
-      amenities: ["Shared Bathroom", "Heating", "Lockers", "Reading Lights"],
-      description:
-        "Cozy 4-bed mixed dorm with individual lockers and reading lights for each bed.",
-      image: "/placeholder.svg?height=200&width=300",
-      occupancy: "60%",
-      bookings: 28,
-    },
-  ];
+  // const rooms = [
+  //   {
+  //     id: 1,
+  //     name: "Deluxe Private Double",
+  //     hostel: "Sunset Beach Hostel",
+  //     type: "Private",
+  //     capacity: 2,
+  //     beds: "1 Queen Bed",
+  //     price: 85,
+  //     status: "Available",
+  //     amenities: [
+  //       "En-suite Bathroom",
+  //       "Air Conditioning",
+  //       "Sea View",
+  //       "TV",
+  //       "Mini Fridge",
+  //     ],
+  //     description:
+  //       "Spacious private room with a queen-sized bed and en-suite bathroom. Features a beautiful sea view.",
+  //     image: "/placeholder.svg?height=200&width=300",
+  //     occupancy: "75%",
+  //     bookings: 42,
+  //   },
+  //   {
+  //     id: 2,
+  //     name: "Standard Private Single",
+  //     hostel: "Sunset Beach Hostel",
+  //     type: "Private",
+  //     capacity: 1,
+  //     beds: "1 Single Bed",
+  //     price: 65,
+  //     status: "Available",
+  //     amenities: ["Shared Bathroom", "Air Conditioning", "Desk", "Locker"],
+  //     description:
+  //       "Cozy private room with a single bed. Shared bathroom facilities.",
+  //     image: "/placeholder.svg?height=200&width=300",
+  //     occupancy: "80%",
+  //     bookings: 38,
+  //   },
+  //   {
+  //     id: 3,
+  //     name: "4-Bed Mixed Dorm",
+  //     hostel: "Sunset Beach Hostel",
+  //     type: "Dorm",
+  //     capacity: 4,
+  //     beds: "4 Single Beds",
+  //     price: 30,
+  //     status: "Available",
+  //     amenities: [
+  //       "Shared Bathroom",
+  //       "Air Conditioning",
+  //       "Lockers",
+  //       "Reading Lights",
+  //     ],
+  //     description:
+  //       "Comfortable 4-bed mixed dorm with individual lockers and reading lights for each bed.",
+  //     image: "/placeholder.svg?height=200&width=300",
+  //     occupancy: "90%",
+  //     bookings: 65,
+  //   },
+  //   {
+  //     id: 4,
+  //     name: "6-Bed Female Dorm",
+  //     hostel: "Sunset Beach Hostel",
+  //     type: "Dorm",
+  //     capacity: 6,
+  //     beds: "6 Single Beds",
+  //     price: 25,
+  //     status: "Available",
+  //     amenities: [
+  //       "Shared Bathroom",
+  //       "Air Conditioning",
+  //       "Lockers",
+  //       "Reading Lights",
+  //       "Female Only",
+  //     ],
+  //     description:
+  //       "Female-only dorm with 6 single beds, individual lockers, and reading lights.",
+  //     image: "/placeholder.svg?height=200&width=300",
+  //     occupancy: "85%",
+  //     bookings: 58,
+  //   },
+  //   {
+  //     id: 5,
+  //     name: "Premium Private Double",
+  //     hostel: "Downtown Backpackers",
+  //     type: "Private",
+  //     capacity: 2,
+  //     beds: "1 Queen Bed",
+  //     price: 75,
+  //     status: "Available",
+  //     amenities: ["En-suite Bathroom", "Air Conditioning", "City View", "TV"],
+  //     description:
+  //       "Modern private room with a queen-sized bed and en-suite bathroom. Features a city view.",
+  //     image: "/placeholder.svg?height=200&width=300",
+  //     occupancy: "85%",
+  //     bookings: 45,
+  //   },
+  //   {
+  //     id: 6,
+  //     name: "8-Bed Mixed Dorm",
+  //     hostel: "Downtown Backpackers",
+  //     type: "Dorm",
+  //     capacity: 8,
+  //     beds: "8 Single Beds",
+  //     price: 22,
+  //     status: "Available",
+  //     amenities: [
+  //       "Shared Bathroom",
+  //       "Air Conditioning",
+  //       "Lockers",
+  //       "Reading Lights",
+  //     ],
+  //     description:
+  //       "Spacious 8-bed mixed dorm with individual lockers and reading lights for each bed.",
+  //     image: "/placeholder.svg?height=200&width=300",
+  //     occupancy: "95%",
+  //     bookings: 72,
+  //   },
+  //   {
+  //     id: 7,
+  //     name: "Mountain View Suite",
+  //     hostel: "Mountain View Lodge",
+  //     type: "Private",
+  //     capacity: 2,
+  //     beds: "1 King Bed",
+  //     price: 95,
+  //     status: "Available",
+  //     amenities: [
+  //       "En-suite Bathroom",
+  //       "Fireplace",
+  //       "Mountain View",
+  //       "TV",
+  //       "Mini Kitchen",
+  //     ],
+  //     description:
+  //       "Luxurious private suite with a king-sized bed, en-suite bathroom, and a fireplace. Features a stunning mountain view.",
+  //     image: "/placeholder.svg?height=200&width=300",
+  //     occupancy: "70%",
+  //     bookings: 32,
+  //   },
+  //   {
+  //     id: 8,
+  //     name: "4-Bed Mixed Dorm",
+  //     hostel: "Mountain View Lodge",
+  //     type: "Dorm",
+  //     capacity: 4,
+  //     beds: "4 Single Beds",
+  //     price: 35,
+  //     status: "Available",
+  //     amenities: ["Shared Bathroom", "Heating", "Lockers", "Reading Lights"],
+  //     description:
+  //       "Cozy 4-bed mixed dorm with individual lockers and reading lights for each bed.",
+  //     image: "/placeholder.svg?height=200&width=300",
+  //     occupancy: "60%",
+  //     bookings: 28,
+  //   },
+  // ];
 
   const [isAddHostelOpen, setIsAddHostelOpen] = useState(false);
   const [statusFilter, setStatusFilter] = useState("all");
@@ -237,6 +238,9 @@ export default function OwnerHostelsRooms() {
   const [currentPage, setCurrentPage] = useState(1);
   const itemsPerPage = 10;
   const { id } = useParams();
+  const [openEditDialog, setOpenEditDialog] = useState(false);
+  const [selectedRoom, setSelectedRoom] = useState(null);
+  const [open, setOpen] = useState(false);
 
   const { data, isError, isLoading, refetch } = useGetAllHostelRoomQuery(id);
   const [deleteroom, { isLoading: isDeleting }] = useDeleteroomMutation();
@@ -430,270 +434,61 @@ export default function OwnerHostelsRooms() {
                       Add room
                     </Button>
                   </DialogTrigger>
-                  <DialogContent className="sm:max-w-[600px]">
+                  <RoomsPOST
+                    isPosting={isPosting}
+                    roomNumber={roomNumber}
+                    setRoomNumber={setRoomNumber}
+                    capacity={capacity}
+                    setCapacity={setCapacity}
+                    price={price}
+                    setPrice={setPrice}
+                    currentOccupancy={currentOccupancy}
+                    setCurrentOccupancy={setCurrentOccupancy}
+                    roomType={roomType}
+                    setRoomType={setRoomType}
+                    payment={payment}
+                    setPayment={setPayment}
+                    charge={charge}
+                    setCharge={setCharge}
+                    gardianInfo={gardianInfo}
+                    setGardianInfo={setGardianInfo}
+                    features={features}
+                    handleFeatures={handleFeatures}
+                    addFeatures={addFeatures}
+                    removeFeatures={removeFeatures}
+                    visitTimes={visitTimes}
+                    handleVisitTime={handleVisitTime}
+                    addVisitTime={addVisitTime}
+                    removeVisitTime={removeVisitTime}
+                    selectedImages={selectedImages}
+                    setSelectedImages={setSelectedImages}
+                    handleSubmit={handleSubmit}
+                    setIsAddHostelOpen={setIsAddHostelOpen}
+                  />
+                </Dialog>
+
+                <Dialog open={openEditDialog} onOpenChange={setOpenEditDialog}>
+                  <DialogContent>
                     <DialogHeader>
-                      <DialogTitle>Add New Room</DialogTitle>
+                      <DialogTitle>Edit Room</DialogTitle>
                     </DialogHeader>
-                    {/* <div className="grid gap-4 py-4"> */}
-                    <div
-                      className="overflow-y-auto pr-2 mt-2 space-y-4"
-                      style={{ maxHeight: "calc(90vh - 130px)" }}
-                    >
-                      <div className="grid grid-cols-2 gap-4">
-                        <div className="space-y-2">
-                          <Label htmlFor="roomNumber">Room Number</Label>
-                          <Input
-                            id="roomNumber"
-                            placeholder="Enter room number"
-                            value={roomNumber}
-                            onChange={(e) => setRoomNumber(e.target.value)}
-                            required
-                          />
-                        </div>
-                        <div className="space-y-2">
-                          <Label htmlFor="capacity">Capacity</Label>
-                          <Input
-                            id="capacity"
-                            placeholder="Enter room capacity"
-                            value={capacity}
-                            onChange={(e) => setCapacity(e.target.value)}
-                            required
-                          />
-                        </div>
+                    <RoomsPUT
+                      room={selectedRoom}
+                      onClose={() => setOpenEditDialog(false)}
+                      onUpdated={refetch}
+                    />
+                  </DialogContent>
+                </Dialog>
 
-                        <div className="space-y-2">
-                          <Label htmlFor="roomtype">Room Type</Label>
-                          <Input
-                            id="roomtype"
-                            placeholder="Enter room type"
-                            value={roomType}
-                            onChange={(e) => setRoomType(e.target.value)}
-                            required
-                          />
-                        </div>
-
-                        <div className="space-y-2">
-                          <Label htmlFor="charge">Charge</Label>
-                          <Input
-                            id="charge"
-                            placeholder="Enter room Charge"
-                            value={charge}
-                            onChange={(e) => setCharge(e.target.value)}
-                            required
-                          />
-                        </div>
-
-                        <div className="space-y-2">
-                          <Label htmlFor="payment">Payment</Label>
-                          <Input
-                            id="payment"
-                            placeholder="Enter payment"
-                            value={payment}
-                            onChange={(e) => setPayment(e.target.value)}
-                            required
-                          />
-                        </div>
-
-                        <div className="space-y-2">
-                          <Label htmlFor="name">Gardian Name</Label>
-                          <Input
-                            id="name"
-                            placeholder="Enter street"
-                            value={gardianInfo.name}
-                            onChange={(e) =>
-                              setGardianInfo({
-                                ...gardianInfo,
-                                name: e.target.value,
-                              })
-                            }
-                          />
-                        </div>
-                        <div className="space-y-2">
-                          <Label htmlFor="email">Gardian Email</Label>
-                          <Input
-                            id="email"
-                            placeholder="Enter gardian email"
-                            value={gardianInfo.email}
-                            onChange={(e) =>
-                              setGardianInfo({
-                                ...gardianInfo,
-                                email: e.target.value,
-                              })
-                            }
-                          />
-                        </div>
-                        <div className="space-y-2">
-                          <Label htmlFor="phone">Gardian Phone</Label>
-                          <Input
-                            id="phone"
-                            placeholder="Enter gardian phone"
-                            value={gardianInfo.phone}
-                            onChange={(e) =>
-                              setGardianInfo({
-                                ...gardianInfo,
-                                phone: e.target.value,
-                              })
-                            }
-                          />
-                        </div>
-                      </div>
-                      <div className="grid grid-cols-2 gap-4">
-                        <div className="space-y-2">
-                          <Label htmlFor="currentOccupancy">
-                            Current Occupancy
-                          </Label>
-
-                          <Input
-                            id="currentOccupancy"
-                            placeholder="Enter number of people currently in the room"
-                            value={currentOccupancy}
-                            onChange={(e) =>
-                              setCurrentOccupancy(e.target.value)
-                            }
-                            required
-                          />
-                        </div>
-                        <div className="space-y-2">
-                          <Label htmlFor="price">Price</Label>
-
-                          <Input
-                            id="price"
-                            placeholder="Enter room price"
-                            value={price}
-                            onChange={(e) => setPrice(e.target.value)}
-                            required
-                          />
-                        </div>
-
-                        <div className="space-y-2">
-                          <Label>Features</Label>
-                          {features.map((feature, index) => (
-                            <div
-                              key={index}
-                              className="flex gap-2 items-center"
-                            >
-                              <Input
-                                value={feature}
-                                onChange={(e) =>
-                                  handleFeatures(index, e.target.value)
-                                }
-                                placeholder={`Enter feature ${index + 1}`}
-                              />
-                              {features.length > 1 && (
-                                <Button
-                                  type="button"
-                                  variant="ghost"
-                                  size="sm"
-                                  onClick={() => removeFeatures(index)}
-                                >
-                                  ✕
-                                </Button>
-                              )}
-                            </div>
-                          ))}
-                          <Button
-                            type="button"
-                            variant="outline"
-                            size="sm"
-                            onClick={addFeatures}
-                          >
-                            + Add Feature
-                          </Button>
-                        </div>
-
-                        <div className="space-y-2">
-                          <Label>Visit Times</Label>
-                          {visitTimes.map((time, index) => (
-                            <div
-                              key={index}
-                              className="flex gap-2 items-center"
-                            >
-                              <Input
-                                value={time}
-                                onChange={(e) =>
-                                  handleVisitTime(index, e.target.value)
-                                }
-                                placeholder={`Enter visit time ${index + 1}`}
-                              />
-                              {visitTimes.length > 1 && (
-                                <Button
-                                  type="button"
-                                  variant="ghost"
-                                  size="sm"
-                                  onClick={() => removeVisitTime(index)}
-                                >
-                                  ✕
-                                </Button>
-                              )}
-                            </div>
-                          ))}
-                          <Button
-                            type="button"
-                            variant="outline"
-                            size="sm"
-                            onClick={addVisitTime}
-                          >
-                            + Add Visit Time
-                          </Button>
-                        </div>
-                      </div>
-                      <div className="space-y-2">
-                        <Label htmlFor="images">Upload Images</Label>
-                        <label className="border-2 border-dashed rounded-md p-6 flex flex-col items-center justify-center gap-2 cursor-pointer">
-                          <ImagePlus className="h-8 w-8 text-muted-foreground" />
-                          <p className="text-sm text-muted-foreground">
-                            Click to upload
-                          </p>
-                          <Upload className="h-4 w-4" />
-
-                          <Input
-                            type="file"
-                            accept="image/*"
-                            multiple
-                            className="hidden"
-                            onChange={(e) => {
-                              if (e.target.files) {
-                                setSelectedImages((prevImages) => [
-                                  ...prevImages,
-                                  ...Array.from(e.target.files),
-                                ]);
-                              }
-                            }}
-                          />
-                        </label>
-
-                        {selectedImages.length > 0 && (
-                          <div className="grid gap-2 mt-4">
-                            <Label>Preview</Label>
-                            <div className="grid grid-cols-2 gap-2">
-                              {selectedImages.map((file, index) => (
-                                <img
-                                  key={index}
-                                  src={URL.createObjectURL(file)}
-                                  alt="preview"
-                                  className="w-full h-32 object-cover rounded-md"
-                                />
-                              ))}
-                            </div>
-                          </div>
-                        )}
-                      </div>
-                    </div>
-                    <DialogFooter>
-                      <Button
-                        variant="outline"
-                        onClick={() => setIsAddHostelOpen(false)}
-                        className={"cursor-pointer"}
-                      >
-                        Cancel
-                      </Button>
-                      <Button
-                        className="bg-rose-600 hover:bg-rose-700 cursor-pointer"
-                        onClick={handleSubmit}
-                      >
-                        {isPosting ? "Creating..." : "Create"}
-                      </Button>
-                    </DialogFooter>
+                <Dialog open={open} onOpenChange={setOpen}>
+                  <DialogContent>
+                    <DialogHeader>
+                      <DialogTitle>Room Images</DialogTitle>
+                    </DialogHeader>
+                    <ShowImagesIcon
+                      images={selectedRoom?.photos}
+                      onClose={() => setOpen(false)}
+                    />
                   </DialogContent>
                 </Dialog>
               </div>
@@ -811,7 +606,12 @@ export default function OwnerHostelsRooms() {
                             <td className="py-3 px-4">
                               <div className="flex items-center gap-3">
                                 <div className="h-10 w-10 bg-gray-100 rounded-md flex items-center justify-center">
-                                  <Building className="h-5 w-5 text-gray-500" />
+                                  <Building className="h-5 w-5 text-gray-500 cursor-pointer"
+                                       onClick={() => {
+                                      setOpen(true);
+                                      setSelectedRoom(room);
+                                    }}
+                                  />
                                 </div>
                                 <span className="font-medium">
                                   {room.roomNumber}
@@ -875,6 +675,10 @@ export default function OwnerHostelsRooms() {
                                   </DropdownMenuItem>
                                   <DropdownMenuItem
                                     className={"cursor-pointer"}
+                                    onClick={() => {
+                                      setSelectedRoom(room);
+                                      setOpenEditDialog(true);
+                                    }}
                                   >
                                     <Pencil className="h-4 w-4 mr-2" />
                                     Edit
@@ -947,7 +751,7 @@ export default function OwnerHostelsRooms() {
               </Card>
             </motion.div>
 
-            <motion.div
+            {/* <motion.div
               initial={{ opacity: 0, y: 20 }}
               animate={{ opacity: 1, y: 0 }}
               transition={{ duration: 0.5, delay: 0.2 }}
@@ -1034,7 +838,7 @@ export default function OwnerHostelsRooms() {
                   </div>
                 </CardContent>
               </Card>
-            </motion.div>
+            </motion.div> */}
           </div>
         </main>
       </div>

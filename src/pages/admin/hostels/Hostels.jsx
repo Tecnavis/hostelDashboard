@@ -8,17 +8,15 @@ import {
   ChevronLeft,
   ChevronRight,
   Filter,
-  ImagePlus,
   MoreHorizontal,
   Pencil,
   Plus,
   Search,
+  Star,
   Trash2,
-  Upload,
   UserCheck,
   UserX,
 } from "lucide-react";
-
 import { Sidebar } from "@/components/Sidebar";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
@@ -56,7 +54,7 @@ import {
   useGetAllSuperAdminhostelQuery,
 } from "@/app/service/hostel";
 import { useNavigate } from "react-router-dom";
-import { HostelPOST, HostelPUT, ShowImagesIcon } from "./HostelAU";
+import { HostelPOST, HostelPUT, iconMap, ShowImagesIcon } from "./HostelAU";
 
 export default function AdminHostels() {
   const [isAddHostelOpen, setIsAddHostelOpen] = useState(false);
@@ -69,7 +67,6 @@ export default function AdminHostels() {
     pincode: "",
   });
   const [selectedImages, setSelectedImages] = useState([]);
-  const [amenities, setAmenities] = useState([""]);
   const [description, setDescription] = useState("");
   const [category, setCategory] = useState("");
   const [ownerId, setOwnerId] = useState("");
@@ -146,20 +143,33 @@ export default function AdminHostels() {
     startIndex + itemsPerPage
   );
 
-  const handleFacilities = (index, value) => {
-    const newAmenities = [...amenities];
-    newAmenities[index] = value;
-    setAmenities(newAmenities);
+  const [selectedAmenities, setSelectedAmenities] = useState([]);
+
+  const toggleAmenity = (amenity) => {
+    const exists = selectedAmenities.find((a) => a.name === amenity.name);
+    if (exists) {
+      setSelectedAmenities((prev) =>
+        prev.filter((a) => a.name !== amenity.name)
+      );
+    } else {
+      setSelectedAmenities((prev) => [...prev, amenity]);
+    }
   };
 
-  const addFacilities = () => {
-    setAmenities([...amenities, ""]);
-  };
+  // const handleFacilities = (index, value) => {
+  //   const newAmenities = [...amenities];
+  //   newAmenities[index] = value;
+  //   setAmenities(newAmenities);
+  // };
 
-  const removeFacilities = (index) => {
-    const newAmenities = amenities.filter((_, i) => i !== index);
-    setAmenities(newAmenities);
-  };
+  // const addFacilities = () => {
+  //   setAmenities([...amenities, ""]);
+  // };
+
+  // const removeFacilities = (index) => {
+  //   const newAmenities = amenities.filter((_, i) => i !== index);
+  //   setAmenities(newAmenities);
+  // };
 
   // create  hostel
 
@@ -195,9 +205,10 @@ export default function AdminHostels() {
     formData.append("location[place]", location.place);
     formData.append("location[pincode]", location.pincode);
     formData.append("superAdminId", superAdminId);
-    amenities.forEach((a, i) => {
-      if (a.trim() !== "") {
-        formData.append(`amenities[${i}]`, a);
+    selectedAmenities.forEach((a, i) => {
+      if (a.name.trim() !== "") {
+        formData.append(`amenities[${i}][name]`, a.name);
+        formData.append(`amenities[${i}][icon]`, a.icon);
       }
     });
     selectedImages.forEach((file) => {
@@ -213,7 +224,7 @@ export default function AdminHostels() {
         setName("");
         setPhone("");
         setSelectedImages([]);
-        setAmenities([""]);
+        setSelectedAmenities([""]);
         setDescription("");
         setPrice("");
         setAccommodationType("");
@@ -284,7 +295,7 @@ export default function AdminHostels() {
                     accommodationType={accommodationType}
                     location={location}
                     description={description}
-                    amenities={amenities}
+                    amenities={selectedAmenities}
                     category={category}
                     owners={owners}
                     selectedImages={selectedImages}
@@ -294,15 +305,16 @@ export default function AdminHostels() {
                     setAccommodationType={setAccommodationType}
                     setLocation={setLocation}
                     setDescription={setDescription}
-                    handleFacilities={handleFacilities}
-                    addFacilities={addFacilities}
-                    removeFacilities={removeFacilities}
+                    // handleFacilities={handleFacilities}
+                    // addFacilities={addFacilities}
+                    // removeFacilities={removeFacilities}
                     setCategory={setCategory}
                     ownerId={ownerId}
                     setOwnerId={setOwnerId}
                     setSelectedImages={setSelectedImages}
                     handleSubmit={handleSubmit}
-                    onCancel={oncancel}
+      onClose={() =>  setIsAddHostelOpen(false)}             
+          toggleAmenity={toggleAmenity}
                   />
                 </Dialog>
 
@@ -508,15 +520,19 @@ export default function AdminHostels() {
                             <td className="py-3 px-4">
                               {hostel?.location?.place}
                             </td>
-                            <td className="py-3 px-4 space-x-2">
-                              {hostel?.amenities?.map((a, i) => (
-                                <span
-                                  key={i}
-                                  className="bg-gray-100 px-2 py-1 rounded text-sm"
-                                >
-                                  {a}
-                                </span>
-                              ))}
+                            <td className="py-3 px-4 flex flex-wrap gap-2">
+                              {hostel?.amenities?.map((a, i) => {
+                                const Icon = iconMap[a.icon]; // find the correct icon
+                                return (
+                                  <span
+                                    key={i}
+                                    className="inline-flex items-center gap-1 bg-gray-100 px-2 py-1 rounded text-sm"
+                                  >
+                                    {Icon && <Icon className="w-4 h-4" />}
+                                    {a.name}
+                                  </span>
+                                );
+                              })}
                             </td>
                             <td className="py-3 px-4">
                               {hostel?.accommodationType}

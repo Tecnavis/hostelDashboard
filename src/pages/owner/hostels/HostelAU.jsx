@@ -11,7 +11,65 @@ import {
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
-import { ImagePlus, Upload } from "lucide-react";
+import {
+  Wifi,
+  Utensils,
+  Bath,
+  Camera,
+  Shirt,
+  Car,
+  BatteryCharging,
+  Gamepad2,
+  Droplet,
+  Fan,
+  BookOpen,
+  Flame,
+  Lock,
+  UserCheck,
+  ImagePlus,
+  Upload,
+  Check,
+  Brush,
+} from "lucide-react";
+
+export const iconMap = {
+  Wifi,
+  Utensils,
+  Bath,
+  Camera,
+  Shirt,
+  Car,
+  BatteryCharging,
+  Gamepad2,
+  Gamepad2,
+  Brush,
+  Droplet,
+  Fan,
+  BookOpen,
+  Flame,
+  Lock,
+  UserCheck,
+};
+
+// amenitiesData.ts
+
+export const AVAILABLE_AMENITIES = [
+  { name: "Wi-Fi / High-speed internet", icon: "Wifi" },
+  { name: "Meals included", icon: "Utensils" },
+  { name: "Attached washroom", icon: "Bath" },
+  { name: "Security / CCTV", icon: "Camera" },
+  { name: "Laundry service", icon: "Shirt" },
+  { name: "Parking (two-wheeler / four-wheeler)", icon: "Car" },
+  { name: "Power backup", icon: "BatteryCharging" },
+  { name: "Common recreation area", icon: "Gamepad2" },
+  { name: "Housekeeping", icon: "Brush" },
+  { name: "24×7 water supply", icon: "Droplet" },
+  { name: "Air conditioning / Fans", icon: "Fan" },
+  { name: "Study tables / Desks", icon: "BookOpen" },
+  { name: "Hot water / Geyser", icon: "Flame" },
+  { name: "Locker / Storage", icon: "Lock" },
+  { name: "Visitor access", icon: "UserCheck" },
+];
 
 export function HostelsPOST({
   isPosting,
@@ -30,13 +88,14 @@ export function HostelsPOST({
   setAccommodationType,
   setLocation,
   setDescription,
-  handleFacilities,
-  addFacilities,
-  removeFacilities,
+  // handleFacilities,
+  // addFacilities,
+  // removeFacilities,
   setCategory,
   setSelectedImages,
   handleSubmit,
-  onCancel,
+  onClose,
+  toggleAmenity,
 }) {
   return (
     <DialogContent className="sm:max-w-[600px]">
@@ -143,7 +202,7 @@ export function HostelsPOST({
             />
           </div>
 
-          <div className="space-y-2">
+          {/* <div className="space-y-2">
             <Label>Facilites</Label>
             {amenities.map((link, index) => (
               <div key={index} className="flex gap-2 items-center">
@@ -172,7 +231,8 @@ export function HostelsPOST({
             >
               + Add Facilities
             </Button>
-          </div>
+          </div> */}
+
           <div className="space-y-2">
             <Label htmlFor="category">Category</Label>
             <Input
@@ -184,6 +244,35 @@ export function HostelsPOST({
             />
           </div>
         </div>
+
+        <div className="space-y-4">
+          <Label className="block mb-2">Facilities</Label>
+          <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-4">
+            {AVAILABLE_AMENITIES.map((item) => {
+              const Icon = iconMap[item.icon];
+              const isSelected = amenities?.some((a) => a.name === item.name);
+              return (
+                <button
+                  type="button"
+                  key={item.name}
+                  onClick={() => toggleAmenity(item)}
+                  className={`relative flex items-center gap-2 p-3 border rounded-lg transition w-full text-left ${
+                    isSelected
+                      ? "bg-blue-100 border-blue-500"
+                      : "bg-white border-gray-300"
+                  }`}
+                >
+                  <Icon className="w-5 h-5" />
+                  <span className="text-sm">{item.name}</span>
+                  {isSelected && (
+                    <Check className="absolute top-2 right-2 w-4 h-4 text-blue-600" />
+                  )}
+                </button>
+              );
+            })}
+          </div>
+        </div>
+
         <div className="space-y-2">
           <Label htmlFor="images">Upload Images</Label>
           <label className="border-2 border-dashed rounded-md p-6 flex flex-col items-center justify-center gap-2 cursor-pointer">
@@ -227,7 +316,7 @@ export function HostelsPOST({
       <DialogFooter>
         <Button
           variant="outline"
-          onClick={onCancel}
+          onClick={onClose}
           className={"cursor-pointer"}
         >
           Cancel

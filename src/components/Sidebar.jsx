@@ -42,6 +42,7 @@ export function Sidebar() {
     { title: "Hostels", href: "/admin/hostels", icon: Building },
     { title: "Users", href: "/admin/users", icon: User },
     { title: "Bookings", href: "/admin/bookings", icon: Hotel },
+        // { title: "Blogs", href: "/admin/blogs", icon: Hotel },
     // { title: "Analytics", href: "/admin/analytics", icon: BarChart3 },
     // { title: "Messages", href: "/admin/messages", icon: MessageSquare },
     { title: "Notifications", href: "/admin/notifications", icon: Bell },

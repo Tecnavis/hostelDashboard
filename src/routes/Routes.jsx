@@ -1,5 +1,6 @@
 import AdminAdmins from "@/pages/admin/admins/Admins";
 import AdminAnalytics from "@/pages/admin/analytics/Analytics";
+import Blogs from "@/pages/admin/blog/Blog";
 import AdminBookings from "@/pages/admin/bookings/Bookings";
 import AdminDashboard from "@/pages/admin/dashboard/Dashboard";
 import AdminHostels from "@/pages/admin/hostels/Hostels";
@@ -52,6 +53,8 @@ export default function AppRoutes() {
         />
         {/* <Route path="/admin/messages" element={<AdminMessages />} /> */}
         <Route path="/admin/bookings" element={<AdminBookings />} />
+                <Route path="/admin/blogs" element={<Blogs />} />
+
         <Route path="/admin/admins" element={<AdminAdmins />} />
         <Route path="/admin/users" element={<AdminUsers />} />
         <Route

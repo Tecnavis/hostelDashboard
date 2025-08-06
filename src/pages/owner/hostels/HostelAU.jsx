@@ -41,7 +41,6 @@ export const iconMap = {
   Car,
   BatteryCharging,
   Gamepad2,
-  Gamepad2,
   Brush,
   Droplet,
   Fan,

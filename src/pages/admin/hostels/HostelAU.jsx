@@ -17,7 +17,6 @@ import {
   Bath,
   Camera,
   Shirt,
-  Car,
   BatteryCharging,
   Gamepad2,
   Droplet,
@@ -30,8 +29,37 @@ import {
   Upload,
   Check,
   Brush,
+  Bus,
+  TrainFrontTunnel,
+  Car,
+  Plane,
+  Ship,
+  Sailboat,
+  Bike,
+  Siren,
+  Navigation,
+  CarTaxiFront,
+  Hotel,
+  Trash2, 
+    School,
+  BookOpenCheck,
+  Hospital,
+  Stethoscope,
+  Pill,
+  Fuel,
+  Church,
+  Mountain,
+  MoonStar,
+  ShieldCheck,
+  ShoppingBag,
+  Store,
+  TreePalm,
+  Dumbbell,
+  Clapperboard,
+  Wine,
+  CreditCard,
+  Building2,
 } from "lucide-react";
-
 
 export const iconMap = {
   Wifi,
@@ -42,7 +70,6 @@ export const iconMap = {
   Car,
   BatteryCharging,
   Gamepad2,
-  Gamepad2,
   Brush,
   Droplet,
   Fan,
@@ -50,6 +77,44 @@ export const iconMap = {
   Flame,
   Lock,
   UserCheck,
+};
+
+export const transportMap = {
+  Bus,
+  TrainFrontTunnel,
+  Car,
+  Plane,
+  CarTaxiFront,
+  Ship,
+  Sailboat,
+  Bike,
+  BatteryCharging,
+  Siren,
+  Navigation,
+};
+
+
+export const nearbyMap = {
+  School,
+  BookOpenCheck,
+  Hospital,
+  Stethoscope,
+  Pill,
+  Fuel,
+  Church,
+  Mountain,
+  MoonStar,
+  ShieldCheck,
+  Flame,
+  ShoppingBag,
+  Store,
+  Utensils,
+  TreePalm,
+  Dumbbell,
+  Clapperboard,
+  Wine,
+  CreditCard,
+  Building2,
 };
 
 // amenitiesData.ts
@@ -72,6 +137,47 @@ export const AVAILABLE_AMENITIES = [
   { name: "Visitor access", icon: "UserCheck" },
 ];
 
+export const AVAILABLE_TRANSPORTATION = [
+  { name: "Bus Stop", icon: "Bus" },
+  { name: "Metro Station", icon: "TrainFrontTunnel" },
+  { name: "Auto Rickshaw Stand", icon: "Car" },
+  { name: "Airport", icon: "Plane" },
+  { name: "Railway Station", icon: "TrainFrontTunnel" },
+  { name: "Taxi Stand", icon: "CarTaxiFront" },
+  { name: "Bike Rental", icon: "Bike" },
+  { name: "Ferry Terminal", icon: "Ship" },
+  { name: "Boat Dock", icon: "Sailboat" },
+  { name: "Helipad", icon: "Navigation" },
+  { name: "EV Charging", icon: "BatteryCharging" },
+  { name: "Rickshaw Stand", icon: "Siren" },
+  { name: "Car Rental", icon: "Car" }, 
+  { name: "Highway Exit", icon: "Navigation" },
+];
+
+export const NEARBY_PLACES = [
+  { name: "School", icon: "School" },
+  { name: "College", icon: "BookOpenCheck" },
+  { name: "Hospital", icon: "Hospital" },
+  { name: "Clinic", icon: "Stethoscope" },
+  { name: "Pharmacy", icon: "Pill" },
+  { name: "Petrol Pump", icon: "Fuel" },
+  { name: "Church", icon: "Church" },
+  { name: "Temple", icon: "Mountain" }, // symbolic
+  { name: "Mosque", icon: "MoonStar" }, // symbolic
+  { name: "Police Station", icon: "ShieldCheck" },
+  { name: "Fire Station", icon: "Flame" },
+  { name: "Shopping Mall", icon: "ShoppingBag" },
+  { name: "Market", icon: "Store" },
+  { name: "Restaurant", icon: "Utensils" },
+  { name: "Park", icon: "TreePalm" },
+  { name: "Gym", icon: "Dumbbell" },
+  { name: "Cinema", icon: "Clapperboard" },
+  { name: "Bar / Pub", icon: "Wine" },
+  { name: "ATM", icon: "CreditCard" },
+  { name: "Bank", icon: "Building2" },
+];
+
+
 export function HostelPOST({
   isPosting,
   name,
@@ -81,6 +187,7 @@ export function HostelPOST({
   location,
   description,
   amenities,
+  transport,
   category,
   owners,
   selectedImages,
@@ -90,17 +197,25 @@ export function HostelPOST({
   setAccommodationType,
   setLocation,
   setDescription,
-  // handleFacilities,
-  // addFacilities,
-  // removeFacilities,
   setCategory,
   ownerId,
   setOwnerId,
   setSelectedImages,
   handleSubmit,
   onClose,
-    toggleAmenity,
-
+  toggleAmenity,
+  toggleTransport,
+  setSelectedTransport,
+  addRestaurant,
+  restaurantName,
+  setRestaurantName,
+  restaurantFar,
+  setRestaurantFar,
+  selectedRestaurants,
+  removeRestaurant,
+  toggleNearby,
+  selectedNearby,
+  setSelectdNearby,
 }) {
   return (
     <DialogContent className="sm:max-w-[600px]">
@@ -248,34 +363,171 @@ export function HostelPOST({
           </div>
         </div>
 
-        
-           <div className="space-y-4">
-                  <Label className="block mb-2">Facilities</Label>
-                  <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-4">
-                    {AVAILABLE_AMENITIES.map((item) => {
-                      const Icon = iconMap[item.icon];
-                      const isSelected = amenities?.some((a) => a.name === item.name);
-                      return (
-                        <button
-                          type="button"
-                          key={item.name}
-                          onClick={() => toggleAmenity(item)}
-                          className={`relative flex items-center gap-2 p-3 border rounded-lg transition w-full text-left ${
-                            isSelected
-                              ? "bg-blue-100 border-blue-500"
-                              : "bg-white border-gray-300"
-                          }`}
-                        >
-                          <Icon className="w-5 h-5" />
-                          <span className="text-sm">{item.name}</span>
-                          {isSelected && (
-                            <Check className="absolute top-2 right-2 w-4 h-4 text-blue-600" />
-                          )}
-                        </button>
-                      );
-                    })}
-                  </div>
+        <div className="space-y-4">
+          <Label className="block mb-2">Facilities</Label>
+          <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-4">
+            {AVAILABLE_AMENITIES.map((item) => {
+              const Icon = iconMap[item.icon];
+              const isSelected = amenities?.some((a) => a.name === item.name);
+              return (
+                <button
+                  type="button"
+                  key={item.name}
+                  onClick={() => toggleAmenity(item)}
+                  className={`relative flex items-center gap-2 p-3 border rounded-lg transition w-full text-left ${
+                    isSelected
+                      ? "bg-blue-100 border-blue-500"
+                      : "bg-white border-gray-300"
+                  }`}
+                >
+                  <Icon className="w-5 h-5" />
+                  <span className="text-sm">{item.name}</span>
+                  {isSelected && (
+                    <Check className="absolute top-2 right-2 w-4 h-4 text-blue-600" />
+                  )}
+                </button>
+              );
+            })}
+          </div>
+        </div>
+
+        <div className="space-y-4">
+          <Label className="block mb-2">Transportation</Label>
+          <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-4">
+            {AVAILABLE_TRANSPORTATION.map((item) => {
+              const Icon = transportMap[item.icon];
+              const isSelected = transport?.some((a) => a.name === item.name);
+              return (
+                <button
+                  type="button"
+                  key={item.name}
+                  onClick={() => toggleTransport(item)}
+                  className={`relative flex items-center gap-2 p-3 border rounded-lg transition w-full text-left ${
+                    isSelected
+                      ? "bg-blue-100 border-blue-500"
+                      : "bg-white border-gray-300"
+                  }`}
+                >
+                  {Icon && <Icon className="w-5 h-5" />}
+                  <span className="text-sm">{item.name}</span>
+                  {isSelected && (
+                    <Check className="absolute top-2 right-2 w-4 h-4 text-blue-600" />
+                  )}
+                </button>
+              );
+            })}
+          </div>
+
+          {transport.length > 0 && (
+            <div className="mt-4 space-y-4">
+              {transport.map((trans, index) => (
+                <div key={trans.name} className="flex items-center gap-4">
+                  <span className="w-32">{trans.name}</span>
+                  <Input
+                    type="text"
+                    className="input input-bordered w-full max-w-xs"
+                    placeholder="Enter distance (e.g., 200m)"
+                    value={trans.far}
+                    onChange={(e) => {
+                      const updated = [...transport];
+                      updated[index].far = e.target.value;
+                      setSelectedTransport(updated);
+                    }}
+                  />
                 </div>
+              ))}
+            </div>
+          )}
+        </div>
+
+
+   <div className="space-y-4">
+          <Label className="block mb-2">Nearby</Label>
+          <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-4">
+            {NEARBY_PLACES.map((item) => {
+              const Icon =  nearbyMap[item.icon];
+              const isSelected = selectedNearby?.some((a) => a.name === item.name);
+              return (
+                <button
+                  type="button"
+                  key={item.name}
+                  onClick={() => toggleNearby(item)}
+                  className={`relative flex items-center gap-2 p-3 border rounded-lg transition w-full text-left ${
+                    isSelected
+                      ? "bg-blue-100 border-blue-500"
+                      : "bg-white border-gray-300"
+                  }`}
+                >
+                  {Icon && <Icon className="w-5 h-5" />}
+                  <span className="text-sm">{item.name}</span>
+                  {isSelected && (
+                    <Check className="absolute top-2 right-2 w-4 h-4 text-blue-600" />
+                  )}
+                </button>
+              );
+            })}
+          </div>
+
+          {selectedNearby.length > 0 && (
+            <div className="mt-4 space-y-4">
+              {selectedNearby.map((nearby, index) => (
+                <div key={nearby.name} className="flex items-center gap-4">
+                  <span className="w-32">{nearby.name}</span>
+                  <Input
+                    type="text"
+                    className="input input-bordered w-full max-w-xs"
+                    placeholder="Enter distance (e.g., 200m)"
+                    value={nearby.far}
+                    onChange={(e) => {
+                      const updated = [...selectedNearby];
+                      updated[index].far = e.target.value;
+                      setSelectdNearby(updated);
+                    }}
+                  />
+                </div>
+              ))}
+            </div>
+          )}
+        </div>
+
+       <div className="space-y-4">
+      <Label className="block mb-2 text-sm">Restaurants</Label>
+      <div className="flex gap-2">
+        <Input
+          placeholder="Restaurant name"
+          value={restaurantName}
+          onChange={(e) => setRestaurantName(e.target.value)}
+        />
+        <Input
+          placeholder="Far (distance)"
+          value={restaurantFar}
+          onChange={(e) => setRestaurantFar(e.target.value)}
+        />
+        <Button onClick={addRestaurant} className="shrink-0">
+          Add
+        </Button>
+      </div>
+
+      <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-3">
+        {selectedRestaurants.map((r) => (
+          <div
+            key={r.name}
+            className="flex items-center justify-between p-3 border rounded-lg bg-white shadow-sm"
+          >
+            <div className="flex items-center gap-2">
+              <Hotel className="w-5 h-5 text-gray-600" />
+              <div className="text-sm">
+                <p className="font-medium">{r.name}</p>
+                <p className="text-xs text-gray-500">{r.far}</p>
+              </div>
+            </div>
+            <button onClick={() => removeRestaurant(r.name)}>
+              <Trash2 className="w-4 h-4 text-red-500" />
+            </button>
+          </div>
+        ))}
+      </div>
+    </div>
 
         <div className="space-y-2 col-span-2">
           <Label htmlFor="images">Upload Images</Label>
@@ -612,7 +864,7 @@ export function HostelPUT({ hostel, owners = [], onClose, onUpdated }) {
   );
 }
 
-export function ShowImagesIcon({ images = [], onClose }) {  
+export function ShowImagesIcon({ images = [], onClose }) {
   return (
     <>
       <div className="fixed inset-0 bg-black bg-opacity-40 flex items-center justify-center z-50">

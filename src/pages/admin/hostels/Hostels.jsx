@@ -8,6 +8,7 @@ import {
   ChevronLeft,
   ChevronRight,
   Filter,
+  Hotel,
   MoreHorizontal,
   Pencil,
   Plus,
@@ -54,7 +55,7 @@ import {
   useGetAllSuperAdminhostelQuery,
 } from "@/app/service/hostel";
 import { useNavigate } from "react-router-dom";
-import { HostelPOST, HostelPUT, iconMap, ShowImagesIcon } from "./HostelAU";
+import { HostelPOST, HostelPUT, iconMap, nearbyMap,  ShowImagesIcon, transportMap } from "./HostelAU";
 
 export default function AdminHostels() {
   const [isAddHostelOpen, setIsAddHostelOpen] = useState(false);
@@ -74,7 +75,7 @@ export default function AdminHostels() {
   const [price, setPrice] = useState("");
   const [searchTerm, setSearchTerm] = useState("");
   const [currentPage, setCurrentPage] = useState(1);
-  const itemsPerPage = 10;
+  const itemsPerPage = 5;
   const navigate = useNavigate();
   const [selectedPlace, setSelectedPlace] = useState("");
   const [selectedStreet, setSelectedStreet] = useState("");
@@ -146,30 +147,74 @@ export default function AdminHostels() {
   const [selectedAmenities, setSelectedAmenities] = useState([]);
 
   const toggleAmenity = (amenity) => {
-    const exists = selectedAmenities.find((a) => a.name === amenity.name);
+    const exists = selectedAmenities?.find((a) => a?.name === amenity?.name);
     if (exists) {
       setSelectedAmenities((prev) =>
-        prev.filter((a) => a.name !== amenity.name)
+        prev?.filter((a) => a?.name !== amenity?.name)
       );
     } else {
       setSelectedAmenities((prev) => [...prev, amenity]);
     }
   };
 
-  // const handleFacilities = (index, value) => {
-  //   const newAmenities = [...amenities];
-  //   newAmenities[index] = value;
-  //   setAmenities(newAmenities);
-  // };
+  const [selectedTransport, setSelectdTransport] = useState([]);
 
-  // const addFacilities = () => {
-  //   setAmenities([...amenities, ""]);
-  // };
+  const toggleTransport = (transport) => {
+    const exists = selectedTransport?.find((a) => a?.name === transport?.name);
+    if (exists) {
+      setSelectdTransport((prev) =>
+        prev?.filter((a) => a?.name !== transport?.name)
+      );
+    } else {
+      setSelectdTransport((prev) => [
+        ...prev,
+        { ...transport, far: "" }, // add `far`
+      ]);
+    }
+  };
 
-  // const removeFacilities = (index) => {
-  //   const newAmenities = amenities.filter((_, i) => i !== index);
-  //   setAmenities(newAmenities);
-  // };
+    const [selectedNearby, setSelectdNearby] = useState([]);
+
+  const toggleNearby = (nearby) => {
+    const exists = selectedNearby?.find((a) => a?.name === nearby?.name);
+    if (exists) {
+      setSelectdNearby((prev) =>
+        prev?.filter((a) => a?.name !== nearby?.name)
+      );
+    } else {
+      setSelectdNearby((prev) => [
+        ...prev,
+        { ...nearby, far: "" }, // add `far`
+      ]);
+    }
+  };
+
+  const [selectedRestaurants, setSelectedRestaurants] = useState([]);
+
+  const [restaurantName, setRestaurantName] = useState("");
+  const [restaurantFar, setRestaurantFar] = useState("");
+
+  const addRestaurant = () => {
+    if (!restaurantName || !restaurantFar) return;
+
+    const alreadyExists = selectedRestaurants.some(
+      (r) => r.name.toLowerCase() === restaurantName.toLowerCase()
+    );
+
+    if (alreadyExists) return;
+
+    setSelectedRestaurants((prev) => [
+      ...prev,
+      { name: restaurantName, far: restaurantFar, icon: "Hotel" },
+    ]);
+
+    setRestaurantName("");
+    setRestaurantFar("");
+  };
+
+  const removeRestaurant = (name) => {
+    setSelectedRestaurants((prev) => prev.filter((r) => r.name !== name));
+  };
 
   // create  hostel
 
@@ -187,7 +232,10 @@ export default function AdminHostels() {
       location.place.trim() === "" ||
       location.pincode.trim() === "" ||
       accommodationType.trim() === "" ||
-      price.trim() === ""
+      price.trim() === "" ||
+      selectedTransport.some((t) => t.far.trim() === "") ||
+      selectedNearby.some((t) => t.far.trim() === "") ||
+      selectedRestaurants.some((t) => t.far.trim() === "")
     ) {
       return;
     }
@@ -211,6 +259,27 @@ export default function AdminHostels() {
         formData.append(`amenities[${i}][icon]`, a.icon);
       }
     });
+    selectedTransport.forEach((a, i) => {
+      if (a.name.trim() !== "") {
+        formData.append(`transportation[${i}][name]`, a.name);
+        formData.append(`transportation[${i}][icon]`, a.icon);
+        formData.append(`transportation[${i}][far]`, a.far);
+      }
+    });
+     selectedNearby.forEach((a, i) => {
+      if (a.name.trim() !== "") {
+        formData.append(`nearbyPlaces[${i}][name]`, a.name);
+        formData.append(`nearbyPlaces[${i}][icon]`, a.icon);
+        formData.append(`nearbyPlaces[${i}][far]`, a.far);
+      }
+    });
+      selectedRestaurants.forEach((a, i) => {
+      if (a.name.trim() !== "") {
+        formData.append(`restaurants[${i}][name]`, a.name);
+        formData.append(`restaurants[${i}][icon]`, a.icon);
+        formData.append(`restaurants[${i}][far]`, a.far);
+      }
+    });
     selectedImages.forEach((file) => {
       formData.append("images", file);
     });
@@ -224,7 +293,10 @@ export default function AdminHostels() {
         setName("");
         setPhone("");
         setSelectedImages([]);
-        setSelectedAmenities([""]);
+        setSelectedAmenities([]);
+        setSelectdTransport([]);
+        setSelectedRestaurants([]);
+        setSelectdNearby([]);
         setDescription("");
         setPrice("");
         setAccommodationType("");
@@ -296,25 +368,35 @@ export default function AdminHostels() {
                     location={location}
                     description={description}
                     amenities={selectedAmenities}
+                    transport={selectedTransport}
                     category={category}
                     owners={owners}
                     selectedImages={selectedImages}
+                    setSelectedTransport={setSelectdTransport}
                     setName={setName}
                     setPhone={setPhone}
                     setPrice={setPrice}
                     setAccommodationType={setAccommodationType}
                     setLocation={setLocation}
                     setDescription={setDescription}
-                    // handleFacilities={handleFacilities}
-                    // addFacilities={addFacilities}
-                    // removeFacilities={removeFacilities}
                     setCategory={setCategory}
                     ownerId={ownerId}
                     setOwnerId={setOwnerId}
                     setSelectedImages={setSelectedImages}
                     handleSubmit={handleSubmit}
-      onClose={() =>  setIsAddHostelOpen(false)}             
-          toggleAmenity={toggleAmenity}
+                    onClose={() => setIsAddHostelOpen(false)}
+                    toggleAmenity={toggleAmenity}
+                    toggleTransport={toggleTransport}
+                    addRestaurant={addRestaurant}
+                    restaurantName={restaurantName}
+                    setRestaurantName={setRestaurantName}
+                    restaurantFar={restaurantFar}
+                    setRestaurantFar={setRestaurantFar}
+                    selectedRestaurants={selectedRestaurants}
+                    setSelectedRestaurants={setSelectedRestaurants}
+                    removeRestaurant={removeRestaurant}
+                    toggleNearby = {toggleNearby }
+                    selectedNearby = { selectedNearby} setSelectdNearby = {setSelectdNearby}
                   />
                 </Dialog>
 
@@ -470,6 +552,14 @@ export default function AdminHostels() {
                           <th className="text-left py-3 px-4 font-medium text-gray-500">
                             Facilities
                           </th>
+                             <th className="text-left py-3 px-4 font-medium text-gray-500">
+                          Transportation
+                          </th>
+                            <th className="text-left py-3 px-4 font-medium text-gray-500">
+                           Restaurants</th>
+                            <th className="text-left py-3 px-4 font-medium text-gray-500">
+                            Nearby
+                          </th>
                           <th className="text-left py-3 px-4 font-medium text-gray-500">
                             Accommodation
                           </th>
@@ -520,9 +610,9 @@ export default function AdminHostels() {
                             <td className="py-3 px-4">
                               {hostel?.location?.place}
                             </td>
-                            <td className="py-3 px-4 flex flex-wrap gap-2">
+                            <td className="py-3 px-4 ">
                               {hostel?.amenities?.map((a, i) => {
-                                const Icon = iconMap[a.icon]; // find the correct icon
+                                const Icon = iconMap[a.icon]; 
                                 return (
                                   <span
                                     key={i}
@@ -534,6 +624,53 @@ export default function AdminHostels() {
                                 );
                               })}
                             </td>
+
+                                <td className="py-3 px-4 ">
+                              {hostel?.transportation?.map((a, i) => {
+                                const Icon = transportMap[a.icon]; 
+                                return (
+                                  <span
+                                    key={i}
+                                    className="inline-flex items-center gap-1 bg-gray-100 px-2 py-1 rounded text-sm"
+                                  >
+                                    {Icon && <Icon className="w-4 h-4" />}
+                                    {a.name} {a.far}
+                                  </span>
+                                );
+                              })}
+                            </td>
+
+                                <td className="py-3 px-4">
+                              {hostel?.restaurants?.map((a, i) => {
+                                return (
+                                  <span
+                                    key={i}
+                                    className="inline-flex items-center gap-1 bg-gray-100 px-2 py-1 rounded text-sm"
+                                  >
+                                    <Hotel className="w-4 h-4" />
+                                    {a.name} {a.far}
+                                  </span>
+                                );
+                              })}
+                            </td>
+
+                                <td className="py-3 px-4 ">
+                              {hostel?.nearbyPlaces?.map((a, i) => {
+                                const Icon = nearbyMap[a.icon]; 
+                                return (
+                                  <span
+                                    key={i}
+                                    className="inline-flex items-center gap-1 bg-gray-100 px-2 py-1 rounded text-sm"
+                                  >
+                                    {Icon && <Icon className="w-4 h-4" />}
+                                    {a.name} {a.far}
+                                  </span>
+                                );
+                              })}
+                            </td>
+                            
+
+
                             <td className="py-3 px-4">
                               {hostel?.accommodationType}
                             </td>

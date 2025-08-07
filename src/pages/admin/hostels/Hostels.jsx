@@ -55,7 +55,14 @@ import {
   useGetAllSuperAdminhostelQuery,
 } from "@/app/service/hostel";
 import { useNavigate } from "react-router-dom";
-import { HostelPOST, HostelPUT, iconMap, nearbyMap,  ShowImagesIcon, transportMap } from "./HostelAU";
+import {
+  HostelPOST,
+  HostelPUT,
+  iconMap,
+  nearbyMap,
+  ShowImagesIcon,
+  transportMap,
+} from "./HostelAU";
 
 export default function AdminHostels() {
   const [isAddHostelOpen, setIsAddHostelOpen] = useState(false);
@@ -82,6 +89,12 @@ export default function AdminHostels() {
   const [openEditDialog, setOpenEditDialog] = useState(false);
   const [selectedHostel, setSelectedHostel] = useState(null);
   const [open, setOpen] = useState(false);
+  const [selectedAmenities, setSelectedAmenities] = useState([]);
+  const [selectedTransport, setSelectdTransport] = useState([]);
+  const [selectedRestaurants, setSelectedRestaurants] = useState([]);
+  const [restaurantName, setRestaurantName] = useState("");
+  const [restaurantFar, setRestaurantFar] = useState("");
+  const [selectedNearby, setSelectdNearby] = useState([]);
 
   const admin = JSON.parse(localStorage.getItem("admin"));
 
@@ -144,8 +157,6 @@ export default function AdminHostels() {
     startIndex + itemsPerPage
   );
 
-  const [selectedAmenities, setSelectedAmenities] = useState([]);
-
   const toggleAmenity = (amenity) => {
     const exists = selectedAmenities?.find((a) => a?.name === amenity?.name);
     if (exists) {
@@ -156,8 +167,6 @@ export default function AdminHostels() {
       setSelectedAmenities((prev) => [...prev, amenity]);
     }
   };
-
-  const [selectedTransport, setSelectdTransport] = useState([]);
 
   const toggleTransport = (transport) => {
     const exists = selectedTransport?.find((a) => a?.name === transport?.name);
@@ -173,14 +182,10 @@ export default function AdminHostels() {
     }
   };
 
-    const [selectedNearby, setSelectdNearby] = useState([]);
-
   const toggleNearby = (nearby) => {
     const exists = selectedNearby?.find((a) => a?.name === nearby?.name);
     if (exists) {
-      setSelectdNearby((prev) =>
-        prev?.filter((a) => a?.name !== nearby?.name)
-      );
+      setSelectdNearby((prev) => prev?.filter((a) => a?.name !== nearby?.name));
     } else {
       setSelectdNearby((prev) => [
         ...prev,
@@ -188,11 +193,6 @@ export default function AdminHostels() {
       ]);
     }
   };
-
-  const [selectedRestaurants, setSelectedRestaurants] = useState([]);
-
-  const [restaurantName, setRestaurantName] = useState("");
-  const [restaurantFar, setRestaurantFar] = useState("");
 
   const addRestaurant = () => {
     if (!restaurantName || !restaurantFar) return;
@@ -266,14 +266,14 @@ export default function AdminHostels() {
         formData.append(`transportation[${i}][far]`, a.far);
       }
     });
-     selectedNearby.forEach((a, i) => {
+    selectedNearby.forEach((a, i) => {
       if (a.name.trim() !== "") {
         formData.append(`nearbyPlaces[${i}][name]`, a.name);
         formData.append(`nearbyPlaces[${i}][icon]`, a.icon);
         formData.append(`nearbyPlaces[${i}][far]`, a.far);
       }
     });
-      selectedRestaurants.forEach((a, i) => {
+    selectedRestaurants.forEach((a, i) => {
       if (a.name.trim() !== "") {
         formData.append(`restaurants[${i}][name]`, a.name);
         formData.append(`restaurants[${i}][icon]`, a.icon);
@@ -395,8 +395,9 @@ export default function AdminHostels() {
                     selectedRestaurants={selectedRestaurants}
                     setSelectedRestaurants={setSelectedRestaurants}
                     removeRestaurant={removeRestaurant}
-                    toggleNearby = {toggleNearby }
-                    selectedNearby = { selectedNearby} setSelectdNearby = {setSelectdNearby}
+                    toggleNearby={toggleNearby}
+                    selectedNearby={selectedNearby}
+                    setSelectdNearby={setSelectdNearby}
                   />
                 </Dialog>
 
@@ -552,12 +553,13 @@ export default function AdminHostels() {
                           <th className="text-left py-3 px-4 font-medium text-gray-500">
                             Facilities
                           </th>
-                             <th className="text-left py-3 px-4 font-medium text-gray-500">
-                          Transportation
+                          <th className="text-left py-3 px-4 font-medium text-gray-500">
+                            Transportation
                           </th>
-                            <th className="text-left py-3 px-4 font-medium text-gray-500">
-                           Restaurants</th>
-                            <th className="text-left py-3 px-4 font-medium text-gray-500">
+                          <th className="text-left py-3 px-4 font-medium text-gray-500">
+                            Restaurants
+                          </th>
+                          <th className="text-left py-3 px-4 font-medium text-gray-500">
                             Nearby
                           </th>
                           <th className="text-left py-3 px-4 font-medium text-gray-500">
@@ -612,7 +614,7 @@ export default function AdminHostels() {
                             </td>
                             <td className="py-3 px-4 ">
                               {hostel?.amenities?.map((a, i) => {
-                                const Icon = iconMap[a.icon]; 
+                                const Icon = iconMap[a.icon];
                                 return (
                                   <span
                                     key={i}
@@ -625,9 +627,9 @@ export default function AdminHostels() {
                               })}
                             </td>
 
-                                <td className="py-3 px-4 ">
+                            <td className="py-3 px-4 ">
                               {hostel?.transportation?.map((a, i) => {
-                                const Icon = transportMap[a.icon]; 
+                                const Icon = transportMap[a.icon];
                                 return (
                                   <span
                                     key={i}
@@ -640,7 +642,7 @@ export default function AdminHostels() {
                               })}
                             </td>
 
-                                <td className="py-3 px-4">
+                            <td className="py-3 px-4">
                               {hostel?.restaurants?.map((a, i) => {
                                 return (
                                   <span
@@ -654,9 +656,9 @@ export default function AdminHostels() {
                               })}
                             </td>
 
-                                <td className="py-3 px-4 ">
+                            <td className="py-3 px-4 ">
                               {hostel?.nearbyPlaces?.map((a, i) => {
-                                const Icon = nearbyMap[a.icon]; 
+                                const Icon = nearbyMap[a.icon];
                                 return (
                                   <span
                                     key={i}
@@ -668,8 +670,6 @@ export default function AdminHostels() {
                                 );
                               })}
                             </td>
-                            
-
 
                             <td className="py-3 px-4">
                               {hostel?.accommodationType}

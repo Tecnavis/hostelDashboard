@@ -59,6 +59,10 @@ import {
   Wine,
   CreditCard,
   Building2,
+  AirVent,
+  WashingMachine,
+  Cuboid,
+  Container,
 } from "lucide-react";
 
 export const iconMap = {
@@ -67,12 +71,17 @@ export const iconMap = {
   Bath,
   Camera,
   Shirt,
+  Bike,
   Car,
   BatteryCharging,
   Gamepad2,
   Brush,
   Droplet,
   Fan,
+  AirVent,
+  WashingMachine,
+  Cuboid,
+  Container,
   BookOpen,
   Flame,
   Lock,
@@ -117,6 +126,7 @@ export const nearbyMap = {
   Building2,
 };
 
+
 // amenitiesData.ts
 
 export const AVAILABLE_AMENITIES = [
@@ -125,12 +135,17 @@ export const AVAILABLE_AMENITIES = [
   { name: "Attached washroom", icon: "Bath" },
   { name: "Security / CCTV", icon: "Camera" },
   { name: "Laundry service", icon: "Shirt" },
-  { name: "Parking (two-wheeler / four-wheeler)", icon: "Car" },
+    { name: "Parking two-wheeler", icon: "Bike" },
+  { name: "Parking four-wheeler", icon: "Car" },
   { name: "Power backup", icon: "BatteryCharging" },
   { name: "Common recreation area", icon: "Gamepad2" },
   { name: "Housekeeping", icon: "Brush" },
   { name: "24×7 water supply", icon: "Droplet" },
-  { name: "Air conditioning / Fans", icon: "Fan" },
+    { name: "Fans", icon: "Fan" },
+  { name: "A/C", icon: "AirVent" },
+    { name: "Washing machine", icon: "WashingMachine" },
+  { name: "Cupboard", icon: "Cuboid" },
+  { name: "Iron box", icon: "Container" },
   { name: "Study tables / Desks", icon: "BookOpen" },
   { name: "Hot water / Geyser", icon: "Flame" },
   { name: "Locker / Storage", icon: "Lock" },
@@ -162,8 +177,8 @@ export const NEARBY_PLACES = [
   { name: "Pharmacy", icon: "Pill" },
   { name: "Petrol Pump", icon: "Fuel" },
   { name: "Church", icon: "Church" },
-  { name: "Temple", icon: "Mountain" }, // symbolic
-  { name: "Mosque", icon: "MoonStar" }, // symbolic
+  { name: "Temple", icon: "Mountain" }, 
+  { name: "Mosque", icon: "MoonStar" }, 
   { name: "Police Station", icon: "ShieldCheck" },
   { name: "Fire Station", icon: "Flame" },
   { name: "Shopping Mall", icon: "ShoppingBag" },
@@ -217,6 +232,13 @@ export function HostelPOST({
   selectedNearby,
   setSelectdNearby,
 }) {
+
+   const [search, setSearch] = useState("");
+
+  const filteredOwners = owners.filter((o) =>
+    o.name.toLowerCase().includes(search.toLowerCase())
+  );
+
   return (
     <DialogContent className="sm:max-w-[600px]">
       <DialogHeader>
@@ -336,7 +358,7 @@ export function HostelPOST({
               + Add Facility
             </Button>
           </div> */}
-          <div className="space-y-2">
+          {/* <div className="space-y-2">
             <Label htmlFor="category">Category</Label>
             <Input
               id="category"
@@ -344,7 +366,25 @@ export function HostelPOST({
               value={category}
               onChange={(e) => setCategory(e.target.value)}
             />
-          </div>
+          </div> */}
+
+          <div className="space-y-2">
+  <Label htmlFor="category">Category</Label>
+  <select
+    id="category"
+    value={category}
+    onChange={(e) => setCategory(e.target.value)}
+    className="w-full border border-gray-300 rounded px-3 py-2"
+  >
+    <option value="">Select category</option>
+    <option value="Men's hostel">Men's hostel</option>
+    <option value="Women's hostel">Women's hostel</option>
+    <option value="Others">Others</option>
+  </select>
+</div>
+
+
+{/* 
           <div className="space-y-2">
             <Label htmlFor="owner">Owner</Label>
             <select
@@ -360,7 +400,37 @@ export function HostelPOST({
                 </option>
               ))}
             </select>
-          </div>
+          </div> */}
+
+
+   <div className="space-y-2">
+      <Label htmlFor="owner">Owner</Label>
+      
+      {/* Search box */}
+      <input
+        type="text"
+        placeholder="Search owner..."
+        value={search}
+        onChange={(e) => setSearch(e.target.value)}
+        className="w-full border border-gray-300 rounded px-3 py-2 mb-1"
+      />
+
+      {/* Owner select */}
+      <select
+        id="owner"
+        value={ownerId}
+        onChange={(e) => setOwnerId(e.target.value)}
+        className="w-full border border-gray-300 rounded px-3 py-2"
+      >
+        <option value="">Select owner</option>
+        {filteredOwners.map((o) => (
+          <option key={o._id} value={o._id}>
+            {o.name}
+          </option>
+        ))}
+      </select>
+    </div>
+
         </div>
 
         <div className="space-y-4">

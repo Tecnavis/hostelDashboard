@@ -40,8 +40,8 @@ import {
   Navigation,
   CarTaxiFront,
   Hotel,
-  Trash2, 
-    School,
+  Trash2,
+  School,
   BookOpenCheck,
   Hospital,
   Stethoscope,
@@ -102,6 +102,7 @@ export const transportMap = {
   Navigation,
 };
 
+const restorentMap = { Hotel };
 
 export const nearbyMap = {
   School,
@@ -126,7 +127,6 @@ export const nearbyMap = {
   Building2,
 };
 
-
 // amenitiesData.ts
 
 export const AVAILABLE_AMENITIES = [
@@ -135,15 +135,15 @@ export const AVAILABLE_AMENITIES = [
   { name: "Attached washroom", icon: "Bath" },
   { name: "Security / CCTV", icon: "Camera" },
   { name: "Laundry service", icon: "Shirt" },
-    { name: "Parking two-wheeler", icon: "Bike" },
+  { name: "Parking two-wheeler", icon: "Bike" },
   { name: "Parking four-wheeler", icon: "Car" },
   { name: "Power backup", icon: "BatteryCharging" },
   { name: "Common recreation area", icon: "Gamepad2" },
   { name: "Housekeeping", icon: "Brush" },
   { name: "24×7 water supply", icon: "Droplet" },
-    { name: "Fans", icon: "Fan" },
+  { name: "Fans", icon: "Fan" },
   { name: "A/C", icon: "AirVent" },
-    { name: "Washing machine", icon: "WashingMachine" },
+  { name: "Washing machine", icon: "WashingMachine" },
   { name: "Cupboard", icon: "Cuboid" },
   { name: "Iron box", icon: "Container" },
   { name: "Study tables / Desks", icon: "BookOpen" },
@@ -165,7 +165,7 @@ export const AVAILABLE_TRANSPORTATION = [
   { name: "Helipad", icon: "Navigation" },
   { name: "EV Charging", icon: "BatteryCharging" },
   { name: "Rickshaw Stand", icon: "Siren" },
-  { name: "Car Rental", icon: "Car" }, 
+  { name: "Car Rental", icon: "Car" },
   { name: "Highway Exit", icon: "Navigation" },
 ];
 
@@ -177,8 +177,8 @@ export const NEARBY_PLACES = [
   { name: "Pharmacy", icon: "Pill" },
   { name: "Petrol Pump", icon: "Fuel" },
   { name: "Church", icon: "Church" },
-  { name: "Temple", icon: "Mountain" }, 
-  { name: "Mosque", icon: "MoonStar" }, 
+  { name: "Temple", icon: "Mountain" },
+  { name: "Mosque", icon: "MoonStar" },
   { name: "Police Station", icon: "ShieldCheck" },
   { name: "Fire Station", icon: "Flame" },
   { name: "Shopping Mall", icon: "ShoppingBag" },
@@ -191,7 +191,6 @@ export const NEARBY_PLACES = [
   { name: "ATM", icon: "CreditCard" },
   { name: "Bank", icon: "Building2" },
 ];
-
 
 export function HostelPOST({
   isPosting,
@@ -232,8 +231,7 @@ export function HostelPOST({
   selectedNearby,
   setSelectdNearby,
 }) {
-
-   const [search, setSearch] = useState("");
+  const [search, setSearch] = useState("");
 
   const filteredOwners = owners.filter((o) =>
     o.name.toLowerCase().includes(search.toLowerCase())
@@ -242,7 +240,7 @@ export function HostelPOST({
   return (
     <DialogContent className="sm:max-w-[600px]">
       <DialogHeader>
-        <DialogTitle>Add New Hostel</DialogTitle>
+        <DialogTitle>Add New Hostel</DialogTitle>restorentMap
       </DialogHeader>
 
       <div
@@ -265,7 +263,7 @@ export function HostelPOST({
               id="phone"
               placeholder="+91..."
               value={phone}
-              onChange={(e) => setPhone(e.target.value)}
+              onChange={(e) => setPhone(e.target.restorentMapvalue)}
             />
           </div>
           <div className="space-y-2">
@@ -277,14 +275,18 @@ export function HostelPOST({
               onChange={(e) => setPrice(e.target.value)}
             />
           </div>
+
           <div className="space-y-2">
-            <Label htmlFor="accommodation">Accommodation</Label>
-            <Input
-              id="accommodation"
-              placeholder="Accommodation"
+            <Label>Accommodation</Label>
+            <select
               value={accommodationType}
               onChange={(e) => setAccommodationType(e.target.value)}
-            />
+              className="border rounded px-3 py-2 w-full focus:outline-none focus:ring-2 focus:ring-blue-500"
+            >
+              <option value="">Select Accommodation</option>
+              <option value="with_food">With Food</option>
+              <option value="without_food">Without Food</option>
+            </select>
           </div>
           <div className="space-y-2">
             <Label htmlFor="street">Street</Label>
@@ -369,22 +371,21 @@ export function HostelPOST({
           </div> */}
 
           <div className="space-y-2">
-  <Label htmlFor="category">Category</Label>
-  <select
-    id="category"
-    value={category}
-    onChange={(e) => setCategory(e.target.value)}
-    className="w-full border border-gray-300 rounded px-3 py-2"
-  >
-    <option value="">Select category</option>
-    <option value="Men's hostel">Men's hostel</option>
-    <option value="Women's hostel">Women's hostel</option>
-    <option value="Others">Others</option>
-  </select>
-</div>
+            <Label htmlFor="category">Category</Label>
+            <select
+              id="category"
+              value={category}
+              onChange={(e) => setCategory(e.target.value)}
+              className="w-full border border-gray-300 rounded px-3 py-2"
+            >
+              <option value="">Select category</option>
+              <option value="Men's hostel">Men's hostel</option>
+              <option value="Women's hostel">Women's hostel</option>
+              <option value="Others">Others</option>
+            </select>
+          </div>
 
-
-{/* 
+          {/* 
           <div className="space-y-2">
             <Label htmlFor="owner">Owner</Label>
             <select
@@ -402,35 +403,33 @@ export function HostelPOST({
             </select>
           </div> */}
 
+          <div className="space-y-2">
+            <Label htmlFor="owner">Owner</Label>
 
-   <div className="space-y-2">
-      <Label htmlFor="owner">Owner</Label>
-      
-      {/* Search box */}
-      <input
-        type="text"
-        placeholder="Search owner..."
-        value={search}
-        onChange={(e) => setSearch(e.target.value)}
-        className="w-full border border-gray-300 rounded px-3 py-2 mb-1"
-      />
+            {/* Search box */}
+            <input
+              type="text"
+              placeholder="Search owner..."
+              value={search}
+              onChange={(e) => setSearch(e.target.value)}
+              className="w-full border border-gray-300 rounded px-3 py-2 mb-1"
+            />
 
-      {/* Owner select */}
-      <select
-        id="owner"
-        value={ownerId}
-        onChange={(e) => setOwnerId(e.target.value)}
-        className="w-full border border-gray-300 rounded px-3 py-2"
-      >
-        <option value="">Select owner</option>
-        {filteredOwners.map((o) => (
-          <option key={o._id} value={o._id}>
-            {o.name}
-          </option>
-        ))}
-      </select>
-    </div>
-
+            {/* Owner select */}
+            <select
+              id="owner"
+              value={ownerId}
+              onChange={(e) => setOwnerId(e.target.value)}
+              className="w-full border border-gray-300 rounded px-3 py-2"
+            >
+              <option value="">Select owner</option>
+              {filteredOwners.map((o) => (
+                <option key={o._id} value={o._id}>
+                  {o.name}
+                </option>
+              ))}
+            </select>
+          </div>
         </div>
 
         <div className="space-y-4">
@@ -510,13 +509,14 @@ export function HostelPOST({
           )}
         </div>
 
-
-   <div className="space-y-4">
+        <div className="space-y-4">
           <Label className="block mb-2">Nearby</Label>
           <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-4">
             {NEARBY_PLACES.map((item) => {
-              const Icon =  nearbyMap[item.icon];
-              const isSelected = selectedNearby?.some((a) => a.name === item.name);
+              const Icon = nearbyMap[item.icon];
+              const isSelected = selectedNearby?.some(
+                (a) => a.name === item.name
+              );
               return (
                 <button
                   type="button"
@@ -560,44 +560,44 @@ export function HostelPOST({
           )}
         </div>
 
-       <div className="space-y-4">
-      <Label className="block mb-2 text-sm">Restaurants</Label>
-      <div className="flex gap-2">
-        <Input
-          placeholder="Restaurant name"
-          value={restaurantName}
-          onChange={(e) => setRestaurantName(e.target.value)}
-        />
-        <Input
-          placeholder="Far (distance)"
-          value={restaurantFar}
-          onChange={(e) => setRestaurantFar(e.target.value)}
-        />
-        <Button onClick={addRestaurant} className="shrink-0">
-          Add
-        </Button>
-      </div>
-
-      <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-3">
-        {selectedRestaurants.map((r) => (
-          <div
-            key={r.name}
-            className="flex items-center justify-between p-3 border rounded-lg bg-white shadow-sm"
-          >
-            <div className="flex items-center gap-2">
-              <Hotel className="w-5 h-5 text-gray-600" />
-              <div className="text-sm">
-                <p className="font-medium">{r.name}</p>
-                <p className="text-xs text-gray-500">{r.far}</p>
-              </div>
-            </div>
-            <button onClick={() => removeRestaurant(r.name)}>
-              <Trash2 className="w-4 h-4 text-red-500" />
-            </button>
+        <div className="space-y-4">
+          <Label className="block mb-2 text-sm">Restaurants</Label>
+          <div className="flex gap-2">
+            <Input
+              placeholder="Restaurant name"
+              value={restaurantName}
+              onChange={(e) => setRestaurantName(e.target.value)}
+            />
+            <Input
+              placeholder="Far (distance)"
+              value={restaurantFar}
+              onChange={(e) => setRestaurantFar(e.target.value)}
+            />
+            <Button onClick={addRestaurant} className="shrink-0">
+              Add
+            </Button>
           </div>
-        ))}
-      </div>
-    </div>
+
+          <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-3">
+            {selectedRestaurants.map((r) => (
+              <div
+                key={r.name}
+                className="flex items-center justify-between p-3 border rounded-lg bg-white shadow-sm"
+              >
+                <div className="flex items-center gap-2">
+                  <Hotel className="w-5 h-5 text-gray-600" />
+                  <div className="text-sm">
+                    <p className="font-medium">{r.name}</p>
+                    <p className="text-xs text-gray-500">{r.far}</p>
+                  </div>
+                </div>
+                <button onClick={() => removeRestaurant(r.name)}>
+                  <Trash2 className="w-4 h-4 text-red-500" />
+                </button>
+              </div>
+            ))}
+          </div>
+        </div>
 
         <div className="space-y-2 col-span-2">
           <Label htmlFor="images">Upload Images</Label>
@@ -762,10 +762,15 @@ export function HostelPUT({ hostel, owners = [], onClose, onUpdated }) {
 
           <div className="space-y-2">
             <Label>Accommodation</Label>
-            <Input
+            <select
               value={accommodationType}
               onChange={(e) => setAccommodationType(e.target.value)}
-            />
+              className="border rounded px-3 py-2 w-full focus:outline-none focus:ring-2 focus:ring-blue-500"
+            >
+              <option value="">Select Accommodation</option>
+              <option value="with_food">With Food</option>
+              <option value="without_food">Without Food</option>
+            </select>
           </div>
 
           <div className="space-y-2">
@@ -954,6 +959,46 @@ export function ShowImagesIcon({ images = [], onClose }) {
             </div>
           ) : (
             <p className="text-gray-500">No images available.</p>
+          )}
+          <button
+            onClick={onClose}
+            className="mt-4 bg-rose-600 hover:bg-rose-700 text-white px-4 py-2 rounded"
+          >
+            Close
+          </button>
+        </div>
+      </div>
+    </>
+  );
+}
+
+export function ShowMorFacility({ facility = [], onClose }) {
+  return (
+    <>
+      <div className="fixed inset-0 bg-black bg-opacity-40 flex items-center justify-center z-50">
+        <div className="bg-white rounded-lg p-6 w-full max-w-lg max-h-[80vh] overflow-y-auto">
+          <h2 className="text-lg font-semibold mb-4">{facility?.name}</h2>
+          {facility?.data?.length > 0 ? (
+            <div className="py-3 px-4 ">
+              {facility.data?.map((a, i) => {
+                const Icon =
+                  iconMap[a.icon] ||
+                  transportMap[a.icon] ||
+                  nearbyMap[a.icon] ||
+                  restorentMap[a.icon];
+                return (
+                  <span
+                    key={i}
+                    className="inline-flex items-center gap-1 bg-gray-100 px-2 py-1 rounded text-sm"
+                  >
+                    {Icon && <Icon className="w-4 h-4" />}
+                    {a.name}
+                  </span>
+                );
+              })}
+            </div>
+          ) : (
+            <p className="text-gray-500">No {facility?.name} available.</p>
           )}
           <button
             onClick={onClose}

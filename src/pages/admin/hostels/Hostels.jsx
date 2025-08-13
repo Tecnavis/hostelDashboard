@@ -62,6 +62,7 @@ import {
   nearbyMap,
   ShowImagesIcon,
   transportMap,
+  ShowMorFacility,
 } from "./HostelAU";
 
 export default function AdminHostels() {
@@ -82,7 +83,7 @@ export default function AdminHostels() {
   const [price, setPrice] = useState("");
   const [searchTerm, setSearchTerm] = useState("");
   const [currentPage, setCurrentPage] = useState(1);
-  const itemsPerPage = 5;
+  const itemsPerPage = 10;
   const navigate = useNavigate();
   const [selectedPlace, setSelectedPlace] = useState("");
   const [selectedStreet, setSelectedStreet] = useState("");
@@ -95,6 +96,8 @@ export default function AdminHostels() {
   const [restaurantName, setRestaurantName] = useState("");
   const [restaurantFar, setRestaurantFar] = useState("");
   const [selectedNearby, setSelectdNearby] = useState([]);
+  const [selectedData, setSelectedData] = useState(null);
+  const [show, setShow] = useState(false);
 
   const admin = JSON.parse(localStorage.getItem("admin"));
 
@@ -131,6 +134,7 @@ export default function AdminHostels() {
         hostel?.category.toLowerCase().includes(searchTerm.toLowerCase()) ||
         hostel?.phone.toLowerCase().includes(searchTerm.toLowerCase()) ||
         hostel?.ownerId?.name
+
           .toLowerCase()
           .includes(searchTerm.toLowerCase()) ||
         hostel?.location?.place.toLowerCase().includes(searchTerm.toLowerCase())
@@ -426,6 +430,18 @@ export default function AdminHostels() {
                     />
                   </DialogContent>
                 </Dialog>
+
+                <Dialog open={show} onOpenChange={setShow}>
+                  <DialogContent>
+                    <DialogHeader>
+                      <DialogTitle>{selectedData?.name}</DialogTitle>
+                    </DialogHeader>
+                    <ShowMorFacility
+                      facility={selectedData}
+                      onClose={() => setShow(false)}
+                    />
+                  </DialogContent>
+                </Dialog>
               </div>
             </div>
 
@@ -612,63 +628,135 @@ export default function AdminHostels() {
                             <td className="py-3 px-4">
                               {hostel?.location?.place}
                             </td>
-                            <td className="py-3 px-4 ">
-                              {hostel?.amenities?.map((a, i) => {
-                                const Icon = iconMap[a.icon];
-                                return (
-                                  <span
-                                    key={i}
-                                    className="inline-flex items-center gap-1 bg-gray-100 px-2 py-1 rounded text-sm"
-                                  >
-                                    {Icon && <Icon className="w-4 h-4" />}
-                                    {a.name}
-                                  </span>
-                                );
-                              })}
-                            </td>
 
-                            <td className="py-3 px-4 ">
-                              {hostel?.transportation?.map((a, i) => {
-                                const Icon = transportMap[a.icon];
-                                return (
-                                  <span
-                                    key={i}
-                                    className="inline-flex items-center gap-1 bg-gray-100 px-2 py-1 rounded text-sm"
-                                  >
-                                    {Icon && <Icon className="w-4 h-4" />}
-                                    {a.name} {a.far}
-                                  </span>
-                                );
-                              })}
+                            <td className="py-3 px-4">
+                              {hostel?.amenities?.length > 0 &&
+                                (() => {
+                                  const a = hostel.amenities[0];
+                                  const Icon = iconMap[a.icon];
+                                  return (
+                                    <div className="flex items-center gap-2">
+                                      <span
+                                        onClick={() => {
+                                          setShow(true);
+                                          setSelectedData({
+                                            name: "Amenties",
+                                            data: hostel.amenities,
+                                          });
+                                        }}
+                                        className="inline-flex items-center gap-1 bg-gray-100 px-2 py-1 rounded text-sm cursor-pointer"
+                                      >
+                                        {Icon && <Icon className="w-4 h-4" />}
+                                        {a.name}
+                                      </span>
+
+                                      {/* Show +X if more amenities exist */}
+                                      {hostel.amenities.length > 1 && (
+                                        <span className="text-gray-500 text-sm">
+                                          +{hostel.amenities.length - 1}
+                                        </span>
+                                      )}
+                                    </div>
+                                  );
+                                })()}
                             </td>
 
                             <td className="py-3 px-4">
-                              {hostel?.restaurants?.map((a, i) => {
-                                return (
-                                  <span
-                                    key={i}
-                                    className="inline-flex items-center gap-1 bg-gray-100 px-2 py-1 rounded text-sm"
-                                  >
-                                    <Hotel className="w-4 h-4" />
-                                    {a.name} {a.far}
-                                  </span>
-                                );
-                              })}
+                              {hostel?.transportation?.length > 0 &&
+                                (() => {
+                                  const a = hostel.transportation[0];
+                                  const Icon = transportMap[a.icon];
+
+                                  return (
+                                    <div className="flex items-center gap-2">
+                                      <span
+                                        onClick={() => {
+                                          setShow(true);
+                                          setSelectedData({
+                                            name: "Transportation",
+                                            data: hostel?.transportation,
+                                          });
+                                        }}
+                                        className="inline-flex items-center gap-1 bg-gray-100 px-2 py-1 rounded text-sm cursor-pointer"
+                                      >
+                                        {Icon && <Icon className="w-4 h-4" />}
+                                        {a.name}
+                                      </span>
+
+                                      {/* Show +X if more amenities exist */}
+                                      {hostel.transportation?.length > 1 && (
+                                        <span className="text-gray-500 text-sm">
+                                          +{hostel.transportation?.length - 1}
+                                        </span>
+                                      )}
+                                    </div>
+                                  ); // first amenity
+                                })()}
                             </td>
 
-                            <td className="py-3 px-4 ">
-                              {hostel?.nearbyPlaces?.map((a, i) => {
-                                const Icon = nearbyMap[a.icon];
-                                return (
-                                  <span
-                                    key={i}
-                                    className="inline-flex items-center gap-1 bg-gray-100 px-2 py-1 rounded text-sm"
-                                  >
-                                    {Icon && <Icon className="w-4 h-4" />}
-                                    {a.name} {a.far}
-                                  </span>
-                                );
-                              })}
+                            <td className="py-3 px-4">
+                              {hostel?.restaurants?.length > 0 &&
+                                (() => {
+                                  const a = hostel.restaurants[0];
+
+                                  return (
+                                    <div className="flex items-center gap-2">
+                                      <span
+                                        onClick={() => {
+                                          setShow(true);
+                                          setSelectedData({
+                                            name: "Restaurants",
+                                            data: hostel?.restaurants,
+                                          });
+                                        }}
+                                        className="inline-flex items-center gap-1 bg-gray-100 px-2 py-1 rounded text-sm cursor-pointer"
+                                      >
+                                        <Hotel className="w-4 h-4" />
+                                        {a.name}
+                                      </span>
+
+                                      {/* Show +X if more amenities exist */}
+                                      {hostel.restaurants?.length > 1 && (
+                                        <span className="text-gray-500 text-sm">
+                                          +{hostel.restaurants?.length - 1}
+                                        </span>
+                                      )}
+                                    </div>
+                                  );
+                                })()}
+                            </td>
+
+                            <td className="py-3 px-4">
+                              {hostel?.nearbyPlaces?.length > 0 &&
+                                (() => {
+                                  const a = hostel.nearbyPlaces[0];
+                                  const Icon = nearbyMap[a.icon];
+
+                                  return (
+                                    <div className="flex items-center gap-2">
+                                      <span
+                                        onClick={() => {
+                                          setShow(true);
+                                          setSelectedData({
+                                            name: "Nearby",
+                                            data: hostel?.nearbyPlaces,
+                                          });
+                                        }}
+                                        className="inline-flex items-center gap-1 bg-gray-100 px-2 py-1 rounded text-sm cursor-pointer"
+                                      >
+                                        {Icon && <Icon className="w-4 h-4" />}
+                                        {a.name}
+                                      </span>
+
+                                      {/* Show +X if more amenities exist */}
+                                      {hostel.nearbyPlaces?.length > 1 && (
+                                        <span className="text-gray-500 text-sm">
+                                          +{hostel.nearbyPlaces?.length - 1}
+                                        </span>
+                                      )}
+                                    </div>
+                                  );
+                                })()}
                             </td>
 
                             <td className="py-3 px-4">

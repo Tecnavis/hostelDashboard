@@ -415,6 +415,22 @@ export default function AdminHostels() {
                       hostel={selectedHostel}
                       onClose={() => setOpenEditDialog(false)}
                       onUpdated={refetch}
+                      transport={selectedTransport}
+                      selectedNearby={selectedNearby}
+                      restaurantName={restaurantName}
+                      restaurantFar={restaurantFar}
+                      addRestaurant={addRestaurant}
+                      selectedRestaurants={selectedRestaurants}
+                      selectedAmenities={selectedAmenities}
+                      toggleAmenity={toggleAmenity}
+                      toggleTransport={toggleTransport}
+                      toggleNearby={toggleNearby}
+                      setRestaurantName={setRestaurantName}
+                      setSelectdNearby={setSelectdNearby}
+                      setSelectedTransport={setSelectdTransport}
+                      setRestaurantFar={setRestaurantFar}
+                      removeRestaurant={removeRestaurant}
+                      selectedTransport={selectedTransport}
                     />
                   </DialogContent>
                 </Dialog>

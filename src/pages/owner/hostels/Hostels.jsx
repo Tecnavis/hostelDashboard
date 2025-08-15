@@ -8,6 +8,7 @@ import {
   ChevronLeft,
   ChevronRight,
   Filter,
+  Hotel,
   MoreHorizontal,
   Pencil,
   Plus,
@@ -54,13 +55,23 @@ import {
   useGetAllOwnerhostelQuery,
 } from "@/app/service/hostel";
 import { useNavigate } from "react-router-dom";
-import { HostelsPOST, HostelsPUT, iconMap, ShowImagesIcon } from "./HostelAU";
+import {
+  HostelPOST,
+  HostelPUT,
+  iconMap,
+  nearbyMap,
+  ShowImagesIcon,
+  transportMap,
+  ShowMorFacility,
+} from "./HostelAU";
 
 export default function OwnerHostels() {
   const [isAddHostelOpen, setIsAddHostelOpen] = useState(false);
   const [statusFilter, setStatusFilter] = useState("all");
   const [name, setName] = useState("");
   const [phone, setPhone] = useState("");
+  console.log(phone, "hii");
+  
   const [location, setLocation] = useState({
     street: "",
     place: "",
@@ -82,6 +93,15 @@ export default function OwnerHostels() {
   const [openEditDialog, setOpenEditDialog] = useState(false);
   const [selectedHostel, setSelectedHostel] = useState(null);
   const [open, setOpen] = useState(false);
+
+  const [selectedAmenities, setSelectedAmenities] = useState([]);
+  const [selectedTransport, setSelectdTransport] = useState([]);
+  const [selectedRestaurants, setSelectedRestaurants] = useState([]);
+  const [restaurantName, setRestaurantName] = useState("");
+  const [restaurantFar, setRestaurantFar] = useState("");
+  const [selectedNearby, setSelectdNearby] = useState([]);
+  const [selectedData, setSelectedData] = useState(null);
+  const [show, setShow] = useState(false);
 
   const owner = JSON.parse(localStorage.getItem("owner"));
   const ownerId =
@@ -144,18 +164,63 @@ export default function OwnerHostels() {
     startIndex + itemsPerPage
   );
 
-  const [selectedAmenities, setSelectedAmenities] = useState([]);
-
-
   const toggleAmenity = (amenity) => {
-    const exists = selectedAmenities.find((a) => a.name === amenity.name);
+    const exists = selectedAmenities?.find((a) => a?.name === amenity?.name);
     if (exists) {
       setSelectedAmenities((prev) =>
-        prev.filter((a) => a.name !== amenity.name)
+        prev?.filter((a) => a?.name !== amenity?.name)
       );
     } else {
       setSelectedAmenities((prev) => [...prev, amenity]);
     }
+  };
+
+  const toggleTransport = (transport) => {
+    const exists = selectedTransport?.find((a) => a?.name === transport?.name);
+    if (exists) {
+      setSelectdTransport((prev) =>
+        prev?.filter((a) => a?.name !== transport?.name)
+      );
+    } else {
+      setSelectdTransport((prev) => [
+        ...prev,
+        { ...transport, far: "" }, // add `far`
+      ]);
+    }
+  };
+
+  const toggleNearby = (nearby) => {
+    const exists = selectedNearby?.find((a) => a?.name === nearby?.name);
+    if (exists) {
+      setSelectdNearby((prev) => prev?.filter((a) => a?.name !== nearby?.name));
+    } else {
+      setSelectdNearby((prev) => [
+        ...prev,
+        { ...nearby, far: "" }, // add `far`
+      ]);
+    }
+  };
+
+  const addRestaurant = () => {
+    if (!restaurantName || !restaurantFar) return;
+
+    const alreadyExists = selectedRestaurants.some(
+      (r) => r.name.toLowerCase() === restaurantName.toLowerCase()
+    );
+
+    if (alreadyExists) return;
+
+    setSelectedRestaurants((prev) => [
+      ...prev,
+      { name: restaurantName, far: restaurantFar, icon: "Hotel" },
+    ]);
+
+    setRestaurantName("");
+    setRestaurantFar("");
+  };
+
+  const removeRestaurant = (name) => {
+    setSelectedRestaurants((prev) => prev.filter((r) => r.name !== name));
   };
 
   // const handleFacilities = (index, value) => {
@@ -175,6 +240,69 @@ export default function OwnerHostels() {
 
   // create  hostel
 
+  // const handleSubmit = async (e) => {
+  //   e.preventDefault();
+
+  //   if (
+  //     category.trim() === "" ||
+  //     selectedImages.length === 0 ||
+  //     ownerId.trim() === "" ||
+  //     description.trim() === "" ||
+  //     name.trim() === "" ||
+  //     phone.trim() === "" ||
+  //     location.street.trim() === "" ||
+  //     location.place.trim() === "" ||
+  //     location.pincode.trim() === "" ||
+  //     accommodationType.trim() === "" ||
+  //     price.trim() === ""
+  //   ) {
+  //     return;
+  //   }
+
+  //   // Prepare FormData
+  //   const formData = new FormData();
+  //   formData.append("ownerId", ownerId);
+  //   formData.append("category", category);
+  //   formData.append("description", description);
+  //   formData.append("name", name);
+  //   formData.append("phone", phone);
+  //   formData.append("accommodationType", accommodationType);
+  //   formData.append("price", price);
+  //   formData.append("location[street]", location.street);
+  //   formData.append("location[place]", location.place);
+  //   formData.append("location[pincode]", location.pincode);
+  //   selectedAmenities.forEach((a, i) => {
+  //     if (a.name.trim() !== "") {
+  //       formData.append(`amenities[${i}][name]`, a.name);
+  //       formData.append(`amenities[${i}][icon]`, a.icon);
+  //     }
+  //   });
+
+  //   selectedImages.forEach((file) => {
+  //     formData.append("images", file);
+  //   });
+
+  //   try {
+  //     const response = await addNewhostel(formData).unwrap();
+  //     if (response?.status === 201) {
+  //       // Reset form state
+  //       setCategory("");
+  //       setName("");
+  //       setPhone("");
+  //       setSelectedImages([]);
+  //       setSelectedAmenities([""]);
+  //       setDescription("");
+  //       setPrice("");
+  //       setAccommodationType("");
+  //       setLocation({ street: "", place: "", pincode: "" });
+  //       setIsAddHostelOpen(false);
+  //       refetch();
+  //     }
+  //   } catch (error) {
+  //     console.error("Hostel create failed:", error);
+  //   }
+  // };
+
   const handleSubmit = async (e) => {
     e.preventDefault();
 
@@ -189,7 +317,10 @@ export default function OwnerHostels() {
       location.place.trim() === "" ||
       location.pincode.trim() === "" ||
       accommodationType.trim() === "" ||
-      price.trim() === ""
+      price.trim() === "" ||
+      selectedTransport.some((t) => t.far.trim() === "") ||
+      selectedNearby.some((t) => t.far.trim() === "") ||
+      selectedRestaurants.some((t) => t.far.trim() === "")
     ) {
       return;
     }
@@ -206,13 +337,34 @@ export default function OwnerHostels() {
     formData.append("location[street]", location.street);
     formData.append("location[place]", location.place);
     formData.append("location[pincode]", location.pincode);
+    // formData.append("superAdminId", superAdminId);
     selectedAmenities.forEach((a, i) => {
       if (a.name.trim() !== "") {
         formData.append(`amenities[${i}][name]`, a.name);
         formData.append(`amenities[${i}][icon]`, a.icon);
       }
     });
-
+    selectedTransport.forEach((a, i) => {
+      if (a.name.trim() !== "") {
+        formData.append(`transportation[${i}][name]`, a.name);
+        formData.append(`transportation[${i}][icon]`, a.icon);
+        formData.append(`transportation[${i}][far]`, a.far);
+      }
+    });
+    selectedNearby.forEach((a, i) => {
+      if (a.name.trim() !== "") {
+        formData.append(`nearbyPlaces[${i}][name]`, a.name);
+        formData.append(`nearbyPlaces[${i}][icon]`, a.icon);
+        formData.append(`nearbyPlaces[${i}][far]`, a.far);
+      }
+    });
+    selectedRestaurants.forEach((a, i) => {
+      if (a.name.trim() !== "") {
+        formData.append(`restaurants[${i}][name]`, a.name);
+        formData.append(`restaurants[${i}][icon]`, a.icon);
+        formData.append(`restaurants[${i}][far]`, a.far);
+      }
+    });
     selectedImages.forEach((file) => {
       formData.append("images", file);
     });
@@ -225,7 +377,10 @@ export default function OwnerHostels() {
         setName("");
         setPhone("");
         setSelectedImages([]);
-        setSelectedAmenities([""]);
+        setSelectedAmenities([]);
+        setSelectdTransport([]);
+        setSelectedRestaurants([]);
+        setSelectdNearby([]);
         setDescription("");
         setPrice("");
         setAccommodationType("");
@@ -237,6 +392,7 @@ export default function OwnerHostels() {
       console.error("Hostel create failed:", error);
     }
   };
+
   // delete admin
 
   const handleDelete = async (id) => {
@@ -262,77 +418,77 @@ export default function OwnerHostels() {
     }
   };
 
-  const hostels = [
-    {
-      id: 1,
-      name: "Sunset Beach Hostel",
-      location: "Miami, FL",
-      address: "123 Ocean Drive, Miami, FL 33139",
-      description:
-        "A beautiful beachfront hostel with stunning ocean views. Perfect for travelers looking to enjoy the sun and surf of Miami Beach.",
-      image: "/placeholder.svg?height=300&width=500",
-      rooms: 18,
-      occupancy: "78%",
-      rating: 4.8,
-      status: "Active",
-      amenities: [
-        "Free Wi-Fi",
-        "Breakfast Included",
-        "Air Conditioning",
-        "Lockers",
-        "Common Kitchen",
-        "Laundry",
-      ],
-      priceRange: "$30-$120",
-      created: "Jan 15, 2025",
-    },
-    {
-      id: 2,
-      name: "Downtown Backpackers",
-      location: "New York, NY",
-      address: "456 Broadway, New York, NY 10013",
-      description:
-        "Located in the heart of Manhattan, this hostel offers easy access to all major attractions. Modern facilities with a social atmosphere.",
-      image: "/placeholder.svg?height=300&width=500",
-      rooms: 14,
-      occupancy: "92%",
-      rating: 4.6,
-      status: "Active",
-      amenities: [
-        "Free Wi-Fi",
-        "24/7 Reception",
-        "Lockers",
-        "Common Room",
-        "Bike Rental",
-        "Tours",
-      ],
-      priceRange: "$25-$90",
-      created: "Feb 3, 2025",
-    },
-    {
-      id: 3,
-      name: "Mountain View Lodge",
-      location: "Denver, CO",
-      address: "789 Mountain Road, Denver, CO 80202",
-      description:
-        "A cozy mountain retreat with breathtaking views of the Rockies. Perfect base for hiking and outdoor adventures.",
-      image: "/placeholder.svg?height=300&width=500",
-      rooms: 10,
-      occupancy: "65%",
-      rating: 4.7,
-      status: "Active",
-      amenities: [
-        "Free Wi-Fi",
-        "Breakfast Included",
-        "Fireplace",
-        "Hiking Trails",
-        "Parking",
-        "Shuttle Service",
-      ],
-      priceRange: "$35-$110",
-      created: "Mar 10, 2025",
-    },
-  ];
+  // const hostels = [
+  //   {
+  //     id: 1,
+  //     name: "Sunset Beach Hostel",
+  //     location: "Miami, FL",
+  //     address: "123 Ocean Drive, Miami, FL 33139",
+  //     description:
+  //       "A beautiful beachfront hostel with stunning ocean views. Perfect for travelers looking to enjoy the sun and surf of Miami Beach.",
+  //     image: "/placeholder.svg?height=300&width=500",
+  //     rooms: 18,
+  //     occupancy: "78%",
+  //     rating: 4.8,
+  //     status: "Active",
+  //     amenities: [
+  //       "Free Wi-Fi",
+  //       "Breakfast Included",
+  //       "Air Conditioning",
+  //       "Lockers",
+  //       "Common Kitchen",
+  //       "Laundry",
+  //     ],
+  //     priceRange: "$30-$120",
+  //     created: "Jan 15, 2025",
+  //   },
+  //   {
+  //     id: 2,
+  //     name: "Downtown Backpackers",
+  //     location: "New York, NY",
+  //     address: "456 Broadway, New York, NY 10013",
+  //     description:
+  //       "Located in the heart of Manhattan, this hostel offers easy access to all major attractions. Modern facilities with a social atmosphere.",
+  //     image: "/placeholder.svg?height=300&width=500",
+  //     rooms: 14,
+  //     occupancy: "92%",
+  //     rating: 4.6,
+  //     status: "Active",
+  //     amenities: [
+  //       "Free Wi-Fi",
+  //       "24/7 Reception",
+  //       "Lockers",
+  //       "Common Room",
+  //       "Bike Rental",
+  //       "Tours",
+  //     ],
+  //     priceRange: "$25-$90",
+  //     created: "Feb 3, 2025",
+  //   },
+  //   {
+  //     id: 3,
+  //     name: "Mountain View Lodge",
+  //     location: "Denver, CO",
+  //     address: "789 Mountain Road, Denver, CO 80202",
+  //     description:
+  //       "A cozy mountain retreat with breathtaking views of the Rockies. Perfect base for hiking and outdoor adventures.",
+  //     image: "/placeholder.svg?height=300&width=500",
+  //     rooms: 10,
+  //     occupancy: "65%",
+  //     rating: 4.7,
+  //     status: "Active",
+  //     amenities: [
+  //       "Free Wi-Fi",
+  //       "Breakfast Included",
+  //       "Fireplace",
+  //       "Hiking Trails",
+  //       "Parking",
+  //       "Shuttle Service",
+  //     ],
+  //     priceRange: "$35-$110",
+  //     created: "Mar 10, 2025",
+  //   },
+  // ];
 
   return (
     <div className="flex h-screen bg-gray-50">
@@ -360,7 +516,7 @@ export default function OwnerHostels() {
                     </Button>
                   </DialogTrigger>
 
-                  <HostelsPOST
+                  <HostelPOST
                     isPosting={isPosting}
                     name={name}
                     phone={phone}
@@ -369,22 +525,34 @@ export default function OwnerHostels() {
                     location={location}
                     description={description}
                     amenities={selectedAmenities}
+                    transport={selectedTransport}
                     category={category}
                     selectedImages={selectedImages}
+                    setSelectedTransport={setSelectdTransport}
                     setName={setName}
                     setPhone={setPhone}
                     setPrice={setPrice}
                     setAccommodationType={setAccommodationType}
                     setLocation={setLocation}
                     setDescription={setDescription}
-                    // handleFacilities={handleFacilities}
-                    // addFacilities={addFacilities}
-                    // removeFacilities={removeFacilities}
                     setCategory={setCategory}
+                    ownerId={ownerId}
                     setSelectedImages={setSelectedImages}
                     handleSubmit={handleSubmit}
-      onClose={() =>  setIsAddHostelOpen(false)}             
+                    onClose={() => setIsAddHostelOpen(false)}
                     toggleAmenity={toggleAmenity}
+                    toggleTransport={toggleTransport}
+                    addRestaurant={addRestaurant}
+                    restaurantName={restaurantName}
+                    setRestaurantName={setRestaurantName}
+                    restaurantFar={restaurantFar}
+                    setRestaurantFar={setRestaurantFar}
+                    selectedRestaurants={selectedRestaurants}
+                    setSelectedRestaurants={setSelectedRestaurants}
+                    removeRestaurant={removeRestaurant}
+                    toggleNearby={toggleNearby}
+                    selectedNearby={selectedNearby}
+                    setSelectdNearby={setSelectdNearby}
                   />
                 </Dialog>
 
@@ -393,10 +561,26 @@ export default function OwnerHostels() {
                     <DialogHeader>
                       <DialogTitle>Edit Admin</DialogTitle>
                     </DialogHeader>
-                    <HostelsPUT
+                    <HostelPUT
                       hostel={selectedHostel}
                       onClose={() => setOpenEditDialog(false)}
                       onUpdated={refetch}
+                      transport={selectedTransport}
+                      selectedNearby={selectedNearby}
+                      restaurantName={restaurantName}
+                      restaurantFar={restaurantFar}
+                      addRestaurant={addRestaurant}
+                      selectedRestaurants={selectedRestaurants}
+                      selectedAmenities={selectedAmenities}
+                      toggleAmenity={toggleAmenity}
+                      toggleTransport={toggleTransport}
+                      toggleNearby={toggleNearby}
+                      setRestaurantName={setRestaurantName}
+                      setSelectdNearby={setSelectdNearby}
+                      setSelectedTransport={setSelectdTransport}
+                      setRestaurantFar={setRestaurantFar}
+                      removeRestaurant={removeRestaurant}
+                      selectedTransport={selectedTransport}
                     />
                   </DialogContent>
                 </Dialog>
@@ -409,6 +593,18 @@ export default function OwnerHostels() {
                     <ShowImagesIcon
                       images={selectedHostel?.photos}
                       onClose={() => setOpen(false)}
+                    />
+                  </DialogContent>
+                </Dialog>
+
+                <Dialog open={show} onOpenChange={setShow}>
+                  <DialogContent>
+                    <DialogHeader>
+                      <DialogTitle>{selectedData?.name}</DialogTitle>
+                    </DialogHeader>
+                    <ShowMorFacility
+                      facility={selectedData}
+                      onClose={() => setShow(false)}
                     />
                   </DialogContent>
                 </Dialog>
@@ -540,6 +736,15 @@ export default function OwnerHostels() {
                             Facilities
                           </th>
                           <th className="text-left py-3 px-4 font-medium text-gray-500">
+                            Transportation
+                          </th>
+                          <th className="text-left py-3 px-4 font-medium text-gray-500">
+                            Restaurants
+                          </th>
+                          <th className="text-left py-3 px-4 font-medium text-gray-500">
+                            Nearby
+                          </th>
+                          <th className="text-left py-3 px-4 font-medium text-gray-500">
                             Accommodation
                           </th>
                           <th className="text-left py-3 px-4 font-medium text-gray-500">
@@ -574,7 +779,7 @@ export default function OwnerHostels() {
                                   className="font-medium cursor-pointer"
                                   onClick={() =>
                                     navigate(
-                                      `/owner/hostels/rooms/${hostel._id}`
+                                      `/admin/hostels/rooms/${hostel._id}`
                                     )
                                   }
                                 >
@@ -589,19 +794,135 @@ export default function OwnerHostels() {
                             <td className="py-3 px-4">
                               {hostel?.location?.place}
                             </td>
-                            <td className="py-3 px-4 flex flex-wrap gap-2">
-                              {hostel?.amenities?.map((a, i) => {
-                                const Icon = iconMap[a.icon]; // find the correct icon
-                                return (
-                                  <span
-                                    key={i}
-                                    className="inline-flex items-center gap-1 bg-gray-100 px-2 py-1 rounded text-sm"
-                                  >
-                                    {Icon && <Icon className="w-4 h-4" />}
-                                    {a.name}
-                                  </span>
-                                );
-                              })}
+
+                            <td className="py-3 px-4">
+                              {hostel?.amenities?.length > 0 &&
+                                (() => {
+                                  const a = hostel.amenities[0];
+                                  const Icon = iconMap[a.icon];
+                                  return (
+                                    <div className="flex items-center gap-2">
+                                      <span
+                                        onClick={() => {
+                                          setShow(true);
+                                          setSelectedData({
+                                            name: "Amenties",
+                                            data: hostel.amenities,
+                                          });
+                                        }}
+                                        className="inline-flex items-center gap-1 bg-gray-100 px-2 py-1 rounded text-sm cursor-pointer"
+                                      >
+                                        {Icon && <Icon className="w-4 h-4" />}
+                                        {a.name}
+                                      </span>
+
+                                      {/* Show +X if more amenities exist */}
+                                      {hostel.amenities.length > 1 && (
+                                        <span className="text-gray-500 text-sm">
+                                          +{hostel.amenities.length - 1}
+                                        </span>
+                                      )}
+                                    </div>
+                                  );
+                                })()}
+                            </td>
+
+                            <td className="py-3 px-4">
+                              {hostel?.transportation?.length > 0 &&
+                                (() => {
+                                  const a = hostel.transportation[0];
+                                  const Icon = transportMap[a.icon];
+
+                                  return (
+                                    <div className="flex items-center gap-2">
+                                      <span
+                                        onClick={() => {
+                                          setShow(true);
+                                          setSelectedData({
+                                            name: "Transportation",
+                                            data: hostel?.transportation,
+                                          });
+                                        }}
+                                        className="inline-flex items-center gap-1 bg-gray-100 px-2 py-1 rounded text-sm cursor-pointer"
+                                      >
+                                        {Icon && <Icon className="w-4 h-4" />}
+                                        {a.name}
+                                      </span>
+
+                                      {/* Show +X if more amenities exist */}
+                                      {hostel.transportation?.length > 1 && (
+                                        <span className="text-gray-500 text-sm">
+                                          +{hostel.transportation?.length - 1}
+                                        </span>
+                                      )}
+                                    </div>
+                                  ); // first amenity
+                                })()}
+                            </td>
+
+                            <td className="py-3 px-4">
+                              {hostel?.restaurants?.length > 0 &&
+                                (() => {
+                                  const a = hostel.restaurants[0];
+
+                                  return (
+                                    <div className="flex items-center gap-2">
+                                      <span
+                                        onClick={() => {
+                                          setShow(true);
+                                          setSelectedData({
+                                            name: "Restaurants",
+                                            data: hostel?.restaurants,
+                                          });
+                                        }}
+                                        className="inline-flex items-center gap-1 bg-gray-100 px-2 py-1 rounded text-sm cursor-pointer"
+                                      >
+                                        <Hotel className="w-4 h-4" />
+                                        {a.name}
+                                      </span>
+
+                                      {/* Show +X if more amenities exist */}
+                                      {hostel.restaurants?.length > 1 && (
+                                        <span className="text-gray-500 text-sm">
+                                          +{hostel.restaurants?.length - 1}
+                                        </span>
+                                      )}
+                                    </div>
+                                  );
+                                })()}
+                            </td>
+
+                            <td className="py-3 px-4">
+                              {hostel?.nearbyPlaces?.length > 0 &&
+                                (() => {
+                                  const a = hostel.nearbyPlaces[0];
+                                  const Icon = nearbyMap[a.icon];
+
+                                  return (
+                                    <div className="flex items-center gap-2">
+                                      <span
+                                        onClick={() => {
+                                          setShow(true);
+                                          setSelectedData({
+                                            name: "Nearby",
+                                            data: hostel?.nearbyPlaces,
+                                          });
+                                        }}
+                                        className="inline-flex items-center gap-1 bg-gray-100 px-2 py-1 rounded text-sm cursor-pointer"
+                                      >
+                                        {Icon && <Icon className="w-4 h-4" />}
+                                        {a.name}
+                                      </span>
+
+                                      {/* Show +X if more amenities exist */}
+                                      {hostel.nearbyPlaces?.length > 1 && (
+                                        <span className="text-gray-500 text-sm">
+                                          +{hostel.nearbyPlaces?.length - 1}
+                                        </span>
+                                      )}
+                                    </div>
+                                  );
+                                })()}
                             </td>
 
                             <td className="py-3 px-4">
@@ -727,7 +1048,7 @@ export default function OwnerHostels() {
                 </CardContent>
               </Card>
             </motion.div>
-            <motion.div
+            {/* <motion.div
               initial={{ opacity: 0, y: 20 }}
               animate={{ opacity: 1, y: 0 }}
               transition={{ duration: 0.5, delay: 0.2 }}
@@ -826,7 +1147,7 @@ export default function OwnerHostels() {
                   </div>
                 </CardContent>
               </Card>
-            </motion.div>
+            </motion.div> */}
           </div>
         </main>
       </div>

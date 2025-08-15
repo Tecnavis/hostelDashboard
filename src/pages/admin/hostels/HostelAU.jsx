@@ -330,46 +330,6 @@ export function HostelPOST({
               onChange={(e) => setDescription(e.target.value)}
             />
           </div>
-          {/* <div className="space-y-2 col-span-2">
-            <Label>Facilities</Label>
-            {amenities.map((item, index) => (
-              <div key={index} className="flex gap-2 items-center">
-                <Input
-                  value={item}
-                  placeholder={`Facility ${index + 1}`}
-                  onChange={(e) => handleFacilities(index, e.target.value)}
-                />
-                {amenities.length > 1 && (
-                  <Button
-                    type="button"
-                    variant="ghost"
-                    size="sm"
-                    onClick={() => removeFacilities(index)}
-                  >
-                    ✕
-                  </Button>
-                )}
-              </div>
-            ))}
-            <Button
-              type="button"
-              variant="outline"
-              size="sm"
-              onClick={addFacilities}
-            >
-              + Add Facility
-            </Button>
-          </div> */}
-          {/* <div className="space-y-2">
-            <Label htmlFor="category">Category</Label>
-            <Input
-              id="category"
-              placeholder="Category"
-              value={category}
-              onChange={(e) => setCategory(e.target.value)}
-            />
-          </div> */}
-
           <div className="space-y-2">
             <Label htmlFor="category">Category</Label>
             <select
@@ -384,25 +344,6 @@ export function HostelPOST({
               <option value="Others">Others</option>
             </select>
           </div>
-
-          {/* 
-          <div className="space-y-2">
-            <Label htmlFor="owner">Owner</Label>
-            <select
-              id="owner"
-              value={ownerId}
-              onChange={(e) => setOwnerId(e.target.value)}
-              className="w-full border border-gray-300 rounded px-3 py-2"
-            >
-              <option value="">Select owner</option>
-              {owners.map((o) => (
-                <option key={o._id} value={o._id}>
-                  {o.name}
-                </option>
-              ))}
-            </select>
-          </div> */}
-
           <div className="space-y-2">
             <Label htmlFor="owner">Owner</Label>
 
@@ -655,7 +596,28 @@ export function HostelPOST({
 
 import { useUpdatehostelMutation } from "@/app/service/hostel";
 
-export function HostelPUT({ hostel, owners = [], onClose, onUpdated }) {
+export function HostelPUT({
+  hostel,
+  owners = [],
+  onClose,
+  onUpdated,
+  transport,
+  selectedNearby,
+  restaurantName,
+  restaurantFar,
+  addRestaurant,
+  selectedRestaurants,
+  selectedAmenities,
+  toggleAmenity,
+  toggleTransport,
+  toggleNearby,
+  setRestaurantName,
+  setSelectdNearby,
+  setRestaurantFar,
+  removeRestaurant,
+  setSelectedTransport,
+   selectedTransport
+}) {
   const [name, setName] = useState(hostel?.name || "");
   const [phone, setPhone] = useState(hostel?.phone || "");
   const [price, setPrice] = useState(hostel?.price || "");
@@ -678,16 +640,6 @@ export function HostelPUT({ hostel, owners = [], onClose, onUpdated }) {
 
   const [updatehostel, { isLoading }] = useUpdatehostelMutation();
 
-  const handleFacilities = (index, value) => {
-    const newAmenities = [...amenities];
-    newAmenities[index] = value;
-    setAmenities(newAmenities);
-  };
-
-  const addFacilities = () => setAmenities([...amenities, ""]);
-  const removeFacilities = (index) =>
-    setAmenities(amenities.filter((_, i) => i !== index));
-
   const handleUpdate = async () => {
     const formData = new FormData();
     formData.append("name", name);
@@ -701,10 +653,33 @@ export function HostelPUT({ hostel, owners = [], onClose, onUpdated }) {
     formData.append("category", category);
     formData.append("ownerId", ownerId);
 
-    amenities.forEach((a, i) => {
-      if (a.trim()) formData.append(`amenities[${i}]`, a);
+    selectedAmenities.forEach((a, i) => {
+      if (a.name.trim() !== "") {
+        formData.append(`amenities[${i}][name]`, a.name);
+        formData.append(`amenities[${i}][icon]`, a.icon);
+      }
     });
-
+    selectedTransport.forEach((a, i) => {
+      if (a.name.trim() !== "") {
+        formData.append(`transportation[${i}][name]`, a.name);
+        formData.append(`transportation[${i}][icon]`, a.icon);
+        formData.append(`transportation[${i}][far]`, a.far);
+      }
+    });
+    selectedNearby.forEach((a, i) => {
+      if (a.name.trim() !== "") {
+        formData.append(`nearbyPlaces[${i}][name]`, a.name);
+        formData.append(`nearbyPlaces[${i}][icon]`, a.icon);
+        formData.append(`nearbyPlaces[${i}][far]`, a.far);
+      }
+    });
+    selectedRestaurants.forEach((a, i) => {
+      if (a.name.trim() !== "") {
+        formData.append(`restaurants[${i}][name]`, a.name);
+        formData.append(`restaurants[${i}][icon]`, a.icon);
+        formData.append(`restaurants[${i}][far]`, a.far);
+      }
+    });
     formData.append("existingPhotos", JSON.stringify(existingPhotos));
     selectedImages.forEach((file) => formData.append("images", file));
 
@@ -732,6 +707,12 @@ export function HostelPUT({ hostel, owners = [], onClose, onUpdated }) {
   // Remove duplicate owners by _id
   const uniqueOwners = Array.from(
     new Map(combinedOwners.map((o) => [o._id, o])).values()
+  );
+
+  const [search, setSearch] = useState("");
+
+  const filteredOwners = owners.filter((o) =>
+    o.name.toLowerCase().includes(search.toLowerCase())
   );
 
   return (
@@ -811,119 +792,274 @@ export function HostelPUT({ hostel, owners = [], onClose, onUpdated }) {
             />
           </div>
 
-          <div className="space-y-2 col-span-2">
-            <Label>Facilities</Label>
-            {amenities.map((item, i) => (
-              <div key={i} className="flex gap-2">
-                <Input
-                  value={item}
-                  onChange={(e) => handleFacilities(i, e.target.value)}
-                />
-                {amenities.length > 1 && (
-                  <Button
-                    type="button"
-                    variant="ghost"
-                    size="sm"
-                    onClick={() => removeFacilities(i)}
-                  >
-                    ✕
-                  </Button>
-                )}
-              </div>
-            ))}
-            <Button
-              type="button"
-              variant="outline"
-              size="sm"
-              onClick={addFacilities}
-            >
-              + Add Facility
-            </Button>
-          </div>
-
           <div className="space-y-2">
-            <Label>Category</Label>
-            <Input
+            <Label htmlFor="category">Category</Label>
+            <select
+              id="category"
               value={category}
               onChange={(e) => setCategory(e.target.value)}
-            />
+              className="w-full border border-gray-300 rounded px-3 py-2"
+            >
+              <option value="">Select category</option>
+              <option value="Men's hostel">Men's hostel</option>
+              <option value="Women's hostel">Women's hostel</option>
+              <option value="Others">Others</option>
+            </select>
           </div>
 
           <div className="space-y-2">
             <Label htmlFor="owner">Owner</Label>
+
+            {/* Search box */}
+            <input
+              type="text"
+              placeholder="Search owner..."
+              value={search}
+              onChange={(e) => setSearch(e.target.value)}
+              className="w-full border border-gray-300 rounded px-3 py-2 mb-1"
+            />
+
+            {/* Owner select */}
             <select
               id="owner"
               value={ownerId}
               onChange={(e) => setOwnerId(e.target.value)}
-              className="w-full border rounded px-3 py-2"
+              className="w-full border border-gray-300 rounded px-3 py-2"
             >
               <option value="">Select owner</option>
-              {uniqueOwners.map((o) => (
+              {filteredOwners.map((o) => (
                 <option key={o._id} value={o._id}>
                   {o.name}
                 </option>
               ))}
             </select>
           </div>
+        </div>
 
-          <div className="space-y-2 col-span-2">
-            <Label>Upload New Images</Label>
-            <label className="border-2 border-dashed rounded-md p-6 flex flex-col items-center justify-center gap-2 cursor-pointer">
-              <ImagePlus className="h-8 w-8" />
-              <p className="text-sm">Click to upload</p>
-              <Upload className="h-4 w-4" />
-              <Input
-                type="file"
-                accept="image/*"
-                multiple
-                className="hidden"
-                onChange={(e) => {
-                  if (e.target.files) {
-                    setSelectedImages(Array.from(e.target.files));
-                  }
-                }}
-              />
-            </label>
-            {selectedImages.length > 0 && (
-              <div className="grid grid-cols-2 gap-2">
-                {selectedImages.map((file, i) => (
+        <div className="space-y-4">
+          <Label className="block mb-2">Facilities</Label>
+          <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-4">
+            {AVAILABLE_AMENITIES.map((item) => {
+              const Icon = iconMap[item.icon];
+              const isSelected = amenities?.some((a) => a.name === item.name);
+              return (
+                <button
+                  type="button"
+                  key={item.name}
+                  onClick={() => toggleAmenity(item)}
+                  className={`relative flex items-center gap-2 p-3 border rounded-lg transition w-full text-left ${
+                    isSelected
+                      ? "bg-blue-100 border-blue-500"
+                      : "bg-white border-gray-300"
+                  }`}
+                >
+                  <Icon className="w-5 h-5" />
+                  <span className="text-sm">{item.name}</span>
+                  {isSelected && (
+                    <Check className="absolute top-2 right-2 w-4 h-4 text-blue-600" />
+                  )}
+                </button>
+              );
+            })}
+          </div>
+        </div>
+
+        <div className="space-y-4">
+          <Label className="block mb-2">Transportation</Label>
+          <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-4">
+            {AVAILABLE_TRANSPORTATION.map((item) => {
+              const Icon = transportMap[item.icon];
+              const isSelected = transport?.some((a) => a.name === item.name);
+              return (
+                <button
+                  type="button"
+                  key={item.name}
+                  onClick={() => toggleTransport(item)}
+                  className={`relative flex items-center gap-2 p-3 border rounded-lg transition w-full text-left ${
+                    isSelected
+                      ? "bg-blue-100 border-blue-500"
+                      : "bg-white border-gray-300"
+                  }`}
+                >
+                  <Icon className="w-5 h-5" />
+                  <span className="text-sm">{item.name}</span>
+                  {isSelected && (
+                    <Check className="absolute top-2 right-2 w-4 h-4 text-blue-600" />
+                  )}
+                </button>
+              );
+            })}
+          </div>
+
+          {transport.length > 0 && (
+            <div className="mt-4 space-y-4">
+              {transport.map((trans, index) => (
+                <div key={trans.name} className="flex items-center gap-4">
+                  <span className="w-32">{trans.name}</span>
+                  <Input
+                    type="text"
+                    className="input input-bordered w-full max-w-xs"
+                    placeholder="Enter distance (e.g., 200m)"
+                    value={trans.far}
+                    onChange={(e) => {
+                      const updated = [...transport];
+                      updated[index].far = e.target.value;
+                      setSelectedTransport(updated);
+                    }}
+                  />
+                </div>
+              ))}
+            </div>
+          )}
+        </div>
+
+        <div className="space-y-4">
+          <Label className="block mb-2">Nearby</Label>
+          <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-4">
+            {NEARBY_PLACES.map((item) => {
+              const Icon = nearbyMap[item.icon];
+              const isSelected = selectedNearby?.some(
+                (a) => a.name === item.name
+              );
+              return (
+                <button
+                  type="button"
+                  key={item.name}
+                  onClick={() => toggleNearby(item)}
+                  className={`relative flex items-center gap-2 p-3 border rounded-lg transition w-full text-left ${
+                    isSelected
+                      ? "bg-blue-100 border-blue-500"
+                      : "bg-white border-gray-300"
+                  }`}
+                >
+                  {Icon && <Icon className="w-5 h-5" />}
+                  <span className="text-sm">{item.name}</span>
+                  {isSelected && (
+                    <Check className="absolute top-2 right-2 w-4 h-4 text-blue-600" />
+                  )}
+                </button>
+              );
+            })}
+          </div>
+
+          {selectedNearby.length > 0 && (
+            <div className="mt-4 space-y-4">
+              {selectedNearby.map((nearby, index) => (
+                <div key={nearby.name} className="flex items-center gap-4">
+                  <span className="w-32">{nearby.name}</span>
+                  <Input
+                    type="text"
+                    className="input input-bordered w-full max-w-xs"
+                    placeholder="Enter distance (e.g., 200m)"
+                    value={nearby.far}
+                    onChange={(e) => {
+                      const updated = [...selectedNearby];
+                      updated[index].far = e.target.value;
+                      setSelectdNearby(updated);
+                    }}
+                  />
+                </div>
+              ))}
+            </div>
+          )}
+        </div>
+
+        <div className="space-y-4">
+          <Label className="block mb-2 text-sm">Restaurants</Label>
+          <div className="flex gap-2">
+            <Input
+              placeholder="Restaurant name"
+              value={restaurantName}
+              onChange={(e) => setRestaurantName(e.target.value)}
+            />
+            <Input
+              placeholder="Far (distance)"
+              value={restaurantFar}
+              onChange={(e) => setRestaurantFar(e.target.value)}
+            />
+            <Button onClick={addRestaurant} className="shrink-0">
+              Add
+            </Button>
+          </div>
+
+          <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-3">
+            {selectedRestaurants.map((r) => (
+              <div
+                key={r.name}
+                className="flex items-center justify-between p-3 border rounded-lg bg-white shadow-sm"
+              >
+                <div className="flex items-center gap-2">
+                  <Hotel className="w-5 h-5 text-gray-600" />
+                  <div className="text-sm">
+                    <p className="font-medium">{r.name}</p>
+                    <p className="text-xs text-gray-500">{r.far}</p>
+                  </div>
+                </div>
+                <button onClick={() => removeRestaurant(r.name)}>
+                  <Trash2 className="w-4 h-4 text-red-500" />
+                </button>
+              </div>
+            ))}
+          </div>
+        </div>
+
+        <div className="space-y-2 col-span-2">
+          <Label>Upload New Images</Label>
+          <label className="border-2 border-dashed rounded-md p-6 flex flex-col items-center justify-center gap-2 cursor-pointer">
+            <ImagePlus className="h-8 w-8" />
+            <p className="text-sm">Click to upload</p>
+            <Upload className="h-4 w-4" />
+            <Input
+              type="file"
+              accept="image/*"
+              multiple
+              className="hidden"
+              onChange={(e) => {
+                if (e.target.files) {
+                  setSelectedImages(Array.from(e.target.files));
+                }
+              }}
+            />
+          </label>
+          {selectedImages.length > 0 && (
+            <div className="grid grid-cols-2 gap-2">
+              {selectedImages.map((file, i) => (
+                <img
+                  key={i}
+                  src={URL.createObjectURL(file)}
+                  alt="preview"
+                  className="w-full h-32 object-cover rounded-md"
+                />
+              ))}
+            </div>
+          )}
+        </div>
+
+        <div className="space-y-2 col-span-2">
+          {existingPhotos.length > 0 && (
+            <div className="grid grid-cols-2 gap-2">
+              {existingPhotos.map((url, i) => (
+                <div key={i} className="relative">
                   <img
-                    key={i}
-                    src={URL.createObjectURL(file)}
-                    alt="preview"
+                    src={url}
+                    alt="Existing"
                     className="w-full h-32 object-cover rounded-md"
                   />
-                ))}
-              </div>
-            )}
-          </div>
-
-          <div className="space-y-2 col-span-2">
-            {existingPhotos.length > 0 && (
-              <div className="grid grid-cols-2 gap-2">
-                {existingPhotos.map((url, i) => (
-                  <div key={i} className="relative">
-                    <img
-                      src={url}
-                      alt="Existing"
-                      className="w-full h-32 object-cover rounded-md"
-                    />
-                    <button
-                      type="button"
-                      onClick={() =>
-                        setExistingPhotos(
-                          existingPhotos.filter((_, idx) => idx !== i)
-                        )
-                      }
-                      className="absolute top-1 right-1 bg-red-600 text-white rounded-full px-2 py-1 text-xs"
-                    >
-                      ✕
-                    </button>
-                  </div>
-                ))}
-              </div>
-            )}
-          </div>
+                  <button
+                    type="button"
+                    onClick={() =>
+                      setExistingPhotos(
+                        existingPhotos.filter((_, idx) => idx !== i)
+                      )
+                    }
+                    className="absolute top-1 right-1 bg-red-600 text-white rounded-full px-2 py-1 text-xs"
+                  >
+                    ✕
+                  </button>
+                </div>
+              ))}
+            </div>
+          )}
         </div>
       </div>
 

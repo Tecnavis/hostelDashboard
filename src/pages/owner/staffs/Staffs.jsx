@@ -55,6 +55,7 @@ import {
   useGetAllownerStaffQuery,
 } from "@/app/service/owner";
 import { StaffPOST, StaffPUT } from "./StaffAU";
+import { TableSkeleton } from "@/common/TableSkeleton";
 
 export default function OwnerStaffs() {
   const [isAddHostelOpen, setIsAddHostelOpen] = useState(false);
@@ -78,10 +79,6 @@ export default function OwnerStaffs() {
   const [blockowner] = useBlockownerMutation();
   const [addNewowner, { isLoading: isPosting }] = useAddNewownerMutation();
 
-  if (isLoading) return <h1>Loading...</h1>;
-  if (isError || !Array.isArray(data))
-    return <h1>Oops! Something went wrong.</h1>;
-
   // searching
 
   const filteredUsers = data
@@ -99,9 +96,9 @@ export default function OwnerStaffs() {
     });
 
   // Calculate pagination
-  const totalPages = Math.ceil(filteredUsers.length / itemsPerPage);
+  const totalPages = Math.ceil(filteredUsers?.length / itemsPerPage);
   const startIndex = (currentPage - 1) * itemsPerPage;
-  const paginatedUsers = filteredUsers.slice(
+  const paginatedUsers = filteredUsers?.slice(
     startIndex,
     startIndex + itemsPerPage
   );
@@ -218,230 +215,247 @@ export default function OwnerStaffs() {
               </div>
             </div>
 
-            <motion.div
-              initial={{ opacity: 0, y: 20 }}
-              animate={{ opacity: 1, y: 0 }}
-              transition={{ duration: 0.5 }}
-            >
-              <Card>
-                <CardHeader className="pb-2">
-                  <div className="flex items-center justify-between">
-                    <div>
-                      <CardTitle>All Staffs</CardTitle>
-                      <CardDescription>
-                        Manage and monitor all registered staffs
-                      </CardDescription>
-                    </div>
-                  </div>
-                </CardHeader>
-                <CardContent>
-                  <div className="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between mb-6">
-                    <div className="relative w-full sm:w-64">
-                      <Search className="absolute left-2 top-2.5 h-4 w-4 text-gray-400" />
-                      <Input
-                        type="search"
-                        placeholder="Search staffs..."
-                        className="pl-8"
-                        value={searchTerm}
-                        onChange={(e) => {
-                          setSearchTerm(e.target.value);
-                        }}
-                      />
-                    </div>
-
-                    <div className="flex flex-col sm:flex-row items-start sm:items-center gap-2 w-full sm:w-auto">
-                      <Button
-                        variant="outline"
-                        size="sm"
-                        className="gap-2 w-full sm:w-auto"
-                      >
-                        <Filter className="h-4 w-4" />
-                        Filter
-                        <ChevronDown className="h-3 w-3 opacity-50" />
-                      </Button>
-
-                      <Tabs
-                        value={statusFilter}
-                        onValueChange={setStatusFilter}
-                      >
-                        <TabsList className="w-full sm:w-auto">
-                          <TabsTrigger
-                            className="cursor-pointer w-full sm:w-auto"
-                            value="all"
-                          >
-                            All
-                          </TabsTrigger>
-                          <TabsTrigger
-                            className="cursor-pointer w-full sm:w-auto"
-                            value="active"
-                          >
-                            Active
-                          </TabsTrigger>
-                          <TabsTrigger
-                            className="cursor-pointer w-full sm:w-auto"
-                            value="inactive"
-                          >
-                            Inactive
-                          </TabsTrigger>
-                        </TabsList>
-                      </Tabs>
-                    </div>
-                  </div>
-
-                  <div className="overflow-x-auto">
-                    <table className="w-full">
-                      <thead>
-                        <tr className="border-b">
-                          <th className="text-left py-3 px-4 font-medium text-gray-500">
-                            Name
-                          </th>
-                          <th className="text-left py-3 px-4 font-medium text-gray-500">
-                            Email
-                          </th>
-                          <th className="text-left py-3 px-4 font-medium text-gray-500">
-                            Phone
-                          </th>
-                          <th className="text-left py-3 px-4 font-medium text-gray-500">
-                            Role
-                          </th>
-                          <th className="text-left py-3 px-4 font-medium text-gray-500">
-                            Status
-                          </th>
-                          <th className="text-left py-3 px-4 font-medium text-gray-500">
-                            Actions
-                          </th>
-                        </tr>
-                      </thead>
-                      <tbody>
-                        {paginatedUsers?.map((staff) => (
-                          <tr key={staff._id} className="border-b">
-                            <td className="py-3 px-4">
-                              <div className="flex items-center gap-3">
-                                <div className="h-10 w-10 bg-gray-100 rounded-md flex items-center justify-center">
-                                  <Building className="h-5 w-5 text-gray-500" />
-                                </div>
-                                <span className="font-medium">
-                                  {staff.name}
-                                </span>
-                              </div>
-                            </td>
-                            <td className="py-3 px-4">{staff.email}</td>
-                            <td className="py-3 px-4">{staff.phone}</td>
-                            <td className="py-3 px-4">{staff.role}</td>
-                            <td className="py-3 px-4">
-                              <Badge
-                                variant={
-                                  staff.isActive ? "success" : "secondary"
-                                }
-                              >
-                                {staff.isActive ? "Active" : "Inactive"}
-                              </Badge>
-                            </td>
-                            <td className="py-3 px-4">
-                              <DropdownMenu>
-                                <DropdownMenuTrigger asChild>
-                                  <Button
-                                    variant="ghost"
-                                    size="icon"
-                                    className={"cursor-pointer"}
-                                  >
-                                    <MoreHorizontal className="h-4 w-4" />
-                                  </Button>
-                                </DropdownMenuTrigger>
-                                <DropdownMenuContent align="end">
-                                  <DropdownMenuItem
-                                    className={"cursor-pointer"}
-                                    onClick={() => handleBlocUnblock(staff._id)}
-                                  >
-                                    {staff.isActive ? (
-                                      <>
-                                        <UserX className="h-4 w-4 mr-2" />
-                                        Block
-                                      </>
-                                    ) : (
-                                      <>
-                                        <UserCheck className="h-4 w-4 mr-2 text-green-600" />
-                                        Unblock
-                                      </>
-                                    )}
-                                  </DropdownMenuItem>
-                                  <DropdownMenuItem
-                                    className={"cursor-pointer"}
-                                    onClick={() => {
-                                      setSelectedStaff(staff);
-                                      setOpenEditDialog(true);
-                                    }}
-                                  >
-                                    <Pencil className="h-4 w-4 mr-2" />
-                                    Edit
-                                  </DropdownMenuItem>
-                                  <DropdownMenuItem
-                                    className="text-red-600 cursor-pointer"
-                                    onClick={() => handleDelete(staff._id)}
-                                  >
-                                    <Trash2 className="h-4 w-4 mr-2" />
-                                    {isDeleting ? "Deleting..." : "Delete"}
-                                  </DropdownMenuItem>
-                                </DropdownMenuContent>
-                              </DropdownMenu>
-                            </td>
-                          </tr>
-                        ))}
-                      </tbody>
-                    </table>
-                  </div>
-
-                  {/* Pagination */}
-                  {filteredUsers.length > 0 && (
+            {isLoading || isError || !Array.isArray(data) ? (
+              <TableSkeleton
+                columns={[
+                  "Name",
+                  "Email",
+                  "Phone",
+                  "Role",
+                  "Status",
+                  "Actions",
+                ]}
+                rows={6}
+              />
+            ) : (
+              <motion.div
+                initial={{ opacity: 0, y: 20 }}
+                animate={{ opacity: 1, y: 0 }}
+                transition={{ duration: 0.5 }}
+              >
+                <Card>
+                  <CardHeader className="pb-2">
                     <div className="flex items-center justify-between">
-                      <div className="text-sm text-muted-foreground">
-                        Showing{" "}
-                        <span className="font-medium">{startIndex + 1}</span> to{" "}
-                        <span className="font-medium">
-                          {Math.min(
-                            startIndex + itemsPerPage,
-                            filteredUsers.length
-                          )}
-                        </span>{" "}
-                        of{" "}
-                        <span className="font-medium">
-                          {filteredUsers.length}
-                        </span>{" "}
-                        staffs
-                      </div>
-                      <div className="flex items-center gap-2">
-                        <Button
-                          variant="outline"
-                          size="icon"
-                          onClick={() =>
-                            setCurrentPage((prev) => Math.max(prev - 1, 1))
-                          }
-                          disabled={currentPage === 1}
-                          className={"cursor-pointer"}
-                        >
-                          <ChevronLeft className="h-4 w-4" />
-                          <span className="sr-only">Previous page</span>
-                        </Button>
-                        <Button
-                          variant="outline"
-                          size="icon"
-                          onClick={() =>
-                            setCurrentPage((prev) =>
-                              Math.min(prev + 1, totalPages)
-                            )
-                          }
-                          disabled={currentPage === totalPages}
-                          className={"cursor-pointer"}
-                        >
-                          <ChevronRight className="h-4 w-4" />
-                          <span className="sr-only">Next page</span>
-                        </Button>
+                      <div>
+                        <CardTitle>All Staffs</CardTitle>
+                        <CardDescription>
+                          Manage and monitor all registered staffs
+                        </CardDescription>
                       </div>
                     </div>
-                  )}
-                </CardContent>
-              </Card>
-            </motion.div>
+                  </CardHeader>
+                  <CardContent>
+                    <div className="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between mb-6">
+                      <div className="relative w-full sm:w-64">
+                        <Search className="absolute left-2 top-2.5 h-4 w-4 text-gray-400" />
+                        <Input
+                          type="search"
+                          placeholder="Search staffs..."
+                          className="pl-8"
+                          value={searchTerm}
+                          onChange={(e) => {
+                            setSearchTerm(e.target.value);
+                          }}
+                        />
+                      </div>
+
+                      <div className="flex flex-col sm:flex-row items-start sm:items-center gap-2 w-full sm:w-auto">
+                        <Button
+                          variant="outline"
+                          size="sm"
+                          className="gap-2 w-full sm:w-auto"
+                        >
+                          <Filter className="h-4 w-4" />
+                          Filter
+                          <ChevronDown className="h-3 w-3 opacity-50" />
+                        </Button>
+
+                        <Tabs
+                          value={statusFilter}
+                          onValueChange={setStatusFilter}
+                        >
+                          <TabsList className="w-full sm:w-auto">
+                            <TabsTrigger
+                              className="cursor-pointer w-full sm:w-auto"
+                              value="all"
+                            >
+                              All
+                            </TabsTrigger>
+                            <TabsTrigger
+                              className="cursor-pointer w-full sm:w-auto"
+                              value="active"
+                            >
+                              Active
+                            </TabsTrigger>
+                            <TabsTrigger
+                              className="cursor-pointer w-full sm:w-auto"
+                              value="inactive"
+                            >
+                              Inactive
+                            </TabsTrigger>
+                          </TabsList>
+                        </Tabs>
+                      </div>
+                    </div>
+
+                    <div className="overflow-x-auto">
+                      <table className="w-full">
+                        <thead>
+                          <tr className="border-b">
+                            <th className="text-left py-3 px-4 font-medium text-gray-500">
+                              Name
+                            </th>
+                            <th className="text-left py-3 px-4 font-medium text-gray-500">
+                              Email
+                            </th>
+                            <th className="text-left py-3 px-4 font-medium text-gray-500">
+                              Phone
+                            </th>
+                            <th className="text-left py-3 px-4 font-medium text-gray-500">
+                              Role
+                            </th>
+                            <th className="text-left py-3 px-4 font-medium text-gray-500">
+                              Status
+                            </th>
+                            <th className="text-left py-3 px-4 font-medium text-gray-500">
+                              Actions
+                            </th>
+                          </tr>
+                        </thead>
+                        <tbody>
+                          {paginatedUsers?.map((staff) => (
+                            <tr key={staff._id} className="border-b">
+                              <td className="py-3 px-4">
+                                <div className="flex items-center gap-3">
+                                  <div className="h-10 w-10 bg-gray-100 rounded-md flex items-center justify-center">
+                                    <Building className="h-5 w-5 text-gray-500" />
+                                  </div>
+                                  <span className="font-medium">
+                                    {staff.name}
+                                  </span>
+                                </div>
+                              </td>
+                              <td className="py-3 px-4">{staff.email}</td>
+                              <td className="py-3 px-4">{staff.phone}</td>
+                              <td className="py-3 px-4">{staff.role}</td>
+                              <td className="py-3 px-4">
+                                <Badge
+                                  variant={
+                                    staff.isActive ? "success" : "secondary"
+                                  }
+                                >
+                                  {staff.isActive ? "Active" : "Inactive"}
+                                </Badge>
+                              </td>
+                              <td className="py-3 px-4">
+                                <DropdownMenu>
+                                  <DropdownMenuTrigger asChild>
+                                    <Button
+                                      variant="ghost"
+                                      size="icon"
+                                      className={"cursor-pointer"}
+                                    >
+                                      <MoreHorizontal className="h-4 w-4" />
+                                    </Button>
+                                  </DropdownMenuTrigger>
+                                  <DropdownMenuContent align="end">
+                                    <DropdownMenuItem
+                                      className={"cursor-pointer"}
+                                      onClick={() =>
+                                        handleBlocUnblock(staff._id)
+                                      }
+                                    >
+                                      {staff.isActive ? (
+                                        <>
+                                          <UserX className="h-4 w-4 mr-2" />
+                                          Block
+                                        </>
+                                      ) : (
+                                        <>
+                                          <UserCheck className="h-4 w-4 mr-2 text-green-600" />
+                                          Unblock
+                                        </>
+                                      )}
+                                    </DropdownMenuItem>
+                                    <DropdownMenuItem
+                                      className={"cursor-pointer"}
+                                      onClick={() => {
+                                        setSelectedStaff(staff);
+                                        setOpenEditDialog(true);
+                                      }}
+                                    >
+                                      <Pencil className="h-4 w-4 mr-2" />
+                                      Edit
+                                    </DropdownMenuItem>
+                                    <DropdownMenuItem
+                                      className="text-red-600 cursor-pointer"
+                                      onClick={() => handleDelete(staff._id)}
+                                    >
+                                      <Trash2 className="h-4 w-4 mr-2" />
+                                      {isDeleting ? "Deleting..." : "Delete"}
+                                    </DropdownMenuItem>
+                                  </DropdownMenuContent>
+                                </DropdownMenu>
+                              </td>
+                            </tr>
+                          ))}
+                        </tbody>
+                      </table>
+                    </div>
+
+                    {/* Pagination */}
+                    {filteredUsers.length > 0 && (
+                      <div className="flex items-center justify-between">
+                        <div className="text-sm text-muted-foreground">
+                          Showing{" "}
+                          <span className="font-medium">{startIndex + 1}</span>{" "}
+                          to{" "}
+                          <span className="font-medium">
+                            {Math.min(
+                              startIndex + itemsPerPage,
+                              filteredUsers.length
+                            )}
+                          </span>{" "}
+                          of{" "}
+                          <span className="font-medium">
+                            {filteredUsers.length}
+                          </span>{" "}
+                          staffs
+                        </div>
+                        <div className="flex items-center gap-2">
+                          <Button
+                            variant="outline"
+                            size="icon"
+                            onClick={() =>
+                              setCurrentPage((prev) => Math.max(prev - 1, 1))
+                            }
+                            disabled={currentPage === 1}
+                            className={"cursor-pointer"}
+                          >
+                            <ChevronLeft className="h-4 w-4" />
+                            <span className="sr-only">Previous page</span>
+                          </Button>
+                          <Button
+                            variant="outline"
+                            size="icon"
+                            onClick={() =>
+                              setCurrentPage((prev) =>
+                                Math.min(prev + 1, totalPages)
+                              )
+                            }
+                            disabled={currentPage === totalPages}
+                            className={"cursor-pointer"}
+                          >
+                            <ChevronRight className="h-4 w-4" />
+                            <span className="sr-only">Next page</span>
+                          </Button>
+                        </div>
+                      </div>
+                    )}
+                  </CardContent>
+                </Card>
+              </motion.div>
+            )}
           </div>
         </main>
       </div>

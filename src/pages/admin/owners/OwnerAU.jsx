@@ -22,7 +22,7 @@ export function OwnerPOST({
   setPassword,
   setPhone,
   handleSubmit,
-  setIsAddHostelOpen,
+  onClose,
 }) {
   const [showPassword, setShowPassword] = useState(false);
 
@@ -100,13 +100,14 @@ export function OwnerPOST({
           <Button
             type="button"
             variant="outline"
-            onClick={() => setIsAddHostelOpen(false)}
+            onClick={onClose}
+            className={"cursor-pointer"}
           >
             Cancel
           </Button>
           <Button
             type="submit"
-            className="bg-rose-600 hover:bg-rose-700"
+            className="bg-rose-600 hover:bg-rose-700 cursor-pointer"
             disabled={isPosting}
           >
             {isPosting ? "Creating..." : "Create"}
@@ -118,7 +119,6 @@ export function OwnerPOST({
 }
 
 export function OwnerPUT({ owner, onClose, onUpdated }) {
-    
   const [name, setName] = useState(owner.name || "");
   const [email, setEmail] = useState(owner.email || "");
   const [phone, setPhone] = useState(owner.phone || "");
@@ -214,12 +214,16 @@ export function OwnerPUT({ owner, onClose, onUpdated }) {
         </div>
       </div>
       <DialogFooter>
-        <Button variant="outline" onClick={onClose}>
+        <Button
+          className={"cursor-pointer"}
+          variant="outline"
+          onClick={onClose}
+        >
           Cancel
         </Button>
         <Button
           onClick={handleUpdate}
-          className="bg-rose-600 hover:bg-rose-700"
+          className="bg-rose-600 hover:bg-rose-700 cursor-pointer"
           disabled={isLoading}
         >
           {isLoading ? "Updating..." : "Update"}

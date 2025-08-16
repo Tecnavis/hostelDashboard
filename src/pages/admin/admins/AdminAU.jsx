@@ -21,7 +21,7 @@ export function AdminPOST({
   setPassword,
   setPhone,
   handleSubmit,
-  setIsAddHostelOpen,
+  onClose,
 }) {
   const [showPassword, setShowPassword] = useState(false);
 
@@ -96,16 +96,12 @@ export function AdminPOST({
           </div>
         </div>
         <DialogFooter>
-          <Button
-            type="button"
-            variant="outline"
-            onClick={() => setIsAddHostelOpen(false)}
-          >
+          <Button className={"cursor-pointer"} type="button" variant="outline" onClick={onClose}>
             Cancel
           </Button>
           <Button
             type="submit"
-            className="bg-rose-600 hover:bg-rose-700"
+            className="bg-rose-600 hover:bg-rose-700 cursor-pointer"
             disabled={isPosting}
           >
             {isPosting ? "Creating..." : "Create"}
@@ -116,9 +112,7 @@ export function AdminPOST({
   );
 }
 
-
 import { useUpdateAdminMutation } from "@/app/service/admin";
-
 
 export function AdminPUT({ admin, onClose, onUpdated }) {
   const [name, setName] = useState(admin.name || "");
@@ -130,28 +124,27 @@ export function AdminPUT({ admin, onClose, onUpdated }) {
   const [updateAdmin, { isLoading }] = useUpdateAdminMutation();
 
   const handleUpdate = async () => {
-  try {
-    const updateData = {
-      id: admin._id,
-      updateadmin: {
-        name,
-        email,
-        phone,
-        ...(password && { password }),
-      },
-    };
+    try {
+      const updateData = {
+        id: admin._id,
+        updateadmin: {
+          name,
+          email,
+          phone,
+          ...(password && { password }),
+        },
+      };
 
-    const { status } = await updateAdmin(updateData).unwrap();
+      const { status } = await updateAdmin(updateData).unwrap();
 
-    if (status === 200) {
-      onClose();
-      onUpdated();
+      if (status === 200) {
+        onClose();
+        onUpdated();
+      }
+    } catch (err) {
+      console.error("Failed to update admin:", err);
     }
-  } catch (err) {
-    console.error("Failed to update admin:", err);
-  }
-};
-
+  };
 
   return (
     <DialogContent className="sm:max-w-[600px]">
@@ -217,12 +210,12 @@ export function AdminPUT({ admin, onClose, onUpdated }) {
         </div>
       </div>
       <DialogFooter>
-        <Button variant="outline" onClick={onClose}>
+        <Button className={"cursor-pointer"} variant="outline" onClick={onClose}>
           Cancel
         </Button>
         <Button
           onClick={handleUpdate}
-          className="bg-rose-600 hover:bg-rose-700"
+          className="bg-rose-600 hover:bg-rose-700 cursor-pointer"
           disabled={isLoading}
         >
           {isLoading ? "Updating..." : "Update"}

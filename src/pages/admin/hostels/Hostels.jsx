@@ -64,6 +64,7 @@ import {
   transportMap,
   ShowMorFacility,
 } from "./HostelAU";
+import { TableSkeleton } from "@/common/TableSkeleton";
 
 export default function AdminHostels() {
   const [isAddHostelOpen, setIsAddHostelOpen] = useState(false);
@@ -112,9 +113,9 @@ export default function AdminHostels() {
   const [addNewhostel, { isLoading: isPosting }] = useAddNewhostelMutation();
   const { data: owners = [] } = useGetAllownerQuery();
 
-  if (isLoading) return <h1>Loading...</h1>;
-  if (isError || !Array.isArray(data))
-    return <h1>Oops! Something went wrong.</h1>;
+  // if (isLoading) return <h1>Loading...</h1>;
+  // if (isError || !Array.isArray(data))
+  //   return <h1>Oops! Something went wrong.</h1>;
 
   const places = [...new Set(data?.map((h) => h.location.place))];
 
@@ -134,7 +135,6 @@ export default function AdminHostels() {
         hostel?.category.toLowerCase().includes(searchTerm.toLowerCase()) ||
         hostel?.phone.toLowerCase().includes(searchTerm.toLowerCase()) ||
         hostel?.ownerId?.name
-
           .toLowerCase()
           .includes(searchTerm.toLowerCase()) ||
         hostel?.location?.place.toLowerCase().includes(searchTerm.toLowerCase())
@@ -154,9 +154,9 @@ export default function AdminHostels() {
     });
 
   // Calculate pagination
-  const totalPages = Math.ceil(filteredUsers.length / itemsPerPage);
+  const totalPages = Math.ceil(filteredUsers?.length / itemsPerPage);
   const startIndex = (currentPage - 1) * itemsPerPage;
-  const paginatedUsers = filteredUsers.slice(
+  const paginatedUsers = filteredUsers?.slice(
     startIndex,
     startIndex + itemsPerPage
   );
@@ -461,7 +461,13 @@ export default function AdminHostels() {
               </div>
             </div>
 
-            <motion.div
+            {isLoading || isError || !Array.isArray(data) ? (
+              <TableSkeleton
+                columns={["Name", "Email", "Phone", "Role", "Status", "Actions"]}
+                rows={6}
+              />
+            ) : (
+                 <motion.div
               initial={{ opacity: 0, y: 20 }}
               animate={{ opacity: 1, y: 0 }}
               transition={{ duration: 0.5 }}
@@ -898,6 +904,9 @@ export default function AdminHostels() {
                 </CardContent>
               </Card>
             </motion.div>
+            )}
+
+         
           </div>
         </main>
       </div>

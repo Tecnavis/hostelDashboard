@@ -84,7 +84,7 @@ export default function AdminHostels() {
   const [price, setPrice] = useState("");
   const [searchTerm, setSearchTerm] = useState("");
   const [currentPage, setCurrentPage] = useState(1);
-  const itemsPerPage = 10;
+  const itemsPerPage = 8;
   const navigate = useNavigate();
   const [selectedPlace, setSelectedPlace] = useState("");
   const [selectedStreet, setSelectedStreet] = useState("");
@@ -112,10 +112,6 @@ export default function AdminHostels() {
   const [blockhostel] = useBlockhostelMutation();
   const [addNewhostel, { isLoading: isPosting }] = useAddNewhostelMutation();
   const { data: owners = [] } = useGetAllownerQuery();
-
-  // if (isLoading) return <h1>Loading...</h1>;
-  // if (isError || !Array.isArray(data))
-  //   return <h1>Oops! Something went wrong.</h1>;
 
   const places = [...new Set(data?.map((h) => h.location.place))];
 

@@ -231,11 +231,7 @@ export function HostelPOST({
   selectedNearby,
   setSelectdNearby,
 }) {
-  // const [search, setSearch] = useState("");
 
-  // const filteredOwners = owners.filter((o) =>
-  //   o.name.toLowerCase().includes(search.toLowerCase())
-  // );
 
   return (
     <DialogContent className="sm:max-w-[600px]">
@@ -284,8 +280,8 @@ export function HostelPOST({
               className="border rounded px-3 py-2 w-full focus:outline-none focus:ring-2 focus:ring-blue-500"
             >
               <option value="">Select Accommodation</option>
-              <option value="with_food">With Food</option>
-              <option value="without_food">Without Food</option>
+              <option value="with food">With Food</option>
+              <option value="without food">Without Food</option>
             </select>
           </div>
           <div className="space-y-2">
@@ -346,34 +342,6 @@ export function HostelPOST({
               onChange={(e) => setDescription(e.target.value)}
             />
           </div>
-
-          {/* <div className="space-y-2">
-            <Label htmlFor="owner">Owner</Label>
-
-            Search box
-            <input
-              type="text"
-              placeholder="Search owner..."
-              value={search}
-              onChange={(e) => setSearch(e.target.value)}
-              className="w-full border border-gray-300 rounded px-3 py-2 mb-1"
-            />
-
-            Owner select
-            <select
-              id="owner"
-              value={ownerId}
-              onChange={(e) => setOwnerId(e.target.value)}
-              className="w-full border border-gray-300 rounded px-3 py-2"
-            >
-              <option value="">Select owner</option>
-              {filteredOwners.map((o) => (
-                <option key={o._id} value={o._id}>
-                  {o.name}
-                </option>
-              ))}
-            </select>
-          </div> */}
         </div>
 
         <div className="space-y-4">
@@ -599,27 +567,16 @@ export function HostelPOST({
 
 import { useUpdatehostelMutation } from "@/app/service/hostel";
 
+
 export function HostelPUT({
   hostel,
   owners = [],
   onClose,
   onUpdated,
-  transport,
-  selectedNearby,
   restaurantName,
   restaurantFar,
-  addRestaurant,
-  selectedRestaurants,
-  selectedAmenities,
-  toggleAmenity,
-  toggleTransport,
-  toggleNearby,
   setRestaurantName,
-  setSelectdNearby,
   setRestaurantFar,
-  removeRestaurant,
-  setSelectedTransport,
-  selectedTransport,
 }) {
   const [name, setName] = useState(hostel?.name || "");
   const [phone, setPhone] = useState(hostel?.phone || "");
@@ -636,10 +593,102 @@ export function HostelPUT({
   const [category, setCategory] = useState(hostel?.category || "");
   const [ownerId, setOwnerId] = useState(hostel?.ownerId?._id || "");
   const [amenities, setAmenities] = useState(
-    hostel?.amenities?.length ? hostel.amenities : [""]
+    hostel?.amenities?.length ? hostel?.amenities : []
   );
+
+  const [transports, setTransports] = useState(
+    hostel?.transportation?.length ? hostel?.transportation : []
+  );
+  const [nearBys, setNearBys] = useState(
+    hostel?.nearbyPlaces?.length ? hostel?.nearbyPlaces : []
+  );
+  const [restaurants, setRestaurants] = useState(
+    hostel?.restaurants?.length ? hostel?.restaurants : []
+  );
+
   const [existingPhotos, setExistingPhotos] = useState(hostel?.photos || []);
   const [selectedImages, setSelectedImages] = useState([]);
+
+  // Toggle transport add/remove
+  const toggleTransport = (item) => {
+    setTransports((prev) => {
+      const exists = prev.some((t) => t.name === item.name);
+      return exists
+        ? prev.filter((t) => t.name !== item.name)
+        : [...prev, { name: item.name, far: "", icon: item.icon }];
+    });
+  };
+
+  // Update distance
+  const updateTransport = (index, value) => {
+    setTransports((prev) => {
+      const updated = [...prev];
+      updated[index] = { ...updated[index], far: value }; // immutable update
+      return updated;
+    });
+  };
+
+  // Delete manually
+  const removeTransport = (index) => {
+    setTransports((prev) => prev.filter((_, i) => i !== index));
+  };
+
+  // Toggle add/remove
+  const toggleNearby = (item) => {
+    setNearBys((prev) => {
+      const exists = prev.some((t) => t.name === item.name);
+      return exists
+        ? prev.filter((t) => t.name !== item.name)
+        : [...prev, { name: item.name, far: "", icon: item.icon }];
+    });
+  };
+
+  // Update distance
+  const updateNearbyDistance = (index, value) => {
+    setNearBys((prev) => {
+      const next = [...prev];
+      next[index] = { ...next[index], far: value }; // immutable update
+      return next;
+    });
+  };
+
+  // Delete one
+  const removeNearBy = (index) => {
+    setNearBys((prev) => prev.filter((_, i) => i !== index));
+  };
+
+  // ✅ Add restaurant
+  const addRestaurant = () => {
+    if (!restaurantName.trim() || !restaurantFar.trim()) return;
+
+    const newRestaurant = {
+      name: restaurantName.trim(),
+      far: restaurantFar.trim(),
+      icon: "Hotel",
+    };
+
+    setRestaurants((prev) => [...prev, newRestaurant]);
+    setRestaurantName("");
+    setRestaurantFar("");
+  };
+
+  // ✅ Remove restaurant
+  const removeRestaurant = (name) => {
+    setRestaurants((prev) => prev.filter((r) => r.name !== name));
+  };
+
+  const toggleAmenity = (item) => {
+    setAmenities((prev) => {
+      const exists = prev.some((a) => a.name === item.name);
+      if (exists) {
+        // remove
+        return prev.filter((a) => a.name !== item.name);
+      } else {
+        // add
+        return [...prev, item];
+      }
+    });
+  };
 
   const [updatehostel, { isLoading }] = useUpdatehostelMutation();
 
@@ -656,27 +705,27 @@ export function HostelPUT({
     formData.append("category", category);
     formData.append("ownerId", ownerId);
 
-    selectedAmenities.forEach((a, i) => {
+    amenities.forEach((a, i) => {
       if (a.name.trim() !== "") {
         formData.append(`amenities[${i}][name]`, a.name);
         formData.append(`amenities[${i}][icon]`, a.icon);
       }
     });
-    selectedTransport.forEach((a, i) => {
+    transports.forEach((a, i) => {
       if (a.name.trim() !== "") {
         formData.append(`transportation[${i}][name]`, a.name);
         formData.append(`transportation[${i}][icon]`, a.icon);
         formData.append(`transportation[${i}][far]`, a.far);
       }
     });
-    selectedNearby.forEach((a, i) => {
+    nearBys.forEach((a, i) => {
       if (a.name.trim() !== "") {
         formData.append(`nearbyPlaces[${i}][name]`, a.name);
         formData.append(`nearbyPlaces[${i}][icon]`, a.icon);
         formData.append(`nearbyPlaces[${i}][far]`, a.far);
       }
     });
-    selectedRestaurants.forEach((a, i) => {
+    restaurants.forEach((a, i) => {
       if (a.name.trim() !== "") {
         formData.append(`restaurants[${i}][name]`, a.name);
         formData.append(`restaurants[${i}][icon]`, a.icon);
@@ -701,22 +750,7 @@ export function HostelPUT({
     }
   };
 
-  // ✅ Merge owners with current ownerId to ensure current one is included
-  const combinedOwners = [...owners];
-  if (hostel?.ownerId && !owners.some((o) => o._id === hostel.ownerId._id)) {
-    combinedOwners.push(hostel.ownerId);
-  }
-
-  // Remove duplicate owners by _id
-  const uniqueOwners = Array.from(
-    new Map(combinedOwners.map((o) => [o._id, o])).values()
-  );
-
-  const [search, setSearch] = useState("");
-
-  const filteredOwners = owners.filter((o) =>
-    o.name.toLowerCase().includes(search.toLowerCase())
-  );
+ 
 
   return (
     <DialogContent className="sm:max-w-[600px]">
@@ -752,8 +786,8 @@ export function HostelPUT({
               className="border rounded px-3 py-2 w-full focus:outline-none focus:ring-2 focus:ring-blue-500"
             >
               <option value="">Select Accommodation</option>
-              <option value="with_food">With Food</option>
-              <option value="without_food">Without Food</option>
+              <option value="with food">With Food</option>
+              <option value="without food">Without Food</option>
             </select>
           </div>
 
@@ -786,7 +820,8 @@ export function HostelPUT({
               }
             />
           </div>
-          <div className="space-y-2">
+
+           <div className="space-y-2">
             <Label htmlFor="category">Category</Label>
             <select
               id="category"
@@ -809,33 +844,9 @@ export function HostelPUT({
             />
           </div>
 
-          {/* <div className="space-y-2">
-            <Label htmlFor="owner">Owner</Label>
+         
 
-            Search box
-            <input
-              type="text"
-              placeholder="Search owner..."
-              value={search}
-              onChange={(e) => setSearch(e.target.value)}
-              className="w-full border border-gray-300 rounded px-3 py-2 mb-1"
-            />
-
-            Owner select
-            <select
-              id="owner"
-              value={ownerId}
-              onChange={(e) => setOwnerId(e.target.value)}
-              className="w-full border border-gray-300 rounded px-3 py-2"
-            >
-              <option value="">Select owner</option>
-              {filteredOwners.map((o) => (
-                <option key={o._id} value={o._id}>
-                  {o.name}
-                </option>
-              ))}
-            </select>
-          </div> */}
+         
         </div>
 
         <div className="space-y-4">
@@ -868,10 +879,12 @@ export function HostelPUT({
 
         <div className="space-y-4">
           <Label className="block mb-2">Transportation</Label>
+
+          {/* Selection buttons */}
           <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-4">
             {AVAILABLE_TRANSPORTATION.map((item) => {
               const Icon = transportMap[item.icon];
-              const isSelected = transport?.some((a) => a.name === item.name);
+              const isSelected = transports.some((a) => a.name === item.name);
               return (
                 <button
                   type="button"
@@ -883,7 +896,7 @@ export function HostelPUT({
                       : "bg-white border-gray-300"
                   }`}
                 >
-                  <Icon className="w-5 h-5" />
+                  {Icon && <Icon className="w-5 h-5" />}
                   <span className="text-sm">{item.name}</span>
                   {isSelected && (
                     <Check className="absolute top-2 right-2 w-4 h-4 text-blue-600" />
@@ -893,36 +906,46 @@ export function HostelPUT({
             })}
           </div>
 
-          {transport.length > 0 && (
+          {/* Editable list */}
+          {transports.length > 0 && (
             <div className="mt-4 space-y-4">
-              {transport.map((trans, index) => (
-                <div key={trans.name} className="flex items-center gap-4">
-                  <span className="w-32">{trans.name}</span>
-                  <Input
-                    type="text"
-                    className="input input-bordered w-full max-w-xs"
-                    placeholder="Enter distance (e.g., 200m)"
-                    value={trans.far}
-                    onChange={(e) => {
-                      const updated = [...transport];
-                      updated[index].far = e.target.value;
-                      setSelectedTransport(updated);
-                    }}
-                  />
-                </div>
-              ))}
+              {transports.map((trans, index) => {
+                const Icon = transportMap[trans.icon];
+                return (
+                  <div
+                    key={`${trans.name}-${index}`}
+                    className="flex items-center gap-4 border p-2 rounded-md"
+                  >
+                    {Icon && <Icon className="w-5 h-5 text-gray-600" />}
+                    <span className="w-32">{trans.name}</span>
+                    <Input
+                      type="text"
+                      placeholder="Enter distance (e.g., 200m)"
+                      value={trans.far ?? ""}
+                      onChange={(e) => updateTransport(index, e.target.value)}
+                      className="w-full max-w-xs"
+                    />
+                    <button
+                      type="button"
+                      onClick={() => removeTransport(index)}
+                      className="text-red-500 hover:text-red-700"
+                    >
+                      <Trash2 className="w-5 h-5" />
+                    </button>
+                  </div>
+                );
+              })}
             </div>
           )}
         </div>
 
         <div className="space-y-4">
           <Label className="block mb-2">Nearby</Label>
+
           <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-4">
             {NEARBY_PLACES.map((item) => {
               const Icon = nearbyMap[item.icon];
-              const isSelected = selectedNearby?.some(
-                (a) => a.name === item.name
-              );
+              const isSelected = nearBys.some((a) => a.name === item.name); // ✅ use nearBys
               return (
                 <button
                   type="button"
@@ -944,24 +967,36 @@ export function HostelPUT({
             })}
           </div>
 
-          {selectedNearby.length > 0 && (
+          {nearBys.length > 0 && (
             <div className="mt-4 space-y-4">
-              {selectedNearby.map((nearby, index) => (
-                <div key={nearby.name} className="flex items-center gap-4">
-                  <span className="w-32">{nearby.name}</span>
-                  <Input
-                    type="text"
-                    className="input input-bordered w-full max-w-xs"
-                    placeholder="Enter distance (e.g., 200m)"
-                    value={nearby.far}
-                    onChange={(e) => {
-                      const updated = [...selectedNearby];
-                      updated[index].far = e.target.value;
-                      setSelectdNearby(updated);
-                    }}
-                  />
-                </div>
-              ))}
+              {nearBys.map((nearby, index) => {
+                const Icon = nearbyMap[nearby.icon];
+                return (
+                  <div
+                    key={`${nearby.name}-${index}`} // ensure unique key
+                    className="flex items-center gap-4 border p-2 rounded-md"
+                  >
+                    {Icon && <Icon className="w-5 h-5 text-gray-600" />}
+                    <span className="w-32">{nearby.name}</span>
+                    <Input
+                      type="text"
+                      placeholder="Enter distance (e.g., 200m)"
+                      value={nearby.far ?? ""}
+                      onChange={(e) =>
+                        updateNearbyDistance(index, e.target.value)
+                      }
+                      className="w-full max-w-xs"
+                    />
+                    <button
+                      type="button"
+                      onClick={() => removeNearBy(index)}
+                      className="text-red-500 hover:text-red-700"
+                    >
+                      <Trash2 className="w-5 h-5" />
+                    </button>
+                  </div>
+                );
+              })}
             </div>
           )}
         </div>
@@ -984,10 +1019,11 @@ export function HostelPUT({
             </Button>
           </div>
 
+          {/* List */}
           <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-3">
-            {selectedRestaurants.map((r) => (
+            {restaurants.map((r) => (
               <div
-                key={r.name}
+                key={r.id}
                 className="flex items-center justify-between p-3 border rounded-lg bg-white shadow-sm"
               >
                 <div className="flex items-center gap-2">
@@ -1066,10 +1102,14 @@ export function HostelPUT({
       </div>
 
       <DialogFooter>
-        <Button variant="outline" onClick={onClose}>
+        <Button className={"cursor-pointer"} variant="outline" onClick={onClose}>
           Cancel
         </Button>
-        <Button onClick={handleUpdate} disabled={isLoading}>
+        <Button
+          className="bg-rose-600 hover:bg-rose-700 cursor-pointer"
+          onClick={handleUpdate}
+          disabled={isLoading}
+        >
           {isLoading ? "Updating..." : "Update"}
         </Button>
       </DialogFooter>
@@ -1130,7 +1170,7 @@ export function ShowMorFacility({ facility = [], onClose }) {
                     className="inline-flex items-center gap-1 bg-gray-100 px-2 py-1 rounded text-sm"
                   >
                     {Icon && <Icon className="w-4 h-4" />}
-                    {a.name}
+                    {a.name} {a.far}
                   </span>
                 );
               })}

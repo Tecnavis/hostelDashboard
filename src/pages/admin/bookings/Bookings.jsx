@@ -159,7 +159,7 @@ export default function AdminBookings() {
   };
 
   return (
-    <div className="flex h-screen bg-gray-50">
+    <div className="flex min-h-screen bg-gray-50">
       <Sidebar role="admin" />
 
       <div className="flex-1 flex flex-col overflow-hidden">

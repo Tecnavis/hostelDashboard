@@ -230,6 +230,8 @@ export function HostelPOST({
   toggleNearby,
   selectedNearby,
   setSelectdNearby,
+  googleMap,
+  setGoogleMap,
 }) {
   const [search, setSearch] = useState("");
 
@@ -240,7 +242,7 @@ export function HostelPOST({
   return (
     <DialogContent className="sm:max-w-[600px]">
       <DialogHeader>
-        <DialogTitle>Add New Hostel</DialogTitle>restorentMap
+        <DialogTitle>Add New Hostel</DialogTitle>
       </DialogHeader>
 
       <div
@@ -319,6 +321,15 @@ export function HostelPOST({
               onChange={(e) =>
                 setLocation({ ...location, pincode: e.target.value })
               }
+            />
+          </div>
+          <div className="space-y-2">
+            <Label htmlFor="pincode">Google Map</Label>
+            <Input
+              id="googleMap"
+              placeholder="Google Map URL"
+              value={googleMap}
+              onChange={(e) => setGoogleMap(e.target.value)}
             />
           </div>
           <div className="space-y-2 col-span-2">
@@ -592,7 +603,6 @@ export function HostelPOST({
   );
 }
 
-
 ("use client");
 
 import { useUpdatehostelMutation } from "@/app/service/hostel";
@@ -621,6 +631,7 @@ export function HostelPUT({
   const [description, setDescription] = useState(hostel?.description || "");
   const [category, setCategory] = useState(hostel?.category || "");
   const [ownerId, setOwnerId] = useState(hostel?.ownerId?._id || "");
+  const [googleMap, setGoogleMap] = useState(hostel?.googleMap || "");
   const [amenities, setAmenities] = useState(
     hostel?.amenities?.length ? hostel?.amenities : []
   );
@@ -733,6 +744,7 @@ export function HostelPUT({
     formData.append("description", description);
     formData.append("category", category);
     formData.append("ownerId", ownerId);
+    formData.append("googleMap", googleMap);
 
     amenities.forEach((a, i) => {
       if (a.name.trim() !== "") {
@@ -862,6 +874,14 @@ export function HostelPUT({
               onChange={(e) =>
                 setLocation({ ...location, pincode: e.target.value })
               }
+            />
+          </div>
+
+          <div className="space-y-2">
+            <Label>Google Map</Label>
+            <Input
+              value={googleMap}
+              onChange={(e) => setGoogleMap(e.target.value)}
             />
           </div>
 
@@ -1170,7 +1190,11 @@ export function HostelPUT({
       </div>
 
       <DialogFooter>
-        <Button className={"cursor-pointer"} variant="outline" onClick={onClose}>
+        <Button
+          className={"cursor-pointer"}
+          variant="outline"
+          onClick={onClose}
+        >
           Cancel
         </Button>
         <Button

@@ -98,6 +98,7 @@ export default function OwnerHostels() {
   const [selectedAmenities, setSelectedAmenities] = useState([]);
   const [selectedTransport, setSelectdTransport] = useState([]);
   const [selectedRestaurants, setSelectedRestaurants] = useState([]);
+  const [googleMap, setGoogleMap] = useState("");
   const [restaurantName, setRestaurantName] = useState("");
   const [restaurantFar, setRestaurantFar] = useState("");
   const [selectedNearby, setSelectdNearby] = useState([]);
@@ -220,86 +221,6 @@ export default function OwnerHostels() {
     setSelectedRestaurants((prev) => prev.filter((r) => r.name !== name));
   };
 
-  // const handleFacilities = (index, value) => {
-  //   const newAmenities = [...amenities];
-  //   newAmenities[index] = value;
-  //   setAmenities(newAmenities);
-  // };
-
-  // const addFacilities = () => {
-  //   setAmenities([...amenities, ""]);
-  // };
-
-  // const removeFacilities = (index) => {
-  //   const newAmenities = amenities.filter((_, i) => i !== index);
-  //   setAmenities(newAmenities);
-  // };
-
-  // create  hostel
-
-  // const handleSubmit = async (e) => {
-  //   e.preventDefault();
-
-  //   if (
-  //     category.trim() === "" ||
-  //     selectedImages.length === 0 ||
-  //     ownerId.trim() === "" ||
-  //     description.trim() === "" ||
-  //     name.trim() === "" ||
-  //     phone.trim() === "" ||
-  //     location.street.trim() === "" ||
-  //     location.place.trim() === "" ||
-  //     location.pincode.trim() === "" ||
-  //     accommodationType.trim() === "" ||
-  //     price.trim() === ""
-  //   ) {
-  //     return;
-  //   }
-
-  //   // Prepare FormData
-  //   const formData = new FormData();
-  //   formData.append("ownerId", ownerId);
-  //   formData.append("category", category);
-  //   formData.append("description", description);
-  //   formData.append("name", name);
-  //   formData.append("phone", phone);
-  //   formData.append("accommodationType", accommodationType);
-  //   formData.append("price", price);
-  //   formData.append("location[street]", location.street);
-  //   formData.append("location[place]", location.place);
-  //   formData.append("location[pincode]", location.pincode);
-  //   selectedAmenities.forEach((a, i) => {
-  //     if (a.name.trim() !== "") {
-  //       formData.append(`amenities[${i}][name]`, a.name);
-  //       formData.append(`amenities[${i}][icon]`, a.icon);
-  //     }
-  //   });
-
-  //   selectedImages.forEach((file) => {
-  //     formData.append("images", file);
-  //   });
-
-  //   try {
-  //     const response = await addNewhostel(formData).unwrap();
-  //     if (response?.status === 201) {
-  //       // Reset form state
-  //       setCategory("");
-  //       setName("");
-  //       setPhone("");
-  //       setSelectedImages([]);
-  //       setSelectedAmenities([""]);
-  //       setDescription("");
-  //       setPrice("");
-  //       setAccommodationType("");
-  //       setLocation({ street: "", place: "", pincode: "" });
-  //       setIsAddHostelOpen(false);
-  //       refetch();
-  //     }
-  //   } catch (error) {
-  //     console.error("Hostel create failed:", error);
-  //   }
-  // };
-
   const handleSubmit = async (e) => {
     e.preventDefault();
 
@@ -317,7 +238,8 @@ export default function OwnerHostels() {
       price.trim() === "" ||
       selectedTransport.some((t) => t.far.trim() === "") ||
       selectedNearby.some((t) => t.far.trim() === "") ||
-      selectedRestaurants.some((t) => t.far.trim() === "")
+      selectedRestaurants.some((t) => t.far.trim() === "") ||
+      googleMap.trim() === "" 
     ) {
       return;
     }
@@ -331,6 +253,7 @@ export default function OwnerHostels() {
     formData.append("phone", phone);
     formData.append("accommodationType", accommodationType);
     formData.append("price", price);
+    formData.append("googleMap", googleMap);
     formData.append("location[street]", location.street);
     formData.append("location[place]", location.place);
     formData.append("location[pincode]", location.pincode);
@@ -381,6 +304,7 @@ export default function OwnerHostels() {
         setDescription("");
         setPrice("");
         setAccommodationType("");
+        setGoogleMap("");
         setLocation({ street: "", place: "", pincode: "" });
         setIsAddHostelOpen(false);
         refetch();
@@ -415,80 +339,9 @@ export default function OwnerHostels() {
     }
   };
 
-  // const hostels = [
-  //   {
-  //     id: 1,
-  //     name: "Sunset Beach Hostel",
-  //     location: "Miami, FL",
-  //     address: "123 Ocean Drive, Miami, FL 33139",
-  //     description:
-  //       "A beautiful beachfront hostel with stunning ocean views. Perfect for travelers looking to enjoy the sun and surf of Miami Beach.",
-  //     image: "/placeholder.svg?height=300&width=500",
-  //     rooms: 18,
-  //     occupancy: "78%",
-  //     rating: 4.8,
-  //     status: "Active",
-  //     amenities: [
-  //       "Free Wi-Fi",
-  //       "Breakfast Included",
-  //       "Air Conditioning",
-  //       "Lockers",
-  //       "Common Kitchen",
-  //       "Laundry",
-  //     ],
-  //     priceRange: "$30-$120",
-  //     created: "Jan 15, 2025",
-  //   },
-  //   {
-  //     id: 2,
-  //     name: "Downtown Backpackers",
-  //     location: "New York, NY",
-  //     address: "456 Broadway, New York, NY 10013",
-  //     description:
-  //       "Located in the heart of Manhattan, this hostel offers easy access to all major attractions. Modern facilities with a social atmosphere.",
-  //     image: "/placeholder.svg?height=300&width=500",
-  //     rooms: 14,
-  //     occupancy: "92%",
-  //     rating: 4.6,
-  //     status: "Active",
-  //     amenities: [
-  //       "Free Wi-Fi",
-  //       "24/7 Reception",
-  //       "Lockers",
-  //       "Common Room",
-  //       "Bike Rental",
-  //       "Tours",
-  //     ],
-  //     priceRange: "$25-$90",
-  //     created: "Feb 3, 2025",
-  //   },
-  //   {
-  //     id: 3,
-  //     name: "Mountain View Lodge",
-  //     location: "Denver, CO",
-  //     address: "789 Mountain Road, Denver, CO 80202",
-  //     description:
-  //       "A cozy mountain retreat with breathtaking views of the Rockies. Perfect base for hiking and outdoor adventures.",
-  //     image: "/placeholder.svg?height=300&width=500",
-  //     rooms: 10,
-  //     occupancy: "65%",
-  //     rating: 4.7,
-  //     status: "Active",
-  //     amenities: [
-  //       "Free Wi-Fi",
-  //       "Breakfast Included",
-  //       "Fireplace",
-  //       "Hiking Trails",
-  //       "Parking",
-  //       "Shuttle Service",
-  //     ],
-  //     priceRange: "$35-$110",
-  //     created: "Mar 10, 2025",
-  //   },
-  // ];
 
   return (
-    <div className="flex h-screen bg-gray-50">
+    <div className="flex min-h-screen bg-gray-50">
       <Sidebar role="admin" />
 
       <div className="flex-1 flex flex-col overflow-hidden">
@@ -578,6 +431,8 @@ export default function OwnerHostels() {
                       setRestaurantFar={setRestaurantFar}
                       removeRestaurant={removeRestaurant}
                       selectedTransport={selectedTransport}
+                      setGoogleMap={setGoogleMap}
+                      googleMap={googleMap}
                     />
                   </DialogContent>
                 </Dialog>

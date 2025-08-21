@@ -93,7 +93,7 @@ export function Sidebar() {
       </Button>
 
       {/* Mobile Sidebar */}
-      <Sheet open={isMobileOpen} onOpenChange={setIsMobileOpen}>
+      <Sheet  open={isMobileOpen} onOpenChange={setIsMobileOpen}>
         <SheetContent side="left" className="p-0 w-64">
           <div className="h-full bg-white flex flex-col">
             <div className="p-6 border-b">
@@ -152,7 +152,7 @@ export function Sidebar() {
 
       {/* Desktop Sidebar */}
       <motion.div
-        className="hidden md:flex h-screen flex-col border-r bg-white"
+        className="hidden md:flex  min-h-screen flex-col border-r"
         initial={{ width: 240 }}
         animate={{ width: isCollapsed ? 80 : 240 }}
         transition={{ duration: 0.3 }}

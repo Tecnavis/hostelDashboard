@@ -84,7 +84,7 @@ export default function AdminHostels() {
   const [price, setPrice] = useState("");
   const [searchTerm, setSearchTerm] = useState("");
   const [currentPage, setCurrentPage] = useState(1);
-  const itemsPerPage = 8;
+  const itemsPerPage = 10;
   const navigate = useNavigate();
   const [selectedPlace, setSelectedPlace] = useState("");
   const [selectedStreet, setSelectedStreet] = useState("");
@@ -96,6 +96,7 @@ export default function AdminHostels() {
   const [selectedRestaurants, setSelectedRestaurants] = useState([]);
   const [restaurantName, setRestaurantName] = useState("");
   const [restaurantFar, setRestaurantFar] = useState("");
+  const [googleMap, setGoogleMap] = useState("");
   const [selectedNearby, setSelectdNearby] = useState([]);
   const [selectedData, setSelectedData] = useState(null);
   const [show, setShow] = useState(false);
@@ -235,7 +236,8 @@ export default function AdminHostels() {
       price.trim() === "" ||
       selectedTransport.some((t) => t.far.trim() === "") ||
       selectedNearby.some((t) => t.far.trim() === "") ||
-      selectedRestaurants.some((t) => t.far.trim() === "")
+      selectedRestaurants.some((t) => t.far.trim() === "") ||
+      googleMap.trim() === "" 
     ) {
       return;
     }
@@ -247,6 +249,7 @@ export default function AdminHostels() {
     formData.append("description", description);
     formData.append("name", name);
     formData.append("phone", phone);
+    formData.append("googleMap", googleMap);
     formData.append("accommodationType", accommodationType);
     formData.append("price", price);
     formData.append("location[street]", location.street);
@@ -300,6 +303,7 @@ export default function AdminHostels() {
         setDescription("");
         setPrice("");
         setAccommodationType("");
+        setGoogleMap("");
         setLocation({ street: "", place: "", pincode: "" });
         setIsAddHostelOpen(false);
         refetch();
@@ -334,7 +338,7 @@ export default function AdminHostels() {
   };
 
   return (
-    <div className="flex h-screen bg-gray-50">
+    <div className="flex min-h-screen bg-gray-50 ">
       <Sidebar role="admin" />
 
       <div className="flex-1 flex flex-col overflow-hidden">
@@ -398,6 +402,8 @@ export default function AdminHostels() {
                     toggleNearby={toggleNearby}
                     selectedNearby={selectedNearby}
                     setSelectdNearby={setSelectdNearby}
+                    googleMap={googleMap}
+                    setGoogleMap={setGoogleMap}
                   />
                 </Dialog>
 

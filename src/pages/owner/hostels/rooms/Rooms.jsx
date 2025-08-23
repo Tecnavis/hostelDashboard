@@ -223,7 +223,7 @@ export default function OwnerHostelsRooms() {
   const [roomNumber, setRoomNumber] = useState("");
   const [capacity, setCapacity] = useState("");
   const [selectedImages, setSelectedImages] = useState([]);
-  const [features, setFeatures] = useState([""]);
+  // const [features, setFeatures] = useState([""]);
   const [currentOccupancy, setCurrentOccupancy] = useState("");
   const [price, setPrice] = useState("");
   const [roomType, setRoomType] = useState("");
@@ -279,20 +279,20 @@ export default function OwnerHostelsRooms() {
     startIndex + itemsPerPage
   );
 
-  const handleFeatures = (index, value) => {
-    const newFeatures = [...features];
-    newFeatures[index] = value;
-    setFeatures(newFeatures);
-  };
+  // const handleFeatures = (index, value) => {
+  //   const newFeatures = [...features];
+  //   newFeatures[index] = value;
+  //   setFeatures(newFeatures);
+  // };
 
-  const addFeatures = () => {
-    setFeatures([...features, ""]);
-  };
+  // const addFeatures = () => {
+  //   setFeatures([...features, ""]);
+  // };
 
-  const removeFeatures = (index) => {
-    const newFeatures = features.filter((_, i) => i !== index);
-    setFeatures(newFeatures);
-  };
+  // const removeFeatures = (index) => {
+  //   const newFeatures = features.filter((_, i) => i !== index);
+  //   setFeatures(newFeatures);
+  // };
 
   const handleVisitTime = (index, value) => {
     const newVisitTime = [...visitTimes];
@@ -338,11 +338,11 @@ export default function OwnerHostelsRooms() {
     formData.append("payment", payment);
     formData.append("charge", charge);
 
-    features.forEach((a, i) => {
-      if (a.trim() !== "") {
-        formData.append(`features[${i}]`, a);
-      }
-    });
+    // features.forEach((a, i) => {
+    //   if (a.trim() !== "") {
+    //     formData.append(`features[${i}]`, a);
+    //   }
+    // });
     visitTimes.forEach((a, i) => {
       if (a.trim() !== "") {
         formData.append(`visitTimes[${i}]`, a);
@@ -449,10 +449,6 @@ export default function OwnerHostelsRooms() {
                     setCharge={setCharge}
                     gardianInfo={gardianInfo}
                     setGardianInfo={setGardianInfo}
-                    features={features}
-                    handleFeatures={handleFeatures}
-                    addFeatures={addFeatures}
-                    removeFeatures={removeFeatures}
                     visitTimes={visitTimes}
                     handleVisitTime={handleVisitTime}
                     addVisitTime={addVisitTime}
@@ -588,9 +584,6 @@ export default function OwnerHostelsRooms() {
                               Price
                             </th>
                             <th className="text-left py-3 px-4 font-medium text-gray-500">
-                              Features
-                            </th>
-                            <th className="text-left py-3 px-4 font-medium text-gray-500">
                               Room Type
                             </th>
                             <th className="text-left py-3 px-4 font-medium text-gray-500">
@@ -631,7 +624,7 @@ export default function OwnerHostelsRooms() {
                               </td>
                               <td className="py-3 px-4">{room.capacity}</td>
                               <td className="py-3 px-4">{room.price}</td>
-                              <td className="py-3 px-4 space-x-2">
+                              {/* <td className="py-3 px-4 space-x-2">
                                 {room?.features?.map((a, i) => (
                                   <span
                                     key={i}
@@ -640,7 +633,7 @@ export default function OwnerHostelsRooms() {
                                     {a}
                                   </span>
                                 ))}
-                              </td>
+                              </td> */}
                               <td className="py-3 px-4">{room?.roomType}</td>
                               <td className="py-3 px-4">{room?.charge}</td>
                               <td className="py-3 px-4">{room?.payment}</td>

@@ -62,7 +62,7 @@ export default function AdminHostelsRooms() {
   const [roomNumber, setRoomNumber] = useState("");
   const [capacity, setCapacity] = useState("");
   const [selectedImages, setSelectedImages] = useState([]);
-  const [features, setFeatures] = useState([""]);
+  // const [features, setFeatures] = useState([""]);
   const [currentOccupancy, setCurrentOccupancy] = useState("");
   const [price, setPrice] = useState("");
   const [roomType, setRoomType] = useState("");
@@ -117,20 +117,20 @@ export default function AdminHostelsRooms() {
     startIndex + itemsPerPage
   );
 
-  const handleFeatures = (index, value) => {
-    const newFeatures = [...features];
-    newFeatures[index] = value;
-    setFeatures(newFeatures);
-  };
+  // const handleFeatures = (index, value) => {
+  //   const newFeatures = [...features];
+  //   newFeatures[index] = value;
+  //   setFeatures(newFeatures);
+  // };
 
-  const addFeatures = () => {
-    setFeatures([...features, ""]);
-  };
+  // const addFeatures = () => {
+  //   setFeatures([...features, ""]);
+  // };
 
-  const removeFeatures = (index) => {
-    const newFeatures = features.filter((_, i) => i !== index);
-    setFeatures(newFeatures);
-  };
+  // const removeFeatures = (index) => {
+  //   const newFeatures = features.filter((_, i) => i !== index);
+  //   setFeatures(newFeatures);
+  // };
 
   const handleVisitTime = (index, value) => {
     const newVisitTime = [...visitTimes];
@@ -176,11 +176,11 @@ export default function AdminHostelsRooms() {
     formData.append("payment", payment);
     formData.append("charge", charge);
 
-    features.forEach((a, i) => {
-      if (a.trim() !== "") {
-        formData.append(`features[${i}]`, a);
-      }
-    });
+    // features.forEach((a, i) => {
+    //   if (a.trim() !== "") {
+    //     formData.append(`features[${i}]`, a);
+    //   }
+    // });
     visitTimes.forEach((a, i) => {
       if (a.trim() !== "") {
         formData.append(`visitTimes[${i}]`, a);
@@ -196,7 +196,7 @@ export default function AdminHostelsRooms() {
         // Reset form state
         setRoomNumber("");
         setCapacity("");
-        setFeatures([""]);
+        // setFeatures([""]);
         setCurrentOccupancy("");
         setSelectedImages([]);
         setPrice("");
@@ -266,7 +266,7 @@ export default function AdminHostelsRooms() {
                       className="bg-rose-600 hover:bg-rose-700 gap-2 cursor-pointer"
                     >
                       <Plus className="h-4 w-4" />
-                      Add hostel
+                      Add Room
                     </Button>
                   </DialogTrigger>
                   <RoomPOST
@@ -287,10 +287,6 @@ export default function AdminHostelsRooms() {
                     setCharge={setCharge}
                     gardianInfo={gardianInfo}
                     setGardianInfo={setGardianInfo}
-                    features={features}
-                    handleFeatures={handleFeatures}
-                    addFeatures={addFeatures}
-                    removeFeatures={removeFeatures}
                     visitTimes={visitTimes}
                     handleVisitTime={handleVisitTime}
                     addVisitTime={addVisitTime}
@@ -426,9 +422,6 @@ export default function AdminHostelsRooms() {
                               Price
                             </th>
                             <th className="text-left py-3 px-4 font-medium text-gray-500">
-                              Features
-                            </th>
-                            <th className="text-left py-3 px-4 font-medium text-gray-500">
                               Room Type
                             </th>
                             <th className="text-left py-3 px-4 font-medium text-gray-500">
@@ -469,7 +462,7 @@ export default function AdminHostelsRooms() {
                               </td>
                               <td className="py-3 px-4">{room.capacity}</td>
                               <td className="py-3 px-4">{room.price}</td>
-                              <td className="py-3 px-4 space-x-2">
+                              {/* <td className="py-3 px-4 space-x-2">
                                 {room?.features?.map((a, i) => (
                                   <span
                                     key={i}
@@ -478,7 +471,7 @@ export default function AdminHostelsRooms() {
                                     {a}
                                   </span>
                                 ))}
-                              </td>
+                              </td> */}
                               <td className="py-3 px-4">{room?.roomType}</td>
                               <td className="py-3 px-4">{room?.charge}</td>
                               <td className="py-3 px-4">{room?.payment}</td>

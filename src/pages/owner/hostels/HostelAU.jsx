@@ -63,9 +63,16 @@ import {
   WashingMachine,
   Cuboid,
   Container,
+  BedSingle,
+  BedDouble,
+  CookingPot,
+  Volleyball,
 } from "lucide-react";
 
 export const iconMap = {
+  BedDouble,
+  BedSingle,
+  CookingPot,
   Wifi,
   Utensils,
   Bath,
@@ -125,11 +132,15 @@ export const nearbyMap = {
   Wine,
   CreditCard,
   Building2,
+  Volleyball,
 };
 
 // amenitiesData.ts
 
 export const AVAILABLE_AMENITIES = [
+  { name: "Double Beds", icon: "BedDouble" },
+  { name: "Single Beds", icon: "BedSingle" },
+  { name: "Kitchen", icon: "CookingPot" },
   { name: "Wi-Fi / High-speed internet", icon: "Wifi" },
   { name: "Meals included", icon: "Utensils" },
   { name: "Attached washroom", icon: "Bath" },
@@ -190,6 +201,7 @@ export const NEARBY_PLACES = [
   { name: "Bar / Pub", icon: "Wine" },
   { name: "ATM", icon: "CreditCard" },
   { name: "Bank", icon: "Building2" },
+  { name: "Turf", icon: "Volleyball" },
 ];
 
 export function HostelPOST({

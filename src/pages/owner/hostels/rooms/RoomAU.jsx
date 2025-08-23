@@ -27,10 +27,6 @@ export function RoomsPOST({
   setCharge,
   gardianInfo,
   setGardianInfo,
-  features,
-  handleFeatures,
-  addFeatures,
-  removeFeatures,
   visitTimes,
   handleVisitTime,
   addVisitTime,
@@ -172,7 +168,7 @@ export function RoomsPOST({
             />
           </div>
 
-          <div className="space-y-2">
+          {/* <div className="space-y-2">
             <Label>Features</Label>
             {features.map((feature, index) => (
               <div key={index} className="flex gap-2 items-center">
@@ -201,7 +197,7 @@ export function RoomsPOST({
             >
               + Add Feature
             </Button>
-          </div>
+          </div> */}
 
           <div className="space-y-2">
             <Label>Visit Times</Label>
@@ -312,21 +308,21 @@ export function RoomsPUT({ room, onClose, onUpdated }) {
     phone: room.gardianInfo?.phone || "",
   });
 
-  const [features, setFeatures] = useState(room.features || [""]);
+  // const [features, setFeatures] = useState(room.features || [""]);
   const [visitTimes, setVisitTimes] = useState(room.visitTimes || [""]);
   const [selectedImages, setSelectedImages] = useState([]);
   const [existingImages, setExistingImages] = useState(room.photos || []);
 
   const [updateRoom, { isLoading }] = useUpdateroomMutation();
 
-  const handleFeatures = (index, value) => {
-    const newFeatures = [...features];
-    newFeatures[index] = value;
-    setFeatures(newFeatures);
-  };
-  const addFeatures = () => setFeatures([...features, ""]);
-  const removeFeatures = (index) =>
-    setFeatures(features.filter((_, i) => i !== index));
+  // const handleFeatures = (index, value) => {
+  //   const newFeatures = [...features];
+  //   newFeatures[index] = value;
+  //   setFeatures(newFeatures);
+  // };
+  // const addFeatures = () => setFeatures([...features, ""]);
+  // const removeFeatures = (index) =>
+  //   setFeatures(features.filter((_, i) => i !== index));
 
   const handleVisitTime = (index, value) => {
     const newVisit = [...visitTimes];
@@ -357,11 +353,11 @@ export function RoomsPUT({ room, onClose, onUpdated }) {
     formData.append("payment", payment);
     formData.append("charge", charge);
 
-    features.forEach((a, i) => {
-      if (a.trim() !== "") {
-        formData.append(`features[${i}]`, a);
-      }
-    });
+    // features.forEach((a, i) => {
+    //   if (a.trim() !== "") {
+    //     formData.append(`features[${i}]`, a);
+    //   }
+    // });
     visitTimes.forEach((a, i) => {
       if (a.trim() !== "") {
         formData.append(`visitTimes[${i}]`, a);
@@ -474,7 +470,7 @@ export function RoomsPUT({ room, onClose, onUpdated }) {
           </div>
         </div>
 
-        <div className="space-y-2">
+        {/* <div className="space-y-2">
           <Label>Features</Label>
           {features.map((f, i) => (
             <div key={i} className="flex gap-2">
@@ -496,7 +492,7 @@ export function RoomsPUT({ room, onClose, onUpdated }) {
           <Button variant="outline" size="sm" onClick={addFeatures}>
             + Add Feature
           </Button>
-        </div>
+        </div> */}
 
         <div className="space-y-2">
           <Label>Visit Times</Label>
@@ -576,7 +572,7 @@ export function RoomsPUT({ room, onClose, onUpdated }) {
         <Button variant="outline" onClick={onClose}>
           Cancel
         </Button>
-        <Button onClick={handleSubmit} disabled={isLoading}>
+        <Button onClick={handleSubmit} disabled={isLoading}  className="bg-rose-600 hover:bg-rose-700 cursor-pointer">
           {isLoading ? "Updating..." : "Update"}
         </Button>
       </DialogFooter>

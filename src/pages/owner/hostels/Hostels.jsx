@@ -735,7 +735,7 @@ export default function OwnerHostels() {
                                     className="font-medium cursor-pointer"
                                     onClick={() =>
                                       navigate(
-                                        `/admin/hostels/rooms/${hostel._id}`
+                                        `/owner/hostels/rooms/${hostel._id}`
                                       )
                                     }
                                   >

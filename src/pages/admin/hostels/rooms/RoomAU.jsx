@@ -1,8 +1,59 @@
-import { ImagePlus, Upload } from "lucide-react";
+import {
+  ImagePlus,
+  Upload,
+  BedDouble,
+  BedSingle,
+  CookingPot,
+  Bath,
+  Fan,
+  AirVent,
+  WashingMachine,
+  Cuboid,
+  Container,
+  BookOpen,
+  Flame,
+  Lock,
+  Check,
+} from "lucide-react";
 import { Button } from "@/components/ui/button";
-import { DialogContent, DialogFooter, DialogHeader, DialogTitle } from "@/components/ui/dialog";
+import {
+  DialogContent,
+  DialogFooter,
+  DialogHeader,
+  DialogTitle,
+} from "@/components/ui/dialog";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
+
+export const iconMap = {
+  BedDouble,
+  BedSingle,
+  CookingPot,
+  Bath,
+  Fan,
+  AirVent,
+  WashingMachine,
+  Cuboid,
+  Container,
+  BookOpen,
+  Flame,
+  Lock,
+};
+
+export const AVAILABLE_AMENITIES = [
+  { name: "Double Beds", icon: "BedDouble" },
+  { name: "Single Beds", icon: "BedSingle" },
+  { name: "Kitchen", icon: "CookingPot" },
+  { name: "Attached washroom", icon: "Bath" },
+  { name: "Fans", icon: "Fan" },
+  { name: "A/C", icon: "AirVent" },
+  { name: "Washing machine", icon: "WashingMachine" },
+  { name: "Cupboard", icon: "Cuboid" },
+  { name: "Iron box", icon: "Container" },
+  { name: "Study tables / Desks", icon: "BookOpen" },
+  { name: "Hot water / Geyser", icon: "Flame" },
+  { name: "Locker / Storage", icon: "Lock" },
+];
 
 export function RoomPOST({
   isPosting,
@@ -10,26 +61,20 @@ export function RoomPOST({
   setRoomNumber,
   capacity,
   setCapacity,
-  price,
-  setPrice,
   currentOccupancy,
   setCurrentOccupancy,
   roomType,
   setRoomType,
-  payment,
-  setPayment,
-  charge,
-  setCharge,
-  gardianInfo,
-  setGardianInfo,
-  visitTimes,
-  handleVisitTime,
-  addVisitTime,
-  removeVisitTime,
   selectedImages,
   setSelectedImages,
   handleSubmit,
   setIsAddHostelOpen,
+  withFood,
+  setWithFood,
+  withoutFood,
+  setWithoutFood,
+  toggleAmenity,
+  amenities,
 }) {
   return (
     <DialogContent className="sm:max-w-[600px]">
@@ -37,47 +82,63 @@ export function RoomPOST({
         <DialogTitle>Add New Room</DialogTitle>
       </DialogHeader>
 
-      <div className="overflow-y-auto pr-2 mt-2 space-y-4" style={{ maxHeight: "calc(90vh - 130px)" }}>
+      <div
+        className="overflow-y-auto pr-2 mt-2 space-y-4"
+        style={{ maxHeight: "calc(90vh - 130px)" }}
+      >
         <div className="grid grid-cols-2 gap-4">
           <div className="space-y-2">
-            <Label>Room Number</Label>
-            <Input value={roomNumber} onChange={(e) => setRoomNumber(e.target.value)} required />
+            <Label>Room Name</Label>
+            <Input
+              value={roomNumber}
+              placeholder="Room name"
+              onChange={(e) => setRoomNumber(e.target.value)}
+              required
+            />
           </div>
           <div className="space-y-2">
             <Label>Capacity</Label>
-            <Input value={capacity} onChange={(e) => setCapacity(e.target.value)} required />
+            <Input
+              value={capacity}
+              placeholder="Number of members in this room"
+              onChange={(e) => setCapacity(e.target.value)}
+              required
+            />
           </div>
           <div className="space-y-2">
             <Label>Room Type</Label>
-            <Input value={roomType} onChange={(e) => setRoomType(e.target.value)} required />
-          </div>
-          <div className="space-y-2">
-            <Label>Charge</Label>
-            <Input value={charge} onChange={(e) => setCharge(e.target.value)} required />
-          </div>
-          <div className="space-y-2">
-            <Label>Payment</Label>
-            <Input value={payment} onChange={(e) => setPayment(e.target.value)} required />
-          </div>
-          <div className="space-y-2">
-            <Label>Gardian Name</Label>
-            <Input value={gardianInfo.name} onChange={(e) => setGardianInfo({ ...gardianInfo, name: e.target.value })} />
-          </div>
-          <div className="space-y-2">
-            <Label>Gardian Email</Label>
-            <Input value={gardianInfo.email} onChange={(e) => setGardianInfo({ ...gardianInfo, email: e.target.value })} />
-          </div>
-          <div className="space-y-2">
-            <Label>Gardian Phone</Label>
-            <Input value={gardianInfo.phone} onChange={(e) => setGardianInfo({ ...gardianInfo, phone: e.target.value })} />
+            <Input
+              placeholder="No ac / ac"
+              value={roomType}
+              onChange={(e) => setRoomType(e.target.value)}
+              required
+            />
           </div>
           <div className="space-y-2">
             <Label>Current Occupancy</Label>
-            <Input value={currentOccupancy} onChange={(e) => setCurrentOccupancy(e.target.value)} required />
+            <Input
+              placeholder="Currently living members"
+              value={currentOccupancy}
+              onChange={(e) => setCurrentOccupancy(e.target.value)}
+              required
+            />
+          </div>
+
+          <div className="space-y-2">
+            <Label>With Food</Label>
+            <Input
+              value={withFood}
+              placeholder="Price"
+              onChange={(e) => setWithFood(e.target.value)}
+            />
           </div>
           <div className="space-y-2">
-            <Label>Price</Label>
-            <Input value={price} onChange={(e) => setPrice(e.target.value)} required />
+            <Label>Without Food</Label>
+            <Input
+              value={withoutFood}
+              placeholder="Price"
+              onChange={(e) => setWithoutFood(e.target.value)}
+            />
           </div>
         </div>
 
@@ -98,21 +159,32 @@ export function RoomPOST({
           <Button variant="outline" size="sm" onClick={addFeatures}>+ Add Feature</Button>
         </div> */}
 
-        <div className="space-y-2">
-          <Label>Visit Times</Label>
-          {visitTimes.map((time, index) => (
-            <div key={index} className="flex gap-2">
-              <Input
-                value={time}
-                onChange={(e) => handleVisitTime(index, e.target.value)}
-                placeholder={`Visit Time ${index + 1}`}
-              />
-              {visitTimes.length > 1 && (
-                <Button variant="ghost" size="sm" onClick={() => removeVisitTime(index)}>✕</Button>
-              )}
-            </div>
-          ))}
-          <Button variant="outline" size="sm" onClick={addVisitTime}>+ Add Visit Time</Button>
+        <div className="space-y-4">
+          <Label className="block mb-2">Facilities</Label>
+          <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-4">
+            {AVAILABLE_AMENITIES.map((item) => {
+              const Icon = iconMap[item.icon];
+              const isSelected = amenities?.some((a) => a.name === item.name);
+              return (
+                <button
+                  type="button"
+                  key={item.name}
+                  onClick={() => toggleAmenity(item)}
+                  className={`relative flex items-center gap-2 p-3 border rounded-lg transition w-full text-left ${
+                    isSelected
+                      ? "bg-blue-100 border-blue-500"
+                      : "bg-white border-gray-300"
+                  }`}
+                >
+                  <Icon className="w-5 h-5" />
+                  <span className="text-sm">{item.name}</span>
+                  {isSelected && (
+                    <Check className="absolute top-2 right-2 w-4 h-4 text-blue-600" />
+                  )}
+                </button>
+              );
+            })}
+          </div>
         </div>
 
         <div className="space-y-2">
@@ -128,7 +200,10 @@ export function RoomPOST({
               className="hidden"
               onChange={(e) => {
                 if (e.target.files) {
-                  setSelectedImages((prev) => [...prev, ...Array.from(e.target.files)]);
+                  setSelectedImages((prev) => [
+                    ...prev,
+                    ...Array.from(e.target.files),
+                  ]);
                 }
               }}
             />
@@ -136,7 +211,11 @@ export function RoomPOST({
           {selectedImages.length > 0 && (
             <div className="grid grid-cols-2 gap-2 mt-4">
               {selectedImages.map((file, index) => (
-                <img key={index} src={URL.createObjectURL(file)} className="w-full h-32 object-cover rounded-md" />
+                <img
+                  key={index}
+                  src={URL.createObjectURL(file)}
+                  className="w-full h-32 object-cover rounded-md"
+                />
               ))}
             </div>
           )}
@@ -144,8 +223,14 @@ export function RoomPOST({
       </div>
 
       <DialogFooter>
-        <Button variant="outline" onClick={() => setIsAddHostelOpen(false)}>Cancel</Button>
-        <Button onClick={handleSubmit} disabled={isPosting}  className="bg-rose-600 hover:bg-rose-700 cursor-pointer" >
+        <Button variant="outline" onClick={() => setIsAddHostelOpen(false)}>
+          Cancel
+        </Button>
+        <Button
+          onClick={handleSubmit}
+          disabled={isPosting}
+          className="bg-rose-600 hover:bg-rose-700 cursor-pointer"
+        >
           {isPosting ? "Creating..." : "Create"}
         </Button>
       </DialogFooter>
@@ -153,25 +238,18 @@ export function RoomPOST({
   );
 }
 
-
-
 import { useState } from "react";
 import { useUpdateroomMutation } from "@/app/service/room";
-
 
 export function RoomPUT({ room, onClose, onUpdated }) {
   const [roomNumber, setRoomNumber] = useState(room.roomNumber || "");
   const [capacity, setCapacity] = useState(room.capacity || "");
-  const [price, setPrice] = useState(room.price || "");
-  const [currentOccupancy, setCurrentOccupancy] = useState(room.currentOccupancy || "");
+  const [currentOccupancy, setCurrentOccupancy] = useState(
+    room.currentOccupancy || ""
+  );
   const [roomType, setRoomType] = useState(room.roomType || "");
-  const [payment, setPayment] = useState(room.payment || "");
-  const [charge, setCharge] = useState(room.charge || "");
-  const [gardianInfo, setGardianInfo] = useState({
-    name: room.gardianInfo?.name || "",
-    email: room.gardianInfo?.email || "",
-    phone: room.gardianInfo?.phone || "",
-  });
+  const [withFood, setWithFood] = useState(room?.withFood || "");
+  const [withoutFood, setWithoutFood] = useState(room?.withoutFood || "");
 
   // const [features, setFeatures] = useState(room.features || [""]);
   const [visitTimes, setVisitTimes] = useState(room.visitTimes || [""]);
@@ -179,6 +257,10 @@ export function RoomPUT({ room, onClose, onUpdated }) {
   const [existingImages, setExistingImages] = useState(room.photos || []);
 
   const [updateRoom, { isLoading }] = useUpdateroomMutation();
+
+  const [amenities, setAmenities] = useState(
+    room?.amenities?.length ? room?.amenities : []
+  );
 
   // const handleFeatures = (index, value) => {
   //   const newFeatures = [...features];
@@ -188,68 +270,72 @@ export function RoomPUT({ room, onClose, onUpdated }) {
   // const addFeatures = () => setFeatures([...features, ""]);
   // const removeFeatures = (index) => setFeatures(features.filter((_, i) => i !== index));
 
-  const handleVisitTime = (index, value) => {
-    const newVisit = [...visitTimes];
-    newVisit[index] = value;
-    setVisitTimes(newVisit);
+  const toggleAmenity = (item) => {
+    setAmenities((prev) => {
+      const exists = prev.some((a) => a.name === item.name);
+      if (exists) {
+        // remove
+        return prev.filter((a) => a.name !== item.name);
+      } else {
+        // add
+        return [...prev, item];
+      }
+    });
   };
-  const addVisitTime = () => setVisitTimes([...visitTimes, ""]);
-  const removeVisitTime = (index) => setVisitTimes(visitTimes.filter((_, i) => i !== index));
+
+
+    setVisitTimes(visitTimes.filter((_, i) => i !== index));
 
   const handleRemoveExistingImage = (index) => {
     setExistingImages(existingImages.filter((_, i) => i !== index));
   };
 
-// ✅ use array upload, not single
-const handleSubmit = async (e) => {
-  e.preventDefault();
+  // ✅ use array upload, not single
+  const handleSubmit = async (e) => {
+    e.preventDefault();
 
-  const formData = new FormData();
-  formData.append("roomNumber", roomNumber);
-  formData.append("capacity", capacity);
-  formData.append("price", price);
-  formData.append("currentOccupancy", currentOccupancy);
-  formData.append("gardianInfo[name]", gardianInfo.name);
-  formData.append("gardianInfo[email]", gardianInfo.email);
-  formData.append("gardianInfo[phone]", gardianInfo.phone);
-  formData.append("roomType", roomType);
-  formData.append("payment", payment);
-  formData.append("charge", charge);
+    const formData = new FormData();
+    formData.append("roomNumber", roomNumber);
+    formData.append("capacity", capacity);
+    formData.append("currentOccupancy", currentOccupancy);
+    formData.append("roomType", roomType);
+    formData.append("withFood", withFood);
+    formData.append("withoutFood", withoutFood);
 
-  // features.forEach((a, i) => {
-  //   if (a.trim() !== "") {
-  //     formData.append(`features[${i}]`, a);
-  //   }
-  // });
-  visitTimes.forEach((a, i) => {
-    if (a.trim() !== "") {
-      formData.append(`visitTimes[${i}]`, a);
+    // features.forEach((a, i) => {
+    //   if (a.trim() !== "") {
+    //     formData.append(`features[${i}]`, a);
+    //   }
+    // });
+    amenities.forEach((a, i) => {
+      if (a.name.trim() !== "") {
+        formData.append(`amenities[${i}][name]`, a.name);
+        formData.append(`amenities[${i}][icon]`, a.icon);
+      }
+    });
+
+    // ✅ Add NEW images
+    selectedImages.forEach((file) => {
+      formData.append("images", file);
+    });
+
+    // ✅ Add EXISTING images as JSON string
+    formData.append("existingImages", JSON.stringify(existingImages));
+
+    try {
+      const response = await updateRoom({
+        id: room._id,
+        updateroom: formData,
+      }).unwrap();
+
+      if (response?.status === 200) {
+        onClose();
+        onUpdated();
+      }
+    } catch (error) {
+      console.error("Room update failed:", error);
     }
-  });
-
-  // ✅ Add NEW images
-  selectedImages.forEach((file) => {
-    formData.append("images", file);
-  });
-
-  // ✅ Add EXISTING images as JSON string
-  formData.append("existingImages", JSON.stringify(existingImages));
-
-  try {
-    const response = await updateRoom({
-      id: room._id,
-      updateroom: formData,
-    }).unwrap();
-
-    if (response?.status === 200) {
-      onClose();
-      onUpdated();
-    }
-  } catch (error) {
-    console.error("Room update failed:", error);
-  }
-};
-
+  };
 
   return (
     <DialogContent className="sm:max-w-[600px]">
@@ -257,47 +343,54 @@ const handleSubmit = async (e) => {
         <DialogTitle>Edit Room</DialogTitle>
       </DialogHeader>
 
-      <div className="overflow-y-auto pr-2 mt-2 space-y-4" style={{ maxHeight: "calc(90vh - 130px)" }}>
+      <div
+        className="overflow-y-auto pr-2 mt-2 space-y-4"
+        style={{ maxHeight: "calc(90vh - 130px)" }}
+      >
         <div className="grid grid-cols-2 gap-4">
           <div className="space-y-2">
-            <Label>Room Number</Label>
-            <Input value={roomNumber} onChange={(e) => setRoomNumber(e.target.value)} />
+            <Label>Room Name</Label>
+            <Input
+              value={roomNumber}
+              onChange={(e) => setRoomNumber(e.target.value)}
+            />
           </div>
           <div className="space-y-2">
             <Label>Capacity</Label>
-            <Input value={capacity} onChange={(e) => setCapacity(e.target.value)} />
+            <Input
+              value={capacity}
+              onChange={(e) => setCapacity(e.target.value)}
+            />
           </div>
           <div className="space-y-2">
             <Label>Room Type</Label>
-            <Input value={roomType} onChange={(e) => setRoomType(e.target.value)} />
+            <Input
+              value={roomType}
+              onChange={(e) => setRoomType(e.target.value)}
+            />
           </div>
-          <div className="space-y-2">
-            <Label>Charge</Label>
-            <Input value={charge} onChange={(e) => setCharge(e.target.value)} />
-          </div>
-          <div className="space-y-2">
-            <Label>Payment</Label>
-            <Input value={payment} onChange={(e) => setPayment(e.target.value)} />
-          </div>
-          <div className="space-y-2">
-            <Label>Gardian Name</Label>
-            <Input value={gardianInfo.name} onChange={(e) => setGardianInfo({ ...gardianInfo, name: e.target.value })} />
-          </div>
-          <div className="space-y-2">
-            <Label>Gardian Email</Label>
-            <Input value={gardianInfo.email} onChange={(e) => setGardianInfo({ ...gardianInfo, email: e.target.value })} />
-          </div>
-          <div className="space-y-2">
-            <Label>Gardian Phone</Label>
-            <Input value={gardianInfo.phone} onChange={(e) => setGardianInfo({ ...gardianInfo, phone: e.target.value })} />
-          </div>
+
           <div className="space-y-2">
             <Label>Current Occupancy</Label>
-            <Input value={currentOccupancy} onChange={(e) => setCurrentOccupancy(e.target.value)} />
+            <Input
+              value={currentOccupancy}
+              onChange={(e) => setCurrentOccupancy(e.target.value)}
+            />
+          </div>
+
+          <div className="space-y-2">
+            <Label>With Food</Label>
+            <Input
+              value={withFood}
+              onChange={(e) => setWithFood(e.target.value)}
+            />
           </div>
           <div className="space-y-2">
-            <Label>Price</Label>
-            <Input value={price} onChange={(e) => setPrice(e.target.value)} />
+            <Label>Without Food</Label>
+            <Input
+              value={withoutFood}
+              onChange={(e) => setWithoutFood(e.target.value)}
+            />
           </div>
         </div>
 
@@ -314,17 +407,32 @@ const handleSubmit = async (e) => {
           <Button variant="outline" size="sm" onClick={addFeatures}>+ Add Feature</Button>
         </div> */}
 
-        <div className="space-y-2">
-          <Label>Visit Times</Label>
-          {visitTimes.map((v, i) => (
-            <div key={i} className="flex gap-2">
-              <Input value={v} onChange={(e) => handleVisitTime(i, e.target.value)} />
-              {visitTimes.length > 1 && (
-                <Button variant="ghost" size="sm" onClick={() => removeVisitTime(i)}>✕</Button>
-              )}
-            </div>
-          ))}
-          <Button variant="outline" size="sm" onClick={addVisitTime}>+ Add Visit Time</Button>
+        <div className="space-y-4">
+          <Label className="block mb-2">Facilities</Label>
+          <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-4">
+            {AVAILABLE_AMENITIES.map((item) => {
+              const Icon = iconMap[item.icon];
+              const isSelected = amenities?.some((a) => a.name === item.name);
+              return (
+                <button
+                  type="button"
+                  key={item.name}
+                  onClick={() => toggleAmenity(item)}
+                  className={`relative flex items-center gap-2 p-3 border rounded-lg transition w-full text-left ${
+                    isSelected
+                      ? "bg-blue-100 border-blue-500"
+                      : "bg-white border-gray-300"
+                  }`}
+                >
+                  <Icon className="w-5 h-5" />
+                  <span className="text-sm">{item.name}</span>
+                  {isSelected && (
+                    <Check className="absolute top-2 right-2 w-4 h-4 text-blue-600" />
+                  )}
+                </button>
+              );
+            })}
+          </div>
         </div>
 
         <div className="space-y-2">
@@ -340,7 +448,10 @@ const handleSubmit = async (e) => {
               className="hidden"
               onChange={(e) => {
                 if (e.target.files) {
-                  setSelectedImages((prev) => [...prev, ...Array.from(e.target.files)]);
+                  setSelectedImages((prev) => [
+                    ...prev,
+                    ...Array.from(e.target.files),
+                  ]);
                 }
               }}
             />
@@ -350,7 +461,10 @@ const handleSubmit = async (e) => {
             <div className="grid grid-cols-2 gap-2 mt-4">
               {existingImages.map((url, i) => (
                 <div key={i} className="relative">
-                  <img src={url} className="w-full h-32 object-cover rounded-md" />
+                  <img
+                    src={url}
+                    className="w-full h-32 object-cover rounded-md"
+                  />
                   <button
                     className="absolute top-1 right-1 bg-red-500 text-white rounded-full px-2"
                     onClick={() => handleRemoveExistingImage(i)}
@@ -360,7 +474,11 @@ const handleSubmit = async (e) => {
                 </div>
               ))}
               {selectedImages.map((file, i) => (
-                <img key={i} src={URL.createObjectURL(file)} className="w-full h-32 object-cover rounded-md" />
+                <img
+                  key={i}
+                  src={URL.createObjectURL(file)}
+                  className="w-full h-32 object-cover rounded-md"
+                />
               ))}
             </div>
           )}
@@ -368,8 +486,14 @@ const handleSubmit = async (e) => {
       </div>
 
       <DialogFooter>
-        <Button variant="outline" onClick={onClose}>Cancel</Button>
-        <Button onClick={handleSubmit} disabled={isLoading} className="bg-rose-600 hover:bg-rose-700 cursor-pointer">
+        <Button variant="outline" onClick={onClose}>
+          Cancel
+        </Button>
+        <Button
+          onClick={handleSubmit}
+          disabled={isLoading}
+          className="bg-rose-600 hover:bg-rose-700 cursor-pointer"
+        >
           {isLoading ? "Updating..." : "Update"}
         </Button>
       </DialogFooter>
@@ -377,8 +501,7 @@ const handleSubmit = async (e) => {
   );
 }
 
-
-export function ShowImagesIcon({ images = [], onClose }) {  
+export function ShowImagesIcon({ images = [], onClose }) {
   return (
     <>
       <div className="fixed inset-0 bg-black bg-opacity-40 flex items-center justify-center z-50">

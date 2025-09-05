@@ -222,7 +222,7 @@ export function Sidebar() {
           <Button
             variant="ghost"
             className={cn(
-              "text-red-600",
+              "text-red-600 cursor-pointer",
               isCollapsed ? "w-10 h-10 p-0" : "w-full justify-start"
             )}
             onClick={handleLogout}

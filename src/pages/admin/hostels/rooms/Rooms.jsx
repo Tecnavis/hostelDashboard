@@ -53,8 +53,9 @@ import {
   useGetAllHostelRoomQuery,
 } from "@/app/service/room";
 import { useParams } from "react-router-dom";
-import { RoomPOST, RoomPUT, ShowImagesIcon } from "./RoomAU";
+import { iconMap, RoomPOST, RoomPUT, ShowImagesIcon } from "./RoomAU";
 import { TableSkeleton } from "@/common/TableSkeleton";
+import { ShowMorFacility } from "../HostelAU";
 
 export default function AdminHostelsRooms() {
   const [isAddHostelOpen, setIsAddHostelOpen] = useState(false);
@@ -64,16 +65,11 @@ export default function AdminHostelsRooms() {
   const [selectedImages, setSelectedImages] = useState([]);
   // const [features, setFeatures] = useState([""]);
   const [currentOccupancy, setCurrentOccupancy] = useState("");
-  const [price, setPrice] = useState("");
   const [roomType, setRoomType] = useState("");
-  const [payment, setPayment] = useState("");
-  const [charge, setCharge] = useState("");
-  const [gardianInfo, setGardianInfo] = useState({
-    name: "",
-    email: "",
-    phone: "",
-  });
-  const [visitTimes, setVisitTimes] = useState([""]);
+  const [withFood, setWithFood] = useState("");
+  const [withoutFood, setWithoutFood] = useState("");
+  const [selectedAmenities, setSelectedAmenities] = useState([]);
+
   const [searchTerm, setSearchTerm] = useState("");
   const [currentPage, setCurrentPage] = useState(1);
   const itemsPerPage = 10;
@@ -86,10 +82,13 @@ export default function AdminHostelsRooms() {
   const [openEditDialog, setOpenEditDialog] = useState(false);
   const [selectedRoom, setSelectedRoom] = useState(null);
   const [open, setOpen] = useState(false);
+  const [selectedData, setSelectedData] = useState(null);
+  const [show, setShow] = useState(false);
 
   // searching
 
-  const filteredUsers = data?.filter((room) => {
+  const filteredUsers = data
+    ?.filter((room) => {
       const price = String(room?.price || "").toLowerCase();
       const roomNumber = String(room?.roomNumber || "").toLowerCase();
       const hostelName = String(room?.hostelId?.name || "").toLowerCase();
@@ -132,19 +131,15 @@ export default function AdminHostelsRooms() {
   //   setFeatures(newFeatures);
   // };
 
-  const handleVisitTime = (index, value) => {
-    const newVisitTime = [...visitTimes];
-    newVisitTime[index] = value;
-    setVisitTimes(newVisitTime);
-  };
-
-  const addVisitTime = () => {
-    setVisitTimes([...visitTimes, ""]);
-  };
-
-  const removeVisitTime = (index) => {
-    const newVisitTime = visitTimes.filter((_, i) => i !== index);
-    setVisitTimes(newVisitTime);
+  const toggleAmenity = (amenity) => {
+    const exists = selectedAmenities?.find((a) => a?.name === amenity?.name);
+    if (exists) {
+      setSelectedAmenities((prev) =>
+        prev?.filter((a) => a?.name !== amenity?.name)
+      );
+    } else {
+      setSelectedAmenities((prev) => [...prev, amenity]);
+    }
   };
 
   // create  hostel
@@ -155,9 +150,10 @@ export default function AdminHostelsRooms() {
     if (
       roomNumber.trim() === "" ||
       selectedImages.length === 0 ||
-      price.trim() === "" ||
       capacity.trim() === "" ||
-      currentOccupancy.trim() === ""
+      currentOccupancy.trim() === "" ||
+      withFood.trim() === "" ||
+      withoutFood.trim() === ""
     ) {
       return;
     }
@@ -167,25 +163,23 @@ export default function AdminHostelsRooms() {
     formData.append("hostelId", id);
     formData.append("roomNumber", roomNumber);
     formData.append("capacity", capacity);
-    formData.append("price", price);
     formData.append("currentOccupancy", currentOccupancy);
-    formData.append("gardianInfo[name]", gardianInfo.name);
-    formData.append("gardianInfo[email]", gardianInfo.email);
-    formData.append("gardianInfo[phone]", gardianInfo.phone);
     formData.append("roomType", roomType);
-    formData.append("payment", payment);
-    formData.append("charge", charge);
+    formData.append("withFood", withFood);
+    formData.append("withoutFood", withoutFood);
+    selectedAmenities.forEach((a, i) => {
+      if (a.name.trim() !== "") {
+        formData.append(`amenities[${i}][name]`, a.name);
+        formData.append(`amenities[${i}][icon]`, a.icon);
+      }
+    });
 
     // features.forEach((a, i) => {
     //   if (a.trim() !== "") {
     //     formData.append(`features[${i}]`, a);
     //   }
     // });
-    visitTimes.forEach((a, i) => {
-      if (a.trim() !== "") {
-        formData.append(`visitTimes[${i}]`, a);
-      }
-    });
+
     selectedImages.forEach((file) => {
       formData.append("images", file);
     });
@@ -199,17 +193,10 @@ export default function AdminHostelsRooms() {
         // setFeatures([""]);
         setCurrentOccupancy("");
         setSelectedImages([]);
-        setPrice("");
         setIsAddHostelOpen(false);
-        setGardianInfo({
-          name: "",
-          email: "",
-          phone: "",
-        });
         setRoomType("");
-        setPayment("");
-        setCharge("");
-        setVisitTimes([""]);
+        setWithFood("");
+        setWithoutFood("");
         refetch();
       }
     } catch (error) {
@@ -275,26 +262,20 @@ export default function AdminHostelsRooms() {
                     setRoomNumber={setRoomNumber}
                     capacity={capacity}
                     setCapacity={setCapacity}
-                    price={price}
-                    setPrice={setPrice}
                     currentOccupancy={currentOccupancy}
                     setCurrentOccupancy={setCurrentOccupancy}
                     roomType={roomType}
                     setRoomType={setRoomType}
-                    payment={payment}
-                    setPayment={setPayment}
-                    charge={charge}
-                    setCharge={setCharge}
-                    gardianInfo={gardianInfo}
-                    setGardianInfo={setGardianInfo}
-                    visitTimes={visitTimes}
-                    handleVisitTime={handleVisitTime}
-                    addVisitTime={addVisitTime}
-                    removeVisitTime={removeVisitTime}
                     selectedImages={selectedImages}
                     setSelectedImages={setSelectedImages}
                     handleSubmit={handleSubmit}
                     setIsAddHostelOpen={setIsAddHostelOpen}
+                    withFood={withFood}
+                    setWithFood={setWithFood}
+                    withoutFood={withoutFood}
+                    setWithoutFood={setWithoutFood}
+                    toggleAmenity={toggleAmenity}
+                    amenities={selectedAmenities}
                   />
                 </Dialog>
 
@@ -319,6 +300,18 @@ export default function AdminHostelsRooms() {
                     <ShowImagesIcon
                       images={selectedRoom?.photos}
                       onClose={() => setOpen(false)}
+                    />
+                  </DialogContent>
+                </Dialog>
+
+                <Dialog open={show} onOpenChange={setShow}>
+                  <DialogContent>
+                    <DialogHeader>
+                      <DialogTitle>{selectedData?.name}</DialogTitle>
+                    </DialogHeader>
+                    <ShowMorFacility
+                      facility={selectedData}
+                      onClose={() => setShow(false)}
                     />
                   </DialogContent>
                 </Dialog>
@@ -419,16 +412,16 @@ export default function AdminHostelsRooms() {
                               Capacity
                             </th>
                             <th className="text-left py-3 px-4 font-medium text-gray-500">
-                              Price
-                            </th>
-                            <th className="text-left py-3 px-4 font-medium text-gray-500">
                               Room Type
                             </th>
                             <th className="text-left py-3 px-4 font-medium text-gray-500">
-                              Charge
+                              Facilities
                             </th>
                             <th className="text-left py-3 px-4 font-medium text-gray-500">
-                              Payment
+                              With Food
+                            </th>{" "}
+                            <th className="text-left py-3 px-4 font-medium text-gray-500">
+                              Without Food
                             </th>
                             <th className="text-left py-3 px-4 font-medium text-gray-500">
                               Occupancy
@@ -461,7 +454,6 @@ export default function AdminHostelsRooms() {
                                 </div>
                               </td>
                               <td className="py-3 px-4">{room.capacity}</td>
-                              <td className="py-3 px-4">{room.price}</td>
                               {/* <td className="py-3 px-4 space-x-2">
                                 {room?.features?.map((a, i) => (
                                   <span
@@ -473,10 +465,42 @@ export default function AdminHostelsRooms() {
                                 ))}
                               </td> */}
                               <td className="py-3 px-4">{room?.roomType}</td>
-                              <td className="py-3 px-4">{room?.charge}</td>
-                              <td className="py-3 px-4">{room?.payment}</td>
                               <td className="py-3 px-4">
-                                {room.currentOccupancy}
+                                {room?.amenities?.length > 0 &&
+                                  (() => {
+                                    const a = room.amenities[0];
+                                    const Icon = iconMap[a.icon];
+                                    return (
+                                      <div className="flex items-center gap-2">
+                                        <span
+                                          onClick={() => {
+                                            setShow(true);
+                                            setSelectedData({
+                                              name: "Amenties",
+                                              data: room.amenities,
+                                            });
+                                          }}
+                                          className="inline-flex items-center gap-1 bg-gray-100 px-2 py-1 rounded text-sm cursor-pointer"
+                                        >
+                                          {Icon && <Icon className="w-4 h-4" />}
+                                          {a.name}
+                                        </span>
+
+                                        {/* Show +X if more amenities exist */}
+                                        {room.amenities.length > 1 && (
+                                          <span className="text-gray-500 text-sm">
+                                            +{room.amenities.length - 1}
+                                          </span>
+                                        )}
+                                      </div>
+                                    );
+                                  })()}
+                              </td>
+                              <td className="py-3 px-4">{room.withFood}</td>
+                              <td className="py-3 px-4">{room.withoutFood}</td>
+
+                              <td className="py-3 px-4">
+                                {room?.currentOccupancy}
                               </td>
                               <td className="py-3 px-4">
                                 <Badge

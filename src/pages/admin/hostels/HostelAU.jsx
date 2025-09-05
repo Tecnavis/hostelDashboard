@@ -755,7 +755,6 @@ export function HostelPUT({
     hostel?.amenities?.length ? hostel?.amenities : []
   );
 
-
   const [transports, setTransports] = useState(
     hostel?.transportation?.length ? hostel?.transportation : []
   );

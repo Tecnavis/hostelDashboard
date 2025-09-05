@@ -98,6 +98,17 @@ export default function AdminHostels() {
   const [restaurantFar, setRestaurantFar] = useState("");
   const [googleMap, setGoogleMap] = useState("");
   const [selectedNearby, setSelectdNearby] = useState([]);
+  const [visitorsAllow, setVisitorAllow] = useState(false);
+  const [noticePeriod, setNoticePeriod] = useState("");
+  const [gateOpenTime, setGateOpenTime] = useState("");
+  const [gateCloseTime, setGateCloseTime] = useState("");
+  const [additionalFee, setAdditionalFee] = useState("");
+  const [gardianInfo, setGardianInfo] = useState({
+    name: "",
+    phone: "",
+  });
+  const [restrictions, setRestrictions] = useState([""]);
+
   const [selectedData, setSelectedData] = useState(null);
   const [show, setShow] = useState(false);
 
@@ -195,6 +206,21 @@ export default function AdminHostels() {
     }
   };
 
+  const handleRestrictions = (index, value) => {
+    const newRestrictions = [...restrictions];
+    newRestrictions[index] = value;
+    setRestrictions(newRestrictions);
+  };
+
+  const addRestrictions = () => {
+    setRestrictions([...restrictions, ""]);
+  };
+
+  const removeRestrictions = (index) => {
+    const newRestrictions = restrictions.filter((_, i) => i !== index);
+    setRestrictions(newRestrictions);
+  };
+
   const addRestaurant = () => {
     if (!restaurantName || !restaurantFar) return;
 
@@ -237,7 +263,11 @@ export default function AdminHostels() {
       selectedTransport.some((t) => t.far.trim() === "") ||
       selectedNearby.some((t) => t.far.trim() === "") ||
       selectedRestaurants.some((t) => t.far.trim() === "") ||
-      googleMap.trim() === "" 
+      googleMap.trim() === "" ||
+      noticePeriod.trim() === "" ||
+      gateOpenTime.trim() === "" ||
+      gateCloseTime.trim() === "" ||
+      additionalFee.trim() === ""
     ) {
       return;
     }
@@ -252,6 +282,15 @@ export default function AdminHostels() {
     formData.append("googleMap", googleMap);
     formData.append("accommodationType", accommodationType);
     formData.append("price", price);
+
+    formData.append("visitorsAllow", visitorsAllow);
+    formData.append("noticePeriod", noticePeriod);
+    formData.append("gateOpenTime", gateOpenTime);
+    formData.append("gateCloseTime", gateCloseTime);
+    formData.append("additionalFee", additionalFee);
+    formData.append("gardianInfo[name]", gardianInfo.name);
+    formData.append("gardianInfo[phone]", gardianInfo.phone);
+
     formData.append("location[street]", location.street);
     formData.append("location[place]", location.place);
     formData.append("location[pincode]", location.pincode);
@@ -283,6 +322,11 @@ export default function AdminHostels() {
         formData.append(`restaurants[${i}][far]`, a.far);
       }
     });
+    restrictions.forEach((a, i) => {
+      if (a.trim() !== "") {
+        formData.append(`restrictions[${i}]`, a);
+      }
+    });
     selectedImages.forEach((file) => {
       formData.append("images", file);
     });
@@ -305,6 +349,16 @@ export default function AdminHostels() {
         setAccommodationType("");
         setGoogleMap("");
         setLocation({ street: "", place: "", pincode: "" });
+        setVisitorAllow(false);
+        setNoticePeriod("");
+        setGateOpenTime("");
+        setGateCloseTime("");
+        setAdditionalFee("");
+        setGardianInfo({
+          name: "",
+          phone: "",
+        });
+        setRestrictions([""]);
         setIsAddHostelOpen(false);
         refetch();
       }
@@ -404,6 +458,22 @@ export default function AdminHostels() {
                     setSelectdNearby={setSelectdNearby}
                     googleMap={googleMap}
                     setGoogleMap={setGoogleMap}
+                    gardianInfo={gardianInfo}
+                    setGardianInfo={setGardianInfo}
+                    restrictions={restrictions}
+                    handleRestrictions={handleRestrictions}
+                    addRestrictions={addRestrictions}
+                    removeRestrictions={removeRestrictions}
+                    visitorsAllow={visitorsAllow}
+                    setVisitorAllow={setVisitorAllow}
+                    noticePeriod={noticePeriod}
+                    setNoticePeriod={setNoticePeriod}
+                    gateOpenTime={gateOpenTime}
+                    setGateOpenTime={setGateOpenTime}
+                    gateCloseTime={gateCloseTime}
+                    setGateCloseTime={setGateCloseTime}
+                    additionalFee={additionalFee}
+                    setAdditionalFee={setAdditionalFee}
                   />
                 </Dialog>
 
@@ -465,450 +535,540 @@ export default function AdminHostels() {
 
             {isLoading || isError || !Array.isArray(data) ? (
               <TableSkeleton
-                columns={["Name", "Email", "Phone", "Role", "Status", "Actions"]}
+                columns={[
+                  "Name",
+                  "Email",
+                  "Phone",
+                  "Role",
+                  "Status",
+                  "Actions",
+                ]}
                 rows={6}
               />
             ) : (
-                 <motion.div
-              initial={{ opacity: 0, y: 20 }}
-              animate={{ opacity: 1, y: 0 }}
-              transition={{ duration: 0.5 }}
-            >
-              <Card>
-                <CardHeader className="pb-2">
-                  <div className="flex items-center justify-between">
-                    <div>
-                      <CardTitle>All Hostels</CardTitle>
-                      <CardDescription>
-                        Manage and monitor all registered admins
-                      </CardDescription>
+              <motion.div
+                initial={{ opacity: 0, y: 20 }}
+                animate={{ opacity: 1, y: 0 }}
+                transition={{ duration: 0.5 }}
+              >
+                <Card>
+                  <CardHeader className="pb-2">
+                    <div className="flex items-center justify-between">
+                      <div>
+                        <CardTitle>All Hostels</CardTitle>
+                        <CardDescription>
+                          Manage and monitor all registered admins
+                        </CardDescription>
+                      </div>
                     </div>
-                  </div>
-                </CardHeader>
-                <CardContent>
-                  <div className="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between mb-6">
-                    <div className="relative w-full sm:w-64">
-                      <Search className="absolute left-2 top-2.5 h-4 w-4 text-gray-400" />
-                      <Input
-                        type="search"
-                        placeholder="Search staffs..."
-                        className="pl-8"
-                        value={searchTerm}
-                        onChange={(e) => {
-                          setSearchTerm(e.target.value);
-                        }}
-                      />
-                    </div>
-
-                    <div className="flex flex-col sm:flex-row items-start sm:items-center gap-2 w-full sm:w-auto">
-                      <Button
-                        variant="outline"
-                        size="sm"
-                        className="gap-2 w-full sm:w-auto"
-                      >
-                        <Filter className="h-4 w-4" />
-                        Filter
-                        <ChevronDown className="h-3 w-3 opacity-50" />
-                      </Button>
-
-                      <div className="flex flex-wrap gap-2 items-center">
-                        {/* Place Dropdown */}
-                        <select
-                          value={selectedPlace}
+                  </CardHeader>
+                  <CardContent>
+                    <div className="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between mb-6">
+                      <div className="relative w-full sm:w-64">
+                        <Search className="absolute left-2 top-2.5 h-4 w-4 text-gray-400" />
+                        <Input
+                          type="search"
+                          placeholder="Search staffs..."
+                          className="pl-8"
+                          value={searchTerm}
                           onChange={(e) => {
-                            setSelectedPlace(e.target.value);
-                            setSelectedStreet(""); // reset street
+                            setSearchTerm(e.target.value);
                           }}
-                          className="border rounded p-1"
-                        >
-                          <option value="">Select Place</option>
-                          {places.map((place) => (
-                            <option key={place} value={place}>
-                              {place}
-                            </option>
-                          ))}
-                        </select>
+                        />
+                      </div>
 
-                        {/* Street Dropdown */}
-                        {selectedPlace && (
+                      <div className="flex flex-col sm:flex-row items-start sm:items-center gap-2 w-full sm:w-auto">
+                        <Button
+                          variant="outline"
+                          size="sm"
+                          className="gap-2 w-full sm:w-auto"
+                        >
+                          <Filter className="h-4 w-4" />
+                          Filter
+                          <ChevronDown className="h-3 w-3 opacity-50" />
+                        </Button>
+
+                        <div className="flex flex-wrap gap-2 items-center">
+                          {/* Place Dropdown */}
                           <select
-                            value={selectedStreet}
-                            onChange={(e) => setSelectedStreet(e.target.value)}
+                            value={selectedPlace}
+                            onChange={(e) => {
+                              setSelectedPlace(e.target.value);
+                              setSelectedStreet(""); // reset street
+                            }}
                             className="border rounded p-1"
                           >
-                            <option value="">Select Street</option>
-                            {streetsByPlace(selectedPlace).map((street) => (
-                              <option key={street} value={street}>
-                                {street}
+                            <option value="">Select Place</option>
+                            {places.map((place) => (
+                              <option key={place} value={place}>
+                                {place}
                               </option>
                             ))}
                           </select>
-                        )}
+
+                          {/* Street Dropdown */}
+                          {selectedPlace && (
+                            <select
+                              value={selectedStreet}
+                              onChange={(e) =>
+                                setSelectedStreet(e.target.value)
+                              }
+                              className="border rounded p-1"
+                            >
+                              <option value="">Select Street</option>
+                              {streetsByPlace(selectedPlace).map((street) => (
+                                <option key={street} value={street}>
+                                  {street}
+                                </option>
+                              ))}
+                            </select>
+                          )}
+                        </div>
+
+                        <Tabs
+                          value={statusFilter}
+                          onValueChange={setStatusFilter}
+                        >
+                          <TabsList className="w-full sm:w-auto">
+                            <TabsTrigger
+                              className="cursor-pointer w-full sm:w-auto"
+                              value="all"
+                            >
+                              All
+                            </TabsTrigger>
+                            <TabsTrigger
+                              className="cursor-pointer w-full sm:w-auto"
+                              value="active"
+                            >
+                              Active
+                            </TabsTrigger>
+                            <TabsTrigger
+                              className="cursor-pointer w-full sm:w-auto"
+                              value="inactive"
+                            >
+                              Inactive
+                            </TabsTrigger>
+                          </TabsList>
+                        </Tabs>
                       </div>
-
-                      <Tabs
-                        value={statusFilter}
-                        onValueChange={setStatusFilter}
-                      >
-                        <TabsList className="w-full sm:w-auto">
-                          <TabsTrigger
-                            className="cursor-pointer w-full sm:w-auto"
-                            value="all"
-                          >
-                            All
-                          </TabsTrigger>
-                          <TabsTrigger
-                            className="cursor-pointer w-full sm:w-auto"
-                            value="active"
-                          >
-                            Active
-                          </TabsTrigger>
-                          <TabsTrigger
-                            className="cursor-pointer w-full sm:w-auto"
-                            value="inactive"
-                          >
-                            Inactive
-                          </TabsTrigger>
-                        </TabsList>
-                      </Tabs>
                     </div>
-                  </div>
 
-                  <div className="overflow-x-auto">
-                    <table className="w-full">
-                      <thead>
-                        <tr className="border-b">
-                          <th className="text-left py-3 px-4 font-medium text-gray-500">
-                            Name
-                          </th>
-                          <th className="text-left py-3 px-4 font-medium text-gray-500">
-                            Owner
-                          </th>
-                          <th className="text-left py-3 px-4 font-medium text-gray-500">
-                            Phone
-                          </th>
-                          <th className="text-left py-3 px-4 font-medium text-gray-500">
-                            Location
-                          </th>
-                          <th className="text-left py-3 px-4 font-medium text-gray-500">
-                            Facilities
-                          </th>
-                          <th className="text-left py-3 px-4 font-medium text-gray-500">
-                            Transportation
-                          </th>
-                          <th className="text-left py-3 px-4 font-medium text-gray-500">
-                            Restaurants
-                          </th>
-                          <th className="text-left py-3 px-4 font-medium text-gray-500">
-                            Nearby
-                          </th>
-                          <th className="text-left py-3 px-4 font-medium text-gray-500">
-                            Accommodation
-                          </th>
-                          <th className="text-left py-3 px-4 font-medium text-gray-500">
-                            Price
-                          </th>
-                          <th className="text-left py-3 px-4 font-medium text-gray-500">
-                            Category
-                          </th>
-                          <th className="text-left py-3 px-4 font-medium text-gray-500">
-                            Status
-                          </th>
-                          <th className="text-left py-3 px-4 font-medium text-gray-500">
-                            Actions
-                          </th>
-                        </tr>
-                      </thead>
-                      <tbody>
-                        {paginatedUsers?.map((hostel) => (
-                          <tr key={hostel._id} className="border-b">
-                            <td className="py-3 px-4">
-                              <div className="flex items-center gap-3">
-                                <div className="h-10 w-10 bg-gray-100 rounded-md flex items-center justify-center">
-                                  <Building
-                                    className="h-5 w-5 text-gray-500 cursor-pointer"
-                                    onClick={() => {
-                                      setOpen(true);
-                                      setSelectedHostel(hostel);
-                                    }}
-                                  />
-                                </div>
-                                <span
-                                  className="font-medium cursor-pointer"
-                                  onClick={() =>
-                                    navigate(
-                                      `/admin/hostels/rooms/${hostel._id}`
-                                    )
-                                  }
-                                >
-                                  {hostel.name}
-                                </span>
-                              </div>
-                            </td>
-                            <td className="py-3 px-4">
-                              {hostel?.ownerId?.name}
-                            </td>
-                            <td className="py-3 px-4">{hostel.phone}</td>
-                            <td className="py-3 px-4">
-                              {hostel?.location?.place}
-                            </td>
+                    <div className="overflow-x-auto">
+                      <table className="w-full">
+                        <thead>
+                          <tr className="border-b">
+                            <th className="text-left py-3 px-4 font-medium text-gray-500">
+                              Name
+                            </th>
+                            <th className="text-left py-3 px-4 font-medium text-gray-500">
+                              Owner
+                            </th>
+                            <th className="text-left py-3 px-4 font-medium text-gray-500">
+                              Phone
+                            </th>
+                            <th className="text-left py-3 px-4 font-medium text-gray-500">
+                              Location
+                            </th>
+                            <th className="text-left py-3 px-4 font-medium text-gray-500">
+                              Facilities
+                            </th>
+                            <th className="text-left py-3 px-4 font-medium text-gray-500">
+                              Transportation
+                            </th>
+                            <th className="text-left py-3 px-4 font-medium text-gray-500">
+                              Restaurants
+                            </th>
+                            <th className="text-left py-3 px-4 font-medium text-gray-500">
+                              Nearby
+                            </th>
+                            <th className="text-left py-3 px-4 font-medium text-gray-500">
+                              Accommodation
+                            </th>
+                            <th className="text-left py-3 px-4 font-medium text-gray-500">
+                              Price
+                            </th>
+                            <th className="text-left py-3 px-4 font-medium text-gray-500">
+                              Category
+                            </th>
+                            <th className="text-left py-3 px-4 font-medium text-gray-500 whitespace-nowrap min-w-[150px]">
+                              Visitor Allowed
+                            </th>
 
-                            <td className="py-3 px-4">
-                              {hostel?.amenities?.length > 0 &&
-                                (() => {
-                                  const a = hostel.amenities[0];
-                                  const Icon = iconMap[a.icon];
-                                  return (
-                                    <div className="flex items-center gap-2">
-                                      <span
-                                        onClick={() => {
-                                          setShow(true);
-                                          setSelectedData({
-                                            name: "Amenties",
-                                            data: hostel.amenities,
-                                          });
-                                        }}
-                                        className="inline-flex items-center gap-1 bg-gray-100 px-2 py-1 rounded text-sm cursor-pointer"
-                                      >
-                                        {Icon && <Icon className="w-4 h-4" />}
-                                        {a.name}
-                                      </span>
-
-                                      {/* Show +X if more amenities exist */}
-                                      {hostel.amenities.length > 1 && (
-                                        <span className="text-gray-500 text-sm">
-                                          +{hostel.amenities.length - 1}
-                                        </span>
-                                      )}
-                                    </div>
-                                  );
-                                })()}
-                            </td>
-
-                            <td className="py-3 px-4">
-                              {hostel?.transportation?.length > 0 &&
-                                (() => {
-                                  const a = hostel.transportation[0];
-                                  const Icon = transportMap[a.icon];
-
-                                  return (
-                                    <div className="flex items-center gap-2">
-                                      <span
-                                        onClick={() => {
-                                          setShow(true);
-                                          setSelectedData({
-                                            name: "Transportation",
-                                            data: hostel?.transportation,
-                                          });
-                                        }}
-                                        className="inline-flex items-center gap-1 bg-gray-100 px-2 py-1 rounded text-sm cursor-pointer"
-                                      >
-                                        {Icon && <Icon className="w-4 h-4" />}
-                                        {a.name}
-                                      </span>
-
-                                      {/* Show +X if more amenities exist */}
-                                      {hostel.transportation?.length > 1 && (
-                                        <span className="text-gray-500 text-sm">
-                                          +{hostel.transportation?.length - 1}
-                                        </span>
-                                      )}
-                                    </div>
-                                  ); // first amenity
-                                })()}
-                            </td>
-
-                            <td className="py-3 px-4">
-                              {hostel?.restaurants?.length > 0 &&
-                                (() => {
-                                  const a = hostel.restaurants[0];
-
-                                  return (
-                                    <div className="flex items-center gap-2">
-                                      <span
-                                        onClick={() => {
-                                          setShow(true);
-                                          setSelectedData({
-                                            name: "Restaurants",
-                                            data: hostel?.restaurants,
-                                          });
-                                        }}
-                                        className="inline-flex items-center gap-1 bg-gray-100 px-2 py-1 rounded text-sm cursor-pointer"
-                                      >
-                                        <Hotel className="w-4 h-4" />
-                                        {a.name}
-                                      </span>
-
-                                      {/* Show +X if more amenities exist */}
-                                      {hostel.restaurants?.length > 1 && (
-                                        <span className="text-gray-500 text-sm">
-                                          +{hostel.restaurants?.length - 1}
-                                        </span>
-                                      )}
-                                    </div>
-                                  );
-                                })()}
-                            </td>
-
-                            <td className="py-3 px-4">
-                              {hostel?.nearbyPlaces?.length > 0 &&
-                                (() => {
-                                  const a = hostel.nearbyPlaces[0];
-                                  const Icon = nearbyMap[a.icon];
-
-                                  return (
-                                    <div className="flex items-center gap-2">
-                                      <span
-                                        onClick={() => {
-                                          setShow(true);
-                                          setSelectedData({
-                                            name: "Nearby",
-                                            data: hostel?.nearbyPlaces,
-                                          });
-                                        }}
-                                        className="inline-flex items-center gap-1 bg-gray-100 px-2 py-1 rounded text-sm cursor-pointer"
-                                      >
-                                        {Icon && <Icon className="w-4 h-4" />}
-                                        {a.name}
-                                      </span>
-
-                                      {/* Show +X if more amenities exist */}
-                                      {hostel.nearbyPlaces?.length > 1 && (
-                                        <span className="text-gray-500 text-sm">
-                                          +{hostel.nearbyPlaces?.length - 1}
-                                        </span>
-                                      )}
-                                    </div>
-                                  );
-                                })()}
-                            </td>
-
-                            <td className="py-3 px-4">
-                              {hostel?.accommodationType}
-                            </td>
-                            <td className="py-3 px-4">{hostel?.price}</td>
-
-                            <td className="py-3 px-4">{hostel?.category}</td>
-
-                            <td className="py-3 px-4">
-                              <Badge
-                                variant={
-                                  hostel.isActive ? "success" : "secondary"
-                                }
-                              >
-                                {hostel.isActive ? "Active" : "Inactive"}
-                              </Badge>
-                            </td>
-                            <td className="py-3 px-4">
-                              <DropdownMenu>
-                                <DropdownMenuTrigger asChild>
-                                  <Button
-                                    variant="ghost"
-                                    size="icon"
-                                    className={"cursor-pointer"}
-                                  >
-                                    <MoreHorizontal className="h-4 w-4" />
-                                  </Button>
-                                </DropdownMenuTrigger>
-                                <DropdownMenuContent align="end">
-                                  <DropdownMenuItem
-                                    className={"cursor-pointer"}
+                            <th className="text-left py-3 px-4 font-medium text-gray-500 whitespace-nowrap min-w-[150px]">
+                              Notice Period
+                            </th>
+                            <th className="text-left py-3 px-4 font-medium text-gray-500 whitespace-nowrap min-w-[150px]">
+                              Open TM
+                            </th>
+                            <th className="text-left py-3 px-4 font-medium text-gray-500 whitespace-nowrap min-w-[150px]">
+                              Close TM
+                            </th>
+                            <th className="text-left py-3 px-4 font-medium text-gray-500 whitespace-nowrap min-w-[150px]">
+                              Additional Fee
+                            </th>
+                            <th className="text-left py-3 px-4 font-medium text-gray-500 whitespace-nowrap min-w-[150px]">
+                              Gardian Name
+                            </th>
+                            <th className="text-left py-3 px-4 font-medium text-gray-500 whitespace-nowrap min-w-[150px]">
+                              Gardian Phone
+                            </th>
+                            <th className="text-left py-3 px-4 font-medium text-gray-500">
+                              Restrictions
+                            </th>
+                            <th className="text-left py-3 px-4 font-medium text-gray-500">
+                              Status
+                            </th>
+                            <th className="text-left py-3 px-4 font-medium text-gray-500">
+                              Actions
+                            </th>
+                          </tr>
+                        </thead>
+                        <tbody>
+                          {paginatedUsers?.map((hostel) => (
+                            <tr key={hostel._id} className="border-b">
+                              <td className="py-3 px-4">
+                                <div className="flex items-center gap-3">
+                                  <div className="h-10 w-10 bg-gray-100 rounded-md flex items-center justify-center">
+                                    <Building
+                                      className="h-5 w-5 text-gray-500 cursor-pointer"
+                                      onClick={() => {
+                                        setOpen(true);
+                                        setSelectedHostel(hostel);
+                                      }}
+                                    />
+                                  </div>
+                                  <span
+                                    className="font-medium cursor-pointer"
                                     onClick={() =>
-                                      handleBlocUnblock(hostel._id)
+                                      navigate(
+                                        `/admin/hostels/rooms/${hostel._id}`
+                                      )
                                     }
                                   >
-                                    {hostel.isActive ? (
-                                      <>
-                                        <UserX className="h-4 w-4 mr-2" />
-                                        Block
-                                      </>
-                                    ) : (
-                                      <>
-                                        <UserCheck className="h-4 w-4 mr-2 text-green-600" />
-                                        Unblock
-                                      </>
-                                    )}
-                                  </DropdownMenuItem>
-                                  <DropdownMenuItem
-                                    className={"cursor-pointer"}
-                                    onClick={() => {
-                                      setSelectedHostel(hostel);
-                                      setOpenEditDialog(true);
-                                    }}
-                                  >
-                                    <Pencil className="h-4 w-4 mr-2" />
-                                    Edit
-                                  </DropdownMenuItem>
-                                  <DropdownMenuItem
-                                    className="text-red-600 cursor-pointer"
-                                    onClick={() => handleDelete(hostel._id)}
-                                  >
-                                    <Trash2 className="h-4 w-4 mr-2" />
-                                    {isDeleting ? "Deleting..." : "Delete"}
-                                  </DropdownMenuItem>
-                                </DropdownMenuContent>
-                              </DropdownMenu>
-                            </td>
-                          </tr>
-                        ))}
-                      </tbody>
-                    </table>
-                  </div>
+                                    {hostel.name}
+                                  </span>
+                                </div>
+                              </td>
+                              <td className="py-3 px-4">
+                                {hostel?.ownerId?.name}
+                              </td>
+                              <td className="py-3 px-4">{hostel.phone}</td>
+                              <td className="py-3 px-4">
+                                {hostel?.location?.place}
+                              </td>
 
-                  {/* Pagination */}
-                  {filteredUsers.length > 0 && (
-                    <div className="flex items-center justify-between">
-                      <div className="text-sm text-muted-foreground">
-                        Showing{" "}
-                        <span className="font-medium">{startIndex + 1}</span> to{" "}
-                        <span className="font-medium">
-                          {Math.min(
-                            startIndex + itemsPerPage,
-                            filteredUsers.length
-                          )}
-                        </span>{" "}
-                        of{" "}
-                        <span className="font-medium">
-                          {filteredUsers.length}
-                        </span>{" "}
-                        hostels
-                      </div>
-                      <div className="flex items-center gap-2">
-                        <Button
-                          variant="outline"
-                          size="icon"
-                          onClick={() =>
-                            setCurrentPage((prev) => Math.max(prev - 1, 1))
-                          }
-                          disabled={currentPage === 1}
-                          className={"cursor-pointer"}
-                        >
-                          <ChevronLeft className="h-4 w-4" />
-                          <span className="sr-only">Previous page</span>
-                        </Button>
-                        <Button
-                          variant="outline"
-                          size="icon"
-                          onClick={() =>
-                            setCurrentPage((prev) =>
-                              Math.min(prev + 1, totalPages)
-                            )
-                          }
-                          disabled={currentPage === totalPages}
-                          className={"cursor-pointer"}
-                        >
-                          <ChevronRight className="h-4 w-4" />
-                          <span className="sr-only">Next page</span>
-                        </Button>
-                      </div>
+                              <td className="py-3 px-4">
+                                {hostel?.amenities?.length > 0 &&
+                                  (() => {
+                                    const a = hostel.amenities[0];
+                                    const Icon = iconMap[a.icon];
+                                    return (
+                                      <div className="flex items-center gap-2">
+                                        <span
+                                          onClick={() => {
+                                            setShow(true);
+                                            setSelectedData({
+                                              name: "Amenties",
+                                              data: hostel.amenities,
+                                            });
+                                          }}
+                                          className="inline-flex items-center gap-1 bg-gray-100 px-2 py-1 rounded text-sm cursor-pointer"
+                                        >
+                                          {Icon && <Icon className="w-4 h-4" />}
+                                          {a.name}
+                                        </span>
+
+                                        {/* Show +X if more amenities exist */}
+                                        {hostel.amenities.length > 1 && (
+                                          <span className="text-gray-500 text-sm">
+                                            +{hostel.amenities.length - 1}
+                                          </span>
+                                        )}
+                                      </div>
+                                    );
+                                  })()}
+                              </td>
+
+                              <td className="py-3 px-4">
+                                {hostel?.transportation?.length > 0 &&
+                                  (() => {
+                                    const a = hostel.transportation[0];
+                                    const Icon = transportMap[a.icon];
+
+                                    return (
+                                      <div className="flex items-center gap-2">
+                                        <span
+                                          onClick={() => {
+                                            setShow(true);
+                                            setSelectedData({
+                                              name: "Transportation",
+                                              data: hostel?.transportation,
+                                            });
+                                          }}
+                                          className="inline-flex items-center gap-1 bg-gray-100 px-2 py-1 rounded text-sm cursor-pointer"
+                                        >
+                                          {Icon && <Icon className="w-4 h-4" />}
+                                          {a.name}
+                                        </span>
+
+                                        {/* Show +X if more amenities exist */}
+                                        {hostel.transportation?.length > 1 && (
+                                          <span className="text-gray-500 text-sm">
+                                            +{hostel.transportation?.length - 1}
+                                          </span>
+                                        )}
+                                      </div>
+                                    ); // first amenity
+                                  })()}
+                              </td>
+
+                              <td className="py-3 px-4">
+                                {hostel?.restaurants?.length > 0 &&
+                                  (() => {
+                                    const a = hostel.restaurants[0];
+
+                                    return (
+                                      <div className="flex items-center gap-2">
+                                        <span
+                                          onClick={() => {
+                                            setShow(true);
+                                            setSelectedData({
+                                              name: "Restaurants",
+                                              data: hostel?.restaurants,
+                                            });
+                                          }}
+                                          className="inline-flex items-center gap-1 bg-gray-100 px-2 py-1 rounded text-sm cursor-pointer"
+                                        >
+                                          <Hotel className="w-4 h-4" />
+                                          {a.name}
+                                        </span>
+
+                                        {/* Show +X if more amenities exist */}
+                                        {hostel.restaurants?.length > 1 && (
+                                          <span className="text-gray-500 text-sm">
+                                            +{hostel.restaurants?.length - 1}
+                                          </span>
+                                        )}
+                                      </div>
+                                    );
+                                  })()}
+                              </td>
+
+                              <td className="py-3 px-4">
+                                {hostel?.nearbyPlaces?.length > 0 &&
+                                  (() => {
+                                    const a = hostel.nearbyPlaces[0];
+                                    const Icon = nearbyMap[a.icon];
+
+                                    return (
+                                      <div className="flex items-center gap-2">
+                                        <span
+                                          onClick={() => {
+                                            setShow(true);
+                                            setSelectedData({
+                                              name: "Nearby",
+                                              data: hostel?.nearbyPlaces,
+                                            });
+                                          }}
+                                          className="inline-flex items-center gap-1 bg-gray-100 px-2 py-1 rounded text-sm cursor-pointer"
+                                        >
+                                          {Icon && <Icon className="w-4 h-4" />}
+                                          {a.name}
+                                        </span>
+
+                                        {/* Show +X if more amenities exist */}
+                                        {hostel.nearbyPlaces?.length > 1 && (
+                                          <span className="text-gray-500 text-sm">
+                                            +{hostel.nearbyPlaces?.length - 1}
+                                          </span>
+                                        )}
+                                      </div>
+                                    );
+                                  })()}
+                              </td>
+
+                              <td className="py-3 px-4">
+                                {hostel?.accommodationType}
+                              </td>
+                              <td className="py-3 px-4">{hostel?.price}</td>
+
+                              <td className="py-3 px-4">{hostel?.category}</td>
+                              <td className="py-3 px-4">
+                                {hostel?.visitorsAllow == true
+                                  ? "true"
+                                  : "false"}
+                              </td>
+                              <td className="py-3 px-4">
+                                {hostel?.noticePeriod}
+                              </td>
+                              <td className="py-3 px-4">
+                                {hostel?.gateOpenTime} AM
+                              </td>
+                              <td className="py-3 px-4">
+                                {hostel?.gateCloseTime} PM
+                              </td>
+                              <td className="py-3 px-4">
+                                {hostel?.additionalFee}
+                              </td>
+                              <td className="py-3 px-4">
+                                {hostel?.gardianInfo?.name}
+                              </td>
+                              <td className="py-3 px-4">
+                                {hostel?.gardianInfo?.phone}
+                              </td>
+                              <td className="py-3 px-4">
+                                {hostel?.restrictions[0]} {}{" "}
+                              </td>
+
+                              <td className="py-3 px-4">
+                                {hostel?.restrictions?.length > 0 &&
+                                  (() => {
+                                    const a = hostel?.restrictions[0];
+
+                                    return (
+                                      <div className="flex items-center gap-2">
+                                        <span
+                                          onClick={() => {
+                                            setShow(true);
+                                            setSelectedData({
+                                              name: "Restriction",
+                                              data: hostel?.restrictions,
+                                            });
+                                          }}
+                                          className="inline-flex items-center gap-1 bg-gray-100 px-2 py-1 rounded text-sm cursor-pointer"
+                                        >
+                                          {a}
+                                        </span>
+
+                                        {/* Show +X if more amenities exist */}
+                                        {hostel?.restrictions?.length > 1 && (
+                                          <span className="text-gray-500 text-sm">
+                                            +{hostel?.restrictions?.length - 1}
+                                          </span>
+                                        )}
+                                      </div>
+                                    );
+                                  })()}
+                              </td>
+
+                              <td className="py-3 px-4">
+                                <Badge
+                                  variant={
+                                    hostel.isActive ? "success" : "secondary"
+                                  }
+                                >
+                                  {hostel.isActive ? "Active" : "Inactive"}
+                                </Badge>
+                              </td>
+                              <td className="py-3 px-4">
+                                <DropdownMenu>
+                                  <DropdownMenuTrigger asChild>
+                                    <Button
+                                      variant="ghost"
+                                      size="icon"
+                                      className={"cursor-pointer"}
+                                    >
+                                      <MoreHorizontal className="h-4 w-4" />
+                                    </Button>
+                                  </DropdownMenuTrigger>
+                                  <DropdownMenuContent align="end">
+                                    <DropdownMenuItem
+                                      className={"cursor-pointer"}
+                                      onClick={() =>
+                                        handleBlocUnblock(hostel._id)
+                                      }
+                                    >
+                                      {hostel.isActive ? (
+                                        <>
+                                          <UserX className="h-4 w-4 mr-2" />
+                                          Block
+                                        </>
+                                      ) : (
+                                        <>
+                                          <UserCheck className="h-4 w-4 mr-2 text-green-600" />
+                                          Unblock
+                                        </>
+                                      )}
+                                    </DropdownMenuItem>
+                                    <DropdownMenuItem
+                                      className={"cursor-pointer"}
+                                      onClick={() => {
+                                        setSelectedHostel(hostel);
+                                        setOpenEditDialog(true);
+                                      }}
+                                    >
+                                      <Pencil className="h-4 w-4 mr-2" />
+                                      Edit
+                                    </DropdownMenuItem>
+                                    <DropdownMenuItem
+                                      className="text-red-600 cursor-pointer"
+                                      onClick={() => handleDelete(hostel._id)}
+                                    >
+                                      <Trash2 className="h-4 w-4 mr-2" />
+                                      {isDeleting ? "Deleting..." : "Delete"}
+                                    </DropdownMenuItem>
+                                  </DropdownMenuContent>
+                                </DropdownMenu>
+                              </td>
+                            </tr>
+                          ))}
+                        </tbody>
+                      </table>
                     </div>
-                  )}
-                </CardContent>
-              </Card>
-            </motion.div>
-            )}
 
-         
+                    {/* Pagination */}
+                    {filteredUsers.length > 0 && (
+                      <div className="flex items-center justify-between">
+                        <div className="text-sm text-muted-foreground">
+                          Showing{" "}
+                          <span className="font-medium">{startIndex + 1}</span>{" "}
+                          to{" "}
+                          <span className="font-medium">
+                            {Math.min(
+                              startIndex + itemsPerPage,
+                              filteredUsers.length
+                            )}
+                          </span>{" "}
+                          of{" "}
+                          <span className="font-medium">
+                            {filteredUsers.length}
+                          </span>{" "}
+                          hostels
+                        </div>
+                        <div className="flex items-center gap-2">
+                          <Button
+                            variant="outline"
+                            size="icon"
+                            onClick={() =>
+                              setCurrentPage((prev) => Math.max(prev - 1, 1))
+                            }
+                            disabled={currentPage === 1}
+                            className={"cursor-pointer"}
+                          >
+                            <ChevronLeft className="h-4 w-4" />
+                            <span className="sr-only">Previous page</span>
+                          </Button>
+                          <Button
+                            variant="outline"
+                            size="icon"
+                            onClick={() =>
+                              setCurrentPage((prev) =>
+                                Math.min(prev + 1, totalPages)
+                              )
+                            }
+                            disabled={currentPage === totalPages}
+                            className={"cursor-pointer"}
+                          >
+                            <ChevronRight className="h-4 w-4" />
+                            <span className="sr-only">Next page</span>
+                          </Button>
+                        </div>
+                      </div>
+                    )}
+                  </CardContent>
+                </Card>
+              </motion.div>
+            )}
           </div>
         </main>
       </div>

@@ -244,12 +244,29 @@ export function HostelPOST({
   setSelectdNearby,
   googleMap,
   setGoogleMap,
+  gardianInfo,
+  setGardianInfo,
+  restrictions,
+  handleRestrictions,
+  addRestrictions,
+  removeRestrictions,
+  visitorsAllow,
+  setVisitorAllow,
+  noticePeriod,
+  setNoticePeriod,
+  gateOpenTime,
+  setGateOpenTime,
+  gateCloseTime,
+  setGateCloseTime,
+  additionalFee,
+  setAdditionalFee,
 }) {
   const [search, setSearch] = useState("");
 
   const filteredOwners = owners.filter((o) =>
     o.name.toLowerCase().includes(search.toLowerCase())
   );
+
 
   return (
     <DialogContent className="sm:max-w-[600px]">
@@ -288,6 +305,96 @@ export function HostelPOST({
               value={price}
               onChange={(e) => setPrice(e.target.value)}
             />
+          </div>
+
+          <div className="space-y-2">
+            <Label>Visitor Allowed</Label>
+            <input
+              type="checkbox"
+              checked={visitorsAllow}
+              onChange={(e) => setVisitorAllow(e.target.checked)}
+              className="cursor-pointer"
+            />
+          </div>
+
+          <div className="space-y-2">
+            <Label>Notice Period</Label>
+            <Input
+              value={noticePeriod}
+              onChange={(e) => setNoticePeriod(e.target.value)}
+            />
+          </div>
+
+         <div className="space-y-2">
+            <Label>Additional Fee</Label>
+            <Input
+              value={additionalFee}
+              onChange={(e) => setAdditionalFee(e.target.value)}
+            />
+          </div>
+
+
+      <div className="space-y-2">
+        <Label>Gate Open Time</Label>
+        <Input
+          type="time"
+          value={gateOpenTime}
+          onChange={(e) => setGateOpenTime(e.target.value)}
+        />
+      </div>
+
+      <div className="space-y-2">
+        <Label>Gate Close Time</Label>
+        <Input
+          type="time"
+          value={gateCloseTime}
+          onChange={(e) => setGateCloseTime(e.target.value)}
+        />
+      </div>
+
+       
+          <div className="space-y-2">
+            <Label>Gardian Name</Label>
+            <Input
+              value={gardianInfo.name}
+              onChange={(e) =>
+                setGardianInfo({ ...gardianInfo, name: e.target.value })
+              }
+            />
+          </div>
+
+          <div className="space-y-2">
+            <Label>Gardian Phone</Label>
+            <Input
+              value={gardianInfo.phone}
+              onChange={(e) =>
+                setGardianInfo({ ...gardianInfo, phone: e.target.value })
+              }
+            />
+          </div>
+          <div className="space-y-2">
+            <Label>Restrictions</Label>
+            {restrictions?.map((time, index) => (
+              <div key={index} className="flex gap-2">
+                <Input
+                  value={time}
+                  onChange={(e) => handleRestrictions(index, e.target.value)}
+                  placeholder={`Restrictions ${index + 1}`}
+                />
+                {restrictions.length > 1 && (
+                  <Button
+                    variant="ghost"
+                    size="sm"
+                    onClick={() => removeRestrictions(index)}
+                  >
+                    ✕
+                  </Button>
+                )}
+              </div>
+            ))}
+            <Button variant="outline" size="sm" onClick={addRestrictions}>
+              + Add Restrictions
+            </Button>
           </div>
 
           <div className="space-y-2">
@@ -648,6 +755,7 @@ export function HostelPUT({
     hostel?.amenities?.length ? hostel?.amenities : []
   );
 
+
   const [transports, setTransports] = useState(
     hostel?.transportation?.length ? hostel?.transportation : []
   );
@@ -658,8 +766,32 @@ export function HostelPUT({
     hostel?.restaurants?.length ? hostel?.restaurants : []
   );
 
+ 
+
+      const [visitorsAllow, setVisitorAllow] = useState(hostel.visitorsAllow ?  true : false);
+      const [noticePeriod, setNoticePeriod] = useState(hostel?.noticePeriod || "");
+      const [gateOpenTime, setGateOpenTime] = useState( hostel?.gateOpenTime || "");
+      const [gateCloseTime, setGateCloseTime] = useState( hostel?.gateCloseTime || "");
+      const [additionalFee, setAdditionalFee] = useState( hostel?.additionalFee || "");
+      const [gardianInfo, setGardianInfo] = useState({
+        name:  hostel?.gardianInfo?.name || "",
+        phone: hostel?.gardianInfo?.phone || "",
+      });
+  const [restrictions, setRestrictions] = useState(hostel?.restrictions || [""]);
+
+
   const [existingPhotos, setExistingPhotos] = useState(hostel?.photos || []);
   const [selectedImages, setSelectedImages] = useState([]);
+
+  
+      const handleRestrictions = (index, value) => {
+    const newRestrictions = [...restrictions];
+    newRestrictions[index] = value;
+    setRestrictions(newRestrictions);
+  };
+  const addRestrictions = () => setRestrictions([...restrictions, ""]);
+  const removeRestriction = (index) => setRestrictions(restrictions.filter((_, i) => i !== index));
+
 
   // Toggle transport add/remove
   const toggleTransport = (item) => {
@@ -742,6 +874,7 @@ export function HostelPUT({
     });
   };
 
+
   const [updatehostel, { isLoading }] = useUpdatehostelMutation();
 
   const handleUpdate = async () => {
@@ -757,6 +890,20 @@ export function HostelPUT({
     formData.append("category", category);
     formData.append("ownerId", ownerId);
     formData.append("googleMap", googleMap);
+
+       formData.append("visitorsAllow", visitorsAllow);
+    formData.append("noticePeriod", noticePeriod);
+    formData.append("gateOpenTime", gateOpenTime);
+    formData.append("gateCloseTime", gateCloseTime);
+    formData.append("additionalFee", additionalFee);
+    formData.append("gardianInfo[name]", gardianInfo.name);
+    formData.append("gardianInfo[phone]", gardianInfo.phone);
+
+       restrictions.forEach((a, i) => {
+      if (a.trim() !== "") {
+        formData.append(`restrictions[${i}]`, a);
+      }
+    });
 
     amenities.forEach((a, i) => {
       if (a.name.trim() !== "") {
@@ -845,6 +992,91 @@ export function HostelPUT({
             <Label>Price</Label>
             <Input value={price} onChange={(e) => setPrice(e.target.value)} />
           </div>
+
+            <div className="space-y-2">
+            <Label>Visitor Allowed</Label>
+            <input
+              type="checkbox"
+              checked={visitorsAllow}
+              onChange={(e) => setVisitorAllow(e.target.checked)}
+              className="cursor-pointer"
+            />
+          </div>
+
+
+          <div className="space-y-2">
+            <Label>Notice Period</Label>
+            <Input value={noticePeriod} onChange={(e) => setNoticePeriod(e.target.value)} />
+          </div>
+
+            <div className="space-y-2">
+            <Label>Additional Fee</Label>
+            <Input value={additionalFee} onChange={(e) => setAdditionalFee(e.target.value)} />
+          </div>
+
+              <div className="space-y-2">
+        <Label>Gate Open Time</Label>
+        <Input
+          type="time"
+          value={gateOpenTime}
+          onChange={(e) => setGateOpenTime(e.target.value)}
+        />
+      
+      </div>
+
+      <div className="space-y-2">
+        <Label>Gate Close Time</Label>
+        <Input
+          type="time"
+          value={gateCloseTime}
+          onChange={(e) => setGateCloseTime(e.target.value)}
+        />
+      </div>
+
+          <div className="space-y-2">
+            <Label>Gardian Name</Label>
+            <Input
+              value={gardianInfo.name}
+              onChange={(e) =>
+                setGardianInfo({ ...gardianInfo, name: e.target.value })
+              }
+            />
+          </div>
+
+          <div className="space-y-2">
+            <Label>Gardian Phone</Label>
+            <Input
+              value={gardianInfo.phone}
+              onChange={(e) =>
+                setGardianInfo({ ...gardianInfo, phone: e.target.value })
+              }
+            />
+          </div>
+          <div className="space-y-2">
+            <Label>Restrictions</Label>
+            {restrictions.map((time, index) => (
+              <div key={index} className="flex gap-2">
+                <Input
+                  value={time}
+                  onChange={(e) => handleRestrictions(index, e.target.value)}
+                  placeholder={`Restriction ${index + 1}`}
+                />
+                {restrictions.length > 1 && (
+                  <Button
+                    variant="ghost"
+                    size="sm"
+                    onClick={() => removeRestriction(index)}
+                  >
+                    ✕
+                  </Button>
+                )}
+              </div>
+            ))}
+            <Button variant="outline" size="sm" onClick={addRestrictions}>
+              + Add Restrictions
+            </Button>
+          </div>
+
 
           <div className="space-y-2">
             <Label>Accommodation</Label>
@@ -1274,7 +1506,7 @@ export function ShowMorFacility({ facility = [], onClose }) {
                     className="inline-flex items-center gap-1 bg-gray-100 px-2 py-1 rounded text-sm"
                   >
                     {Icon && <Icon className="w-4 h-4" />}
-                    {a.name} {a.far}
+                    {a.name || a} {a.far} 
                   </span>
                 );
               })}

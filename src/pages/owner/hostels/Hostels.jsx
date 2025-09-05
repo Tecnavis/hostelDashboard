@@ -13,7 +13,6 @@ import {
   Pencil,
   Plus,
   Search,
-  Star,
   Trash2,
   UserCheck,
   UserX,
@@ -32,7 +31,6 @@ import {
 import {
   Dialog,
   DialogContent,
-  DialogFooter,
   DialogHeader,
   DialogTitle,
   DialogTrigger,
@@ -44,10 +42,7 @@ import {
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
 import { Input } from "@/components/ui/input";
-import { Label } from "@/components/ui/label";
 import { Tabs, TabsList, TabsTrigger } from "@/components/ui/tabs";
-import { Textarea } from "@/components/ui/textarea";
-import { useGetAllownerQuery } from "@/app/service/owner";
 import {
   useAddNewhostelMutation,
   useBlockhostelMutation,
@@ -71,7 +66,6 @@ export default function OwnerHostels() {
   const [statusFilter, setStatusFilter] = useState("all");
   const [name, setName] = useState("");
   const [phone, setPhone] = useState("");
-  console.log(phone, "hii");
 
   const [location, setLocation] = useState({
     street: "",
@@ -104,6 +98,17 @@ export default function OwnerHostels() {
   const [selectedNearby, setSelectdNearby] = useState([]);
   const [selectedData, setSelectedData] = useState(null);
   const [show, setShow] = useState(false);
+
+  const [visitorsAllow, setVisitorAllow] = useState(false);
+  const [noticePeriod, setNoticePeriod] = useState("");
+  const [gateOpenTime, setGateOpenTime] = useState("");
+  const [gateCloseTime, setGateCloseTime] = useState("");
+  const [additionalFee, setAdditionalFee] = useState("");
+  const [gardianInfo, setGardianInfo] = useState({
+    name: "",
+    phone: "",
+  });
+  const [restrictions, setRestrictions] = useState([""]);
 
   const owner = JSON.parse(localStorage.getItem("owner"));
   const ownerId =
@@ -199,6 +204,21 @@ export default function OwnerHostels() {
     }
   };
 
+  const handleRestrictions = (index, value) => {
+    const newRestrictions = [...restrictions];
+    newRestrictions[index] = value;
+    setRestrictions(newRestrictions);
+  };
+
+  const addRestrictions = () => {
+    setRestrictions([...restrictions, ""]);
+  };
+
+  const removeRestrictions = (index) => {
+    const newRestrictions = restrictions.filter((_, i) => i !== index);
+    setRestrictions(newRestrictions);
+  };
+
   const addRestaurant = () => {
     if (!restaurantName || !restaurantFar) return;
 
@@ -239,7 +259,11 @@ export default function OwnerHostels() {
       selectedTransport.some((t) => t.far.trim() === "") ||
       selectedNearby.some((t) => t.far.trim() === "") ||
       selectedRestaurants.some((t) => t.far.trim() === "") ||
-      googleMap.trim() === "" 
+      googleMap.trim() === "" ||
+      noticePeriod.trim() === "" ||
+      gateOpenTime.trim() === "" ||
+      gateCloseTime.trim() === "" ||
+      additionalFee.trim() === ""
     ) {
       return;
     }
@@ -251,13 +275,21 @@ export default function OwnerHostels() {
     formData.append("description", description);
     formData.append("name", name);
     formData.append("phone", phone);
+    formData.append("googleMap", googleMap);
     formData.append("accommodationType", accommodationType);
     formData.append("price", price);
-    formData.append("googleMap", googleMap);
+
+    formData.append("visitorsAllow", visitorsAllow);
+    formData.append("noticePeriod", noticePeriod);
+    formData.append("gateOpenTime", gateOpenTime);
+    formData.append("gateCloseTime", gateCloseTime);
+    formData.append("additionalFee", additionalFee);
+    formData.append("gardianInfo[name]", gardianInfo.name);
+    formData.append("gardianInfo[phone]", gardianInfo.phone);
+
     formData.append("location[street]", location.street);
     formData.append("location[place]", location.place);
     formData.append("location[pincode]", location.pincode);
-    // formData.append("superAdminId", superAdminId);
     selectedAmenities.forEach((a, i) => {
       if (a.name.trim() !== "") {
         formData.append(`amenities[${i}][name]`, a.name);
@@ -285,6 +317,11 @@ export default function OwnerHostels() {
         formData.append(`restaurants[${i}][far]`, a.far);
       }
     });
+    restrictions.forEach((a, i) => {
+      if (a.trim() !== "") {
+        formData.append(`restrictions[${i}]`, a);
+      }
+    });
     selectedImages.forEach((file) => {
       formData.append("images", file);
     });
@@ -306,6 +343,16 @@ export default function OwnerHostels() {
         setAccommodationType("");
         setGoogleMap("");
         setLocation({ street: "", place: "", pincode: "" });
+        setVisitorAllow(false);
+        setNoticePeriod("");
+        setGateOpenTime("");
+        setGateCloseTime("");
+        setAdditionalFee("");
+        setGardianInfo({
+          name: "",
+          phone: "",
+        });
+        setRestrictions([""]);
         setIsAddHostelOpen(false);
         refetch();
       }
@@ -338,7 +385,6 @@ export default function OwnerHostels() {
       console.error("Failed to block admin:", error);
     }
   };
-
 
   return (
     <div className="flex min-h-screen bg-gray-50">
@@ -403,6 +449,24 @@ export default function OwnerHostels() {
                     toggleNearby={toggleNearby}
                     selectedNearby={selectedNearby}
                     setSelectdNearby={setSelectdNearby}
+                    googleMap={googleMap}
+                    setGoogleMap={setGoogleMap}
+                    gardianInfo={gardianInfo}
+                    setGardianInfo={setGardianInfo}
+                    restrictions={restrictions}
+                    handleRestrictions={handleRestrictions}
+                    addRestrictions={addRestrictions}
+                    removeRestrictions={removeRestrictions}
+                    visitorsAllow={visitorsAllow}
+                    setVisitorAllow={setVisitorAllow}
+                    noticePeriod={noticePeriod}
+                    setNoticePeriod={setNoticePeriod}
+                    gateOpenTime={gateOpenTime}
+                    setGateOpenTime={setGateOpenTime}
+                    gateCloseTime={gateCloseTime}
+                    setGateCloseTime={setGateCloseTime}
+                    additionalFee={additionalFee}
+                    setAdditionalFee={setAdditionalFee}
                   />
                 </Dialog>
 
@@ -528,9 +592,9 @@ export default function OwnerHostels() {
                             }}
                             className="border rounded p-1"
                           >
-                            <option value="">Select Place</option>
+                            <option value="" className="cursor-pointer">Select Place</option>
                             {places.map((place) => (
-                              <option key={place} value={place}>
+                              <option className="cursor-pointer" key={place} value={place}>
                                 {place}
                               </option>
                             ))}
@@ -545,9 +609,9 @@ export default function OwnerHostels() {
                               }
                               className="border rounded p-1"
                             >
-                              <option value="">Select Street</option>
+                              <option value="" className="cursor-pointer">Select Street</option>
                               {streetsByPlace(selectedPlace).map((street) => (
-                                <option key={street} value={street}>
+                                <option className="cursor-pointer" key={street} value={street}>
                                   {street}
                                 </option>
                               ))}
@@ -619,6 +683,31 @@ export default function OwnerHostels() {
                             </th>
                             <th className="text-left py-3 px-4 font-medium text-gray-500">
                               Category
+                            </th>
+                            <th className="text-left py-3 px-4 font-medium text-gray-500 whitespace-nowrap min-w-[150px]">
+                              Visitor Allowed
+                            </th>
+
+                            <th className="text-left py-3 px-4 font-medium text-gray-500 whitespace-nowrap min-w-[150px]">
+                              Notice Period
+                            </th>
+                            <th className="text-left py-3 px-4 font-medium text-gray-500 whitespace-nowrap min-w-[150px]">
+                              Open TM
+                            </th>
+                            <th className="text-left py-3 px-4 font-medium text-gray-500 whitespace-nowrap min-w-[150px]">
+                              Close TM
+                            </th>
+                            <th className="text-left py-3 px-4 font-medium text-gray-500 whitespace-nowrap min-w-[150px]">
+                              Additional Fee
+                            </th>
+                            <th className="text-left py-3 px-4 font-medium text-gray-500 whitespace-nowrap min-w-[150px]">
+                              Gardian Name
+                            </th>
+                            <th className="text-left py-3 px-4 font-medium text-gray-500 whitespace-nowrap min-w-[150px]">
+                              Gardian Phone
+                            </th>
+                            <th className="text-left py-3 px-4 font-medium text-gray-500">
+                              Restrictions
                             </th>
                             <th className="text-left py-3 px-4 font-medium text-gray-500">
                               Status
@@ -798,6 +887,64 @@ export default function OwnerHostels() {
                               <td className="py-3 px-4">{hostel?.price}</td>
 
                               <td className="py-3 px-4">{hostel?.category}</td>
+
+                              <td className="py-3 px-4">
+                                {hostel?.visitorsAllow == true
+                                  ? "true"
+                                  : "false"}
+                              </td>
+                              <td className="py-3 px-4">
+                                {hostel?.noticePeriod}
+                              </td>
+                              <td className="py-3 px-4">
+                                {hostel?.gateOpenTime} AM
+                              </td>
+                              <td className="py-3 px-4">
+                                {hostel?.gateCloseTime} PM
+                              </td>
+                              <td className="py-3 px-4">
+                                {hostel?.additionalFee}
+                              </td>
+                              <td className="py-3 px-4">
+                                {hostel?.gardianInfo?.name}
+                              </td>
+                              <td className="py-3 px-4">
+                                {hostel?.gardianInfo?.phone}
+                              </td>
+                              <td className="py-3 px-4">
+                                {hostel?.restrictions[0]} {}{" "}
+                              </td>
+
+                              <td className="py-3 px-4">
+                                {hostel?.restrictions?.length > 0 &&
+                                  (() => {
+                                    const a = hostel?.restrictions[0];
+
+                                    return (
+                                      <div className="flex items-center gap-2">
+                                        <span
+                                          onClick={() => {
+                                            setShow(true);
+                                            setSelectedData({
+                                              name: "Restriction",
+                                              data: hostel?.restrictions,
+                                            });
+                                          }}
+                                          className="inline-flex items-center gap-1 bg-gray-100 px-2 py-1 rounded text-sm cursor-pointer"
+                                        >
+                                          {a}
+                                        </span>
+
+                                        {/* Show +X if more amenities exist */}
+                                        {hostel?.restrictions?.length > 1 && (
+                                          <span className="text-gray-500 text-sm">
+                                            +{hostel?.restrictions?.length - 1}
+                                          </span>
+                                        )}
+                                      </div>
+                                    );
+                                  })()}
+                              </td>
 
                               <td className="py-3 px-4">
                                 <Badge

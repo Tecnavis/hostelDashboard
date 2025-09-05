@@ -358,7 +358,7 @@ export default function OwnerHostelsRooms() {
         // Reset form state
         setRoomNumber("");
         setCapacity("");
-        setFeatures([""]);
+        // setFeatures([""]);
         setCurrentOccupancy("");
         setSelectedImages([]);
         setPrice("");

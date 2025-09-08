@@ -143,6 +143,8 @@ export default function AdminBookings() {
     startIndex + itemsPerPage
   );
 
+  console.log(paginatedBookings, "hiii");
+  
   //  block & unblock admin
   const handleBooking = async (id, status) => {
     try {
@@ -287,6 +289,9 @@ export default function AdminBookings() {
                             <th className="text-left py-3 px-4 font-medium text-gray-500">
                               Hostel
                             </th>
+                                <th className="text-left py-3 px-4 font-medium text-gray-500">
+                              Room Name
+                            </th>
                             <th className="text-left py-3 px-4 font-medium text-gray-500">
                               Room Type
                             </th>
@@ -294,10 +299,10 @@ export default function AdminBookings() {
                               Check In
                             </th>
                             <th className="text-left py-3 px-4 font-medium text-gray-500">
-                              Check Out
+                              With Food
                             </th>
-                            <th className="text-left py-3 px-4 font-medium text-gray-500">
-                              Amount
+                               <th className="text-left py-3 px-4 font-medium text-gray-500">
+                              Without Food
                             </th>
                             <th className="text-left py-3 px-4 font-medium text-gray-500">
                               Status
@@ -316,6 +321,9 @@ export default function AdminBookings() {
                               <td className="py-3 px-4">
                                 {booking?.hostelId?.name}
                               </td>
+                                 <td className="py-3 px-4">
+                                {booking?.roomId?.roomNumber}
+                              </td>
                               <td className="py-3 px-4">
                                 {booking?.roomId?.roomType}
                               </td>
@@ -328,17 +336,12 @@ export default function AdminBookings() {
                                   day: "numeric",
                                 })}
                               </td>
-                              <td className="py-3 px-4">
-                                {new Date(
-                                  booking?.checkOutDate
-                                ).toLocaleDateString("en-US", {
-                                  year: "numeric",
-                                  month: "long",
-                                  day: "numeric",
-                                })}
-                              </td>
+                            
                               <td className="py-3 px-4 font-medium">
-                                {booking?.roomId.price}
+                                {booking?.roomId?.withFood}
+                              </td>
+                                 <td className="py-3 px-4 font-medium">
+                                {booking?.roomId?.withoutFood}
                               </td>
                               <td className="py-3 px-4">
                                 <Badge

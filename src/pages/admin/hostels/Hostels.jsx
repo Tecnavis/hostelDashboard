@@ -99,6 +99,7 @@ export default function AdminHostels() {
   const [googleMap, setGoogleMap] = useState("");
   const [selectedNearby, setSelectdNearby] = useState([]);
   const [visitorsAllow, setVisitorAllow] = useState(false);
+  const [fulltimeWarden, setFulltimeWarden] = useState(false);
   const [noticePeriod, setNoticePeriod] = useState("");
   const [gateOpenTime, setGateOpenTime] = useState("");
   const [gateCloseTime, setGateCloseTime] = useState("");
@@ -284,6 +285,7 @@ export default function AdminHostels() {
     formData.append("price", price);
 
     formData.append("visitorsAllow", visitorsAllow);
+    formData.append("fulltimeWarden", fulltimeWarden);
     formData.append("noticePeriod", noticePeriod);
     formData.append("gateOpenTime", gateOpenTime);
     formData.append("gateCloseTime", gateCloseTime);
@@ -350,6 +352,7 @@ export default function AdminHostels() {
         setGoogleMap("");
         setLocation({ street: "", place: "", pincode: "" });
         setVisitorAllow(false);
+        setFulltimeWarden(false);
         setNoticePeriod("");
         setGateOpenTime("");
         setGateCloseTime("");
@@ -474,6 +477,8 @@ export default function AdminHostels() {
                     setGateCloseTime={setGateCloseTime}
                     additionalFee={additionalFee}
                     setAdditionalFee={setAdditionalFee}
+                    fulltimeWarden={fulltimeWarden}
+                    setFulltimeWarden={setFulltimeWarden}
                   />
                 </Dialog>
 
@@ -693,6 +698,9 @@ export default function AdminHostels() {
                             <th className="text-left py-3 px-4 font-medium text-gray-500 whitespace-nowrap min-w-[150px]">
                               Visitor Allowed
                             </th>
+                            <th className="text-left py-3 px-4 font-medium text-gray-500 whitespace-nowrap min-w-[150px]">
+                              Fulltime Warden
+                            </th>
 
                             <th className="text-left py-3 px-4 font-medium text-gray-500 whitespace-nowrap min-w-[150px]">
                               Notice Period
@@ -895,6 +903,11 @@ export default function AdminHostels() {
                               <td className="py-3 px-4">{hostel?.category}</td>
                               <td className="py-3 px-4">
                                 {hostel?.visitorsAllow == true
+                                  ? "true"
+                                  : "false"}
+                              </td>
+                              <td className="py-3 px-4">
+                                {hostel?.fulltimeWarden == true
                                   ? "true"
                                   : "false"}
                               </td>

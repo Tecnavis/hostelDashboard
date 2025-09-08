@@ -197,6 +197,7 @@ export default function AdminHostelsRooms() {
         setRoomType("");
         setWithFood("");
         setWithoutFood("");
+        setSelectedAmenities([]);
         refetch();
       }
     } catch (error) {

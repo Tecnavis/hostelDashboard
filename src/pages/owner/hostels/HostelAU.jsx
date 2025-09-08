@@ -205,7 +205,7 @@ export const NEARBY_PLACES = [
 ];
 
 export function HostelPOST({
-   isPosting,
+  isPosting,
   name,
   phone,
   price,
@@ -257,432 +257,441 @@ export function HostelPOST({
   setGateCloseTime,
   additionalFee,
   setAdditionalFee,
+  fulltimeWarden,
+  setFulltimeWarden,
 }) {
   return (
     <DialogContent className="sm:max-w-[600px]">
-         <DialogHeader>
-           <DialogTitle>Add New Hostel</DialogTitle>
-         </DialogHeader>
-   
-         <div
-           className="overflow-y-auto pr-2 mt-2 space-y-4"
-           style={{ maxHeight: "calc(90vh - 130px)" }}
-         >
-           <div className="grid grid-cols-2 gap-4">
-             <div className="space-y-2">
-               <Label htmlFor="name">Name</Label>
-               <Input
-                 id="name"
-                 placeholder="Enter hostel name"
-                 value={name}
-                 onChange={(e) => setName(e.target.value)}
-               />
-             </div>
-             <div className="space-y-2">
-               <Label htmlFor="phone">Phone</Label>
-               <Input
-                 id="phone"
-                 placeholder="+91..."
-                 value={phone}
-                 onChange={(e) => setPhone(e.target.value)}
-               />
-             </div>
-             <div className="space-y-2">
-               <Label htmlFor="price">Price</Label>
-               <Input
-                 id="price"
-                 placeholder="Price"
-                 value={price}
-                 onChange={(e) => setPrice(e.target.value)}
-               />
-             </div>
-   
-             <div className="space-y-2">
-               <Label>Visitor Allowed</Label>
-               <input
-                 type="checkbox"
-                 checked={visitorsAllow}
-                 onChange={(e) => setVisitorAllow(e.target.checked)}
-                 className="cursor-pointer"
-               />
-             </div>
-   
-             <div className="space-y-2">
-               <Label>Notice Period</Label>
-               <Input
-                 value={noticePeriod}
-                 onChange={(e) => setNoticePeriod(e.target.value)}
-               />
-             </div>
-   
-            <div className="space-y-2">
-               <Label>Additional Fee</Label>
-               <Input
-                 value={additionalFee}
-                 onChange={(e) => setAdditionalFee(e.target.value)}
-               />
-             </div>
-   
-   
-         <div className="space-y-2">
-           <Label>Gate Open Time</Label>
-           <Input
-             type="time"
-             value={gateOpenTime}
-             onChange={(e) => setGateOpenTime(e.target.value)}
-           />
-         </div>
-   
-         <div className="space-y-2">
-           <Label>Gate Close Time</Label>
-           <Input
-             type="time"
-             value={gateCloseTime}
-             onChange={(e) => setGateCloseTime(e.target.value)}
-           />
-         </div>
-   
-          
-             <div className="space-y-2">
-               <Label>Gardian Name</Label>
-               <Input
-                 value={gardianInfo.name}
-                 onChange={(e) =>
-                   setGardianInfo({ ...gardianInfo, name: e.target.value })
-                 }
-               />
-             </div>
-   
-             <div className="space-y-2">
-               <Label>Gardian Phone</Label>
-               <Input
-                 value={gardianInfo.phone}
-                 onChange={(e) =>
-                   setGardianInfo({ ...gardianInfo, phone: e.target.value })
-                 }
-               />
-             </div>
-             <div className="space-y-2">
-               <Label>Restrictions</Label>
-               {restrictions?.map((time, index) => (
-                 <div key={index} className="flex gap-2">
-                   <Input
-                     value={time}
-                     onChange={(e) => handleRestrictions(index, e.target.value)}
-                     placeholder={`Restrictions ${index + 1}`}
-                   />
-                   {restrictions.length > 1 && (
-                     <Button
-                       variant="ghost"
-                       size="sm"
-                       onClick={() => removeRestrictions(index)}
-                     >
-                       ✕
-                     </Button>
-                   )}
-                 </div>
-               ))}
-               <Button variant="outline" size="sm" onClick={addRestrictions}>
-                 + Add Restrictions
-               </Button>
-             </div>
-   
-             <div className="space-y-2">
-               <Label>Accommodation</Label>
-               <select
-                 value={accommodationType}
-                 onChange={(e) => setAccommodationType(e.target.value)}
-                 className="border rounded px-3 py-2 w-full focus:outline-none focus:ring-2 focus:ring-blue-500"
-               >
-                 <option value="">Select Accommodation</option>
-                 <option value="with food">With Food</option>
-                 <option value="without food">Without Food</option>
-               </select>
-             </div>
-             <div className="space-y-2">
-               <Label htmlFor="street">Street</Label>
-               <Input
-                 id="street"
-                 placeholder="Street"
-                 value={location.street}
-                 onChange={(e) =>
-                   setLocation({ ...location, street: e.target.value })
-                 }
-               />
-             </div>
-             <div className="space-y-2">
-               <Label htmlFor="place">Place</Label>
-               <Input
-                 id="place"
-                 placeholder="Place"
-                 value={location.place}
-                 onChange={(e) =>
-                   setLocation({ ...location, place: e.target.value })
-                 }
-               />
-             </div>
-             <div className="space-y-2">
-               <Label htmlFor="pincode">Pincode</Label>
-               <Input
-                 id="pincode"
-                 placeholder="Pincode"
-                 value={location.pincode}
-                 onChange={(e) =>
-                   setLocation({ ...location, pincode: e.target.value })
-                 }
-               />
-             </div>
-             <div className="space-y-2">
-               <Label htmlFor="pincode">Google Map</Label>
-               <Input
-                 id="googleMap"
-                 placeholder="Google Map URL"
-                 value={googleMap}
-                 onChange={(e) => setGoogleMap(e.target.value)}
-               />
-             </div>
-             <div className="space-y-2 col-span-2">
-               <Label htmlFor="description">Description</Label>
-               <Textarea
-                 id="description"
-                 placeholder="Description"
-                 value={description}
-                 onChange={(e) => setDescription(e.target.value)}
-               />
-             </div>
-             <div className="space-y-2">
-               <Label htmlFor="category">Category</Label>
-               <select
-                 id="category"
-                 value={category}
-                 onChange={(e) => setCategory(e.target.value)}
-                 className="w-full border border-gray-300 rounded px-3 py-2"
-               >
-                 <option value="">Select category</option>
-                 <option value="Men's hostel">Men's hostel</option>
-                 <option value="Women's hostel">Women's hostel</option>
-                 <option value="Others">Others</option>
-               </select>
-             </div>
-          
-           </div>
-   
-           <div className="space-y-4">
-             <Label className="block mb-2">Facilities</Label>
-             <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-4">
-               {AVAILABLE_AMENITIES.map((item) => {
-                 const Icon = iconMap[item.icon];
-                 const isSelected = amenities?.some((a) => a.name === item.name);
-                 return (
-                   <button
-                     type="button"
-                     key={item.name}
-                     onClick={() => toggleAmenity(item)}
-                     className={`relative flex items-center gap-2 p-3 border rounded-lg transition w-full text-left ${
-                       isSelected
-                         ? "bg-blue-100 border-blue-500"
-                         : "bg-white border-gray-300"
-                     }`}
-                   >
-                     <Icon className="w-5 h-5" />
-                     <span className="text-sm">{item.name}</span>
-                     {isSelected && (
-                       <Check className="absolute top-2 right-2 w-4 h-4 text-blue-600" />
-                     )}
-                   </button>
-                 );
-               })}
-             </div>
-           </div>
-   
-           <div className="space-y-4">
-             <Label className="block mb-2">Transportation</Label>
-             <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-4">
-               {AVAILABLE_TRANSPORTATION.map((item) => {
-                 const Icon = transportMap[item.icon];
-                 const isSelected = transport?.some((a) => a.name === item.name);
-                 return (
-                   <button
-                     type="button"
-                     key={item.name}
-                     onClick={() => toggleTransport(item)}
-                     className={`relative flex items-center gap-2 p-3 border rounded-lg transition w-full text-left ${
-                       isSelected
-                         ? "bg-blue-100 border-blue-500"
-                         : "bg-white border-gray-300"
-                     }`}
-                   >
-                     {Icon && <Icon className="w-5 h-5" />}
-                     <span className="text-sm">{item.name}</span>
-                     {isSelected && (
-                       <Check className="absolute top-2 right-2 w-4 h-4 text-blue-600" />
-                     )}
-                   </button>
-                 );
-               })}
-             </div>
-   
-             {transport.length > 0 && (
-               <div className="mt-4 space-y-4">
-                 {transport.map((trans, index) => (
-                   <div key={trans.name} className="flex items-center gap-4">
-                     <span className="w-32">{trans.name}</span>
-                     <Input
-                       type="text"
-                       className="input input-bordered w-full max-w-xs"
-                       placeholder="Enter distance (e.g., 200m)"
-                       value={trans.far}
-                       onChange={(e) => {
-                         const updated = [...transport];
-                         updated[index].far = e.target.value;
-                         setSelectedTransport(updated);
-                       }}
-                     />
-                   </div>
-                 ))}
-               </div>
-             )}
-           </div>
-   
-           <div className="space-y-4">
-             <Label className="block mb-2">Nearby</Label>
-             <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-4">
-               {NEARBY_PLACES.map((item) => {
-                 const Icon = nearbyMap[item.icon];
-                 const isSelected = selectedNearby?.some(
-                   (a) => a.name === item.name
-                 );
-                 return (
-                   <button
-                     type="button"
-                     key={item.name}
-                     onClick={() => toggleNearby(item)}
-                     className={`relative flex items-center gap-2 p-3 border rounded-lg transition w-full text-left ${
-                       isSelected
-                         ? "bg-blue-100 border-blue-500"
-                         : "bg-white border-gray-300"
-                     }`}
-                   >
-                     {Icon && <Icon className="w-5 h-5" />}
-                     <span className="text-sm">{item.name}</span>
-                     {isSelected && (
-                       <Check className="absolute top-2 right-2 w-4 h-4 text-blue-600" />
-                     )}
-                   </button>
-                 );
-               })}
-             </div>
-   
-             {selectedNearby.length > 0 && (
-               <div className="mt-4 space-y-4">
-                 {selectedNearby.map((nearby, index) => (
-                   <div key={nearby.name} className="flex items-center gap-4">
-                     <span className="w-32">{nearby.name}</span>
-                     <Input
-                       type="text"
-                       className="input input-bordered w-full max-w-xs"
-                       placeholder="Enter distance (e.g., 200m)"
-                       value={nearby.far}
-                       onChange={(e) => {
-                         const updated = [...selectedNearby];
-                         updated[index].far = e.target.value;
-                         setSelectdNearby(updated);
-                       }}
-                     />
-                   </div>
-                 ))}
-               </div>
-             )}
-           </div>
-   
-           <div className="space-y-4">
-             <Label className="block mb-2 text-sm">Restaurants</Label>
-             <div className="flex gap-2">
-               <Input
-                 placeholder="Restaurant name"
-                 value={restaurantName}
-                 onChange={(e) => setRestaurantName(e.target.value)}
-               />
-               <Input
-                 placeholder="Far (distance)"
-                 value={restaurantFar}
-                 onChange={(e) => setRestaurantFar(e.target.value)}
-               />
-               <Button onClick={addRestaurant} className="shrink-0">
-                 Add
-               </Button>
-             </div>
-   
-             <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-3">
-               {selectedRestaurants.map((r) => (
-                 <div
-                   key={r.name}
-                   className="flex items-center justify-between p-3 border rounded-lg bg-white shadow-sm"
-                 >
-                   <div className="flex items-center gap-2">
-                     <Hotel className="w-5 h-5 text-gray-600" />
-                     <div className="text-sm">
-                       <p className="font-medium">{r.name}</p>
-                       <p className="text-xs text-gray-500">{r.far}</p>
-                     </div>
-                   </div>
-                   <button onClick={() => removeRestaurant(r.name)}>
-                     <Trash2 className="w-4 h-4 text-red-500" />
-                   </button>
-                 </div>
-               ))}
-             </div>
-           </div>
-   
-           <div className="space-y-2 col-span-2">
-             <Label htmlFor="images">Upload Images</Label>
-             <label className="border-2 border-dashed rounded-md p-6 flex flex-col items-center justify-center gap-2 cursor-pointer">
-               <ImagePlus className="h-8 w-8 text-muted-foreground" />
-               <p className="text-sm text-muted-foreground">Click to upload</p>
-               <Upload className="h-4 w-4" />
-               <Input
-                 type="file"
-                 multiple
-                 accept="image/*"
-                 className="hidden"
-                 onChange={(e) => {
-                   if (e.target.files) {
-                     setSelectedImages((prev) => [
-                       ...prev,
-                       ...Array.from(e.target.files),
-                     ]);
-                   }
-                 }}
-               />
-             </label>
-   
-             {selectedImages.length > 0 && (
-               <div className="grid grid-cols-2 gap-2">
-                 {selectedImages.map((file, index) => (
-                   <img
-                     key={index}
-                     src={URL.createObjectURL(file)}
-                     alt="preview"
-                     className="w-full h-32 object-cover rounded-md"
-                   />
-                 ))}
-               </div>
-             )}
-           </div>
-         </div>
-   
-         <DialogFooter>
-           <Button variant="outline" onClick={onClose}>
-             Cancel
-           </Button>
-           <Button
-             className="bg-rose-600 hover:bg-rose-700"
-             onClick={handleSubmit}
-           >
-             {isPosting ? "Creating..." : "Create"}
-           </Button>
-         </DialogFooter>
-       </DialogContent>
+      <DialogHeader>
+        <DialogTitle>Add New Hostel</DialogTitle>
+      </DialogHeader>
+
+      <div
+        className="overflow-y-auto pr-2 mt-2 space-y-4"
+        style={{ maxHeight: "calc(90vh - 130px)" }}
+      >
+        <div className="grid grid-cols-2 gap-4">
+          <div className="space-y-2">
+            <Label htmlFor="name">Name</Label>
+            <Input
+              id="name"
+              placeholder="Enter hostel name"
+              value={name}
+              onChange={(e) => setName(e.target.value)}
+            />
+          </div>
+          <div className="space-y-2">
+            <Label htmlFor="phone">Phone</Label>
+            <Input
+              id="phone"
+              placeholder="+91..."
+              value={phone}
+              onChange={(e) => setPhone(e.target.value)}
+            />
+          </div>
+          <div className="space-y-2">
+            <Label htmlFor="price">Price</Label>
+            <Input
+              id="price"
+              placeholder="Price"
+              value={price}
+              onChange={(e) => setPrice(e.target.value)}
+            />
+          </div>
+
+          <div className="space-y-2">
+            <Label>Visitor Allowed</Label>
+            <input
+              type="checkbox"
+              checked={visitorsAllow}
+              onChange={(e) => setVisitorAllow(e.target.checked)}
+              className="cursor-pointer"
+            />
+          </div>
+
+          <div className="space-y-2">
+            <Label>Notice Period</Label>
+            <Input
+              value={noticePeriod}
+              onChange={(e) => setNoticePeriod(e.target.value)}
+            />
+          </div>
+
+          <div className="space-y-2">
+            <Label>Additional Fee</Label>
+            <Input
+              value={additionalFee}
+              onChange={(e) => setAdditionalFee(e.target.value)}
+            />
+          </div>
+
+          <div className="space-y-2">
+            <Label>Gate Open Time</Label>
+            <Input
+              type="time"
+              value={gateOpenTime}
+              onChange={(e) => setGateOpenTime(e.target.value)}
+            />
+          </div>
+
+          <div className="space-y-2">
+            <Label>Gate Close Time</Label>
+            <Input
+              type="time"
+              value={gateCloseTime}
+              onChange={(e) => setGateCloseTime(e.target.value)}
+            />
+          </div>
+
+          <div className="space-y-2">
+            <Label>Fulltime Warden</Label>
+            <input
+              type="checkbox"
+              checked={fulltimeWarden}
+              onChange={(e) => setFulltimeWarden(e.target.checked)}
+              className="cursor-pointer"
+            />
+          </div>
+
+          <div className="space-y-2">
+            <Label>Gardian Name</Label>
+            <Input
+              value={gardianInfo.name}
+              onChange={(e) =>
+                setGardianInfo({ ...gardianInfo, name: e.target.value })
+              }
+            />
+          </div>
+
+          <div className="space-y-2">
+            <Label>Gardian Phone</Label>
+            <Input
+              value={gardianInfo.phone}
+              onChange={(e) =>
+                setGardianInfo({ ...gardianInfo, phone: e.target.value })
+              }
+            />
+          </div>
+          <div className="space-y-2">
+            <Label>Restrictions</Label>
+            {restrictions?.map((time, index) => (
+              <div key={index} className="flex gap-2">
+                <Input
+                  value={time}
+                  onChange={(e) => handleRestrictions(index, e.target.value)}
+                  placeholder={`Restrictions ${index + 1}`}
+                />
+                {restrictions.length > 1 && (
+                  <Button
+                    variant="ghost"
+                    size="sm"
+                    onClick={() => removeRestrictions(index)}
+                  >
+                    ✕
+                  </Button>
+                )}
+              </div>
+            ))}
+            <Button variant="outline" size="sm" onClick={addRestrictions}>
+              + Add Restrictions
+            </Button>
+          </div>
+
+          <div className="space-y-2">
+            <Label>Accommodation</Label>
+            <select
+              value={accommodationType}
+              onChange={(e) => setAccommodationType(e.target.value)}
+              className="border rounded px-3 py-2 w-full focus:outline-none focus:ring-2 focus:ring-blue-500"
+            >
+              <option value="">Select Accommodation</option>
+              <option value="with food">With Food</option>
+              <option value="without food">Without Food</option>
+            </select>
+          </div>
+          <div className="space-y-2">
+            <Label htmlFor="street">Street</Label>
+            <Input
+              id="street"
+              placeholder="Street"
+              value={location.street}
+              onChange={(e) =>
+                setLocation({ ...location, street: e.target.value })
+              }
+            />
+          </div>
+          <div className="space-y-2">
+            <Label htmlFor="place">Place</Label>
+            <Input
+              id="place"
+              placeholder="Place"
+              value={location.place}
+              onChange={(e) =>
+                setLocation({ ...location, place: e.target.value })
+              }
+            />
+          </div>
+          <div className="space-y-2">
+            <Label htmlFor="pincode">Pincode</Label>
+            <Input
+              id="pincode"
+              placeholder="Pincode"
+              value={location.pincode}
+              onChange={(e) =>
+                setLocation({ ...location, pincode: e.target.value })
+              }
+            />
+          </div>
+          <div className="space-y-2">
+            <Label htmlFor="pincode">Google Map</Label>
+            <Input
+              id="googleMap"
+              placeholder="Google Map URL"
+              value={googleMap}
+              onChange={(e) => setGoogleMap(e.target.value)}
+            />
+          </div>
+          <div className="space-y-2 col-span-2">
+            <Label htmlFor="description">Description</Label>
+            <Textarea
+              id="description"
+              placeholder="Description"
+              value={description}
+              onChange={(e) => setDescription(e.target.value)}
+            />
+          </div>
+          <div className="space-y-2">
+            <Label htmlFor="category">Category</Label>
+            <select
+              id="category"
+              value={category}
+              onChange={(e) => setCategory(e.target.value)}
+              className="w-full border border-gray-300 rounded px-3 py-2"
+            >
+              <option value="">Select category</option>
+              <option value="Men's hostel">Men's hostel</option>
+              <option value="Women's hostel">Women's hostel</option>
+              <option value="Others">Others</option>
+            </select>
+          </div>
+        </div>
+
+        <div className="space-y-4">
+          <Label className="block mb-2">Facilities</Label>
+          <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-4">
+            {AVAILABLE_AMENITIES.map((item) => {
+              const Icon = iconMap[item.icon];
+              const isSelected = amenities?.some((a) => a.name === item.name);
+              return (
+                <button
+                  type="button"
+                  key={item.name}
+                  onClick={() => toggleAmenity(item)}
+                  className={`relative flex items-center gap-2 p-3 border rounded-lg transition w-full text-left ${
+                    isSelected
+                      ? "bg-blue-100 border-blue-500"
+                      : "bg-white border-gray-300"
+                  }`}
+                >
+                  <Icon className="w-5 h-5" />
+                  <span className="text-sm">{item.name}</span>
+                  {isSelected && (
+                    <Check className="absolute top-2 right-2 w-4 h-4 text-blue-600" />
+                  )}
+                </button>
+              );
+            })}
+          </div>
+        </div>
+
+        <div className="space-y-4">
+          <Label className="block mb-2">Transportation</Label>
+          <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-4">
+            {AVAILABLE_TRANSPORTATION.map((item) => {
+              const Icon = transportMap[item.icon];
+              const isSelected = transport?.some((a) => a.name === item.name);
+              return (
+                <button
+                  type="button"
+                  key={item.name}
+                  onClick={() => toggleTransport(item)}
+                  className={`relative flex items-center gap-2 p-3 border rounded-lg transition w-full text-left ${
+                    isSelected
+                      ? "bg-blue-100 border-blue-500"
+                      : "bg-white border-gray-300"
+                  }`}
+                >
+                  {Icon && <Icon className="w-5 h-5" />}
+                  <span className="text-sm">{item.name}</span>
+                  {isSelected && (
+                    <Check className="absolute top-2 right-2 w-4 h-4 text-blue-600" />
+                  )}
+                </button>
+              );
+            })}
+          </div>
+
+          {transport.length > 0 && (
+            <div className="mt-4 space-y-4">
+              {transport.map((trans, index) => (
+                <div key={trans.name} className="flex items-center gap-4">
+                  <span className="w-32">{trans.name}</span>
+                  <Input
+                    type="text"
+                    className="input input-bordered w-full max-w-xs"
+                    placeholder="Enter distance (e.g., 200m)"
+                    value={trans.far}
+                    onChange={(e) => {
+                      const updated = [...transport];
+                      updated[index].far = e.target.value;
+                      setSelectedTransport(updated);
+                    }}
+                  />
+                </div>
+              ))}
+            </div>
+          )}
+        </div>
+
+        <div className="space-y-4">
+          <Label className="block mb-2">Nearby</Label>
+          <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-4">
+            {NEARBY_PLACES.map((item) => {
+              const Icon = nearbyMap[item.icon];
+              const isSelected = selectedNearby?.some(
+                (a) => a.name === item.name
+              );
+              return (
+                <button
+                  type="button"
+                  key={item.name}
+                  onClick={() => toggleNearby(item)}
+                  className={`relative flex items-center gap-2 p-3 border rounded-lg transition w-full text-left ${
+                    isSelected
+                      ? "bg-blue-100 border-blue-500"
+                      : "bg-white border-gray-300"
+                  }`}
+                >
+                  {Icon && <Icon className="w-5 h-5" />}
+                  <span className="text-sm">{item.name}</span>
+                  {isSelected && (
+                    <Check className="absolute top-2 right-2 w-4 h-4 text-blue-600" />
+                  )}
+                </button>
+              );
+            })}
+          </div>
+
+          {selectedNearby.length > 0 && (
+            <div className="mt-4 space-y-4">
+              {selectedNearby.map((nearby, index) => (
+                <div key={nearby.name} className="flex items-center gap-4">
+                  <span className="w-32">{nearby.name}</span>
+                  <Input
+                    type="text"
+                    className="input input-bordered w-full max-w-xs"
+                    placeholder="Enter distance (e.g., 200m)"
+                    value={nearby.far}
+                    onChange={(e) => {
+                      const updated = [...selectedNearby];
+                      updated[index].far = e.target.value;
+                      setSelectdNearby(updated);
+                    }}
+                  />
+                </div>
+              ))}
+            </div>
+          )}
+        </div>
+
+        <div className="space-y-4">
+          <Label className="block mb-2 text-sm">Restaurants</Label>
+          <div className="flex gap-2">
+            <Input
+              placeholder="Restaurant name"
+              value={restaurantName}
+              onChange={(e) => setRestaurantName(e.target.value)}
+            />
+            <Input
+              placeholder="Far (distance)"
+              value={restaurantFar}
+              onChange={(e) => setRestaurantFar(e.target.value)}
+            />
+            <Button onClick={addRestaurant} className="shrink-0">
+              Add
+            </Button>
+          </div>
+
+          <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-3">
+            {selectedRestaurants.map((r) => (
+              <div
+                key={r.name}
+                className="flex items-center justify-between p-3 border rounded-lg bg-white shadow-sm"
+              >
+                <div className="flex items-center gap-2">
+                  <Hotel className="w-5 h-5 text-gray-600" />
+                  <div className="text-sm">
+                    <p className="font-medium">{r.name}</p>
+                    <p className="text-xs text-gray-500">{r.far}</p>
+                  </div>
+                </div>
+                <button onClick={() => removeRestaurant(r.name)}>
+                  <Trash2 className="w-4 h-4 text-red-500" />
+                </button>
+              </div>
+            ))}
+          </div>
+        </div>
+
+        <div className="space-y-2 col-span-2">
+          <Label htmlFor="images">Upload Images</Label>
+          <label className="border-2 border-dashed rounded-md p-6 flex flex-col items-center justify-center gap-2 cursor-pointer">
+            <ImagePlus className="h-8 w-8 text-muted-foreground" />
+            <p className="text-sm text-muted-foreground">Click to upload</p>
+            <Upload className="h-4 w-4" />
+            <Input
+              type="file"
+              multiple
+              accept="image/*"
+              className="hidden"
+              onChange={(e) => {
+                if (e.target.files) {
+                  setSelectedImages((prev) => [
+                    ...prev,
+                    ...Array.from(e.target.files),
+                  ]);
+                }
+              }}
+            />
+          </label>
+
+          {selectedImages.length > 0 && (
+            <div className="grid grid-cols-2 gap-2">
+              {selectedImages.map((file, index) => (
+                <img
+                  key={index}
+                  src={URL.createObjectURL(file)}
+                  alt="preview"
+                  className="w-full h-32 object-cover rounded-md"
+                />
+              ))}
+            </div>
+          )}
+        </div>
+      </div>
+
+      <DialogFooter>
+        <Button variant="outline" onClick={onClose}>
+          Cancel
+        </Button>
+        <Button
+          className="bg-rose-600 hover:bg-rose-700"
+          onClick={handleSubmit}
+        >
+          {isPosting ? "Creating..." : "Create"}
+        </Button>
+      </DialogFooter>
+    </DialogContent>
   );
 }
 
@@ -732,6 +741,11 @@ export function HostelPUT({
   const [visitorsAllow, setVisitorAllow] = useState(
     hostel.visitorsAllow ? true : false
   );
+
+  const [fulltimeWarden, setFulltimeWarden] = useState(
+    hostel?.fulltimeWarden ? true : false
+  );
+
   const [noticePeriod, setNoticePeriod] = useState(hostel?.noticePeriod || "");
   const [gateOpenTime, setGateOpenTime] = useState(hostel?.gateOpenTime || "");
   const [gateCloseTime, setGateCloseTime] = useState(
@@ -858,6 +872,8 @@ export function HostelPUT({
     formData.append("googleMap", googleMap);
 
     formData.append("visitorsAllow", visitorsAllow);
+    formData.append("fulltimeWarden", fulltimeWarden);
+
     formData.append("noticePeriod", noticePeriod);
     formData.append("gateOpenTime", gateOpenTime);
     formData.append("gateCloseTime", gateCloseTime);
@@ -960,14 +976,13 @@ export function HostelPUT({
             />
           </div>
 
-              <div className="space-y-2">
+          <div className="space-y-2">
             <Label>Additional Fee</Label>
             <Input
               value={additionalFee}
               onChange={(e) => setAdditionalFee(e.target.value)}
             />
           </div>
-
 
           <div className="space-y-2">
             <Label>Gate Open Time</Label>
@@ -987,7 +1002,16 @@ export function HostelPUT({
             />
           </div>
 
-      
+          <div className="space-y-2">
+            <Label>Fulltime Warden</Label>
+            <input
+              type="checkbox"
+              checked={fulltimeWarden}
+              onChange={(e) => setFulltimeWarden(e.target.checked)}
+              className="cursor-pointer"
+            />
+          </div>
+
           <div className="space-y-2">
             <Label>Gardian Name</Label>
             <Input

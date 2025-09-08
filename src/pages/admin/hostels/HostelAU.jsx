@@ -260,13 +260,14 @@ export function HostelPOST({
   setGateCloseTime,
   additionalFee,
   setAdditionalFee,
+  fulltimeWarden,
+  setFulltimeWarden,
 }) {
   const [search, setSearch] = useState("");
 
   const filteredOwners = owners.filter((o) =>
     o.name.toLowerCase().includes(search.toLowerCase())
   );
-
 
   return (
     <DialogContent className="sm:max-w-[600px]">
@@ -325,7 +326,7 @@ export function HostelPOST({
             />
           </div>
 
-         <div className="space-y-2">
+          <div className="space-y-2">
             <Label>Additional Fee</Label>
             <Input
               value={additionalFee}
@@ -333,26 +334,34 @@ export function HostelPOST({
             />
           </div>
 
+          <div className="space-y-2">
+            <Label>Gate Open Time</Label>
+            <Input
+              type="time"
+              value={gateOpenTime}
+              onChange={(e) => setGateOpenTime(e.target.value)}
+            />
+          </div>
 
-      <div className="space-y-2">
-        <Label>Gate Open Time</Label>
-        <Input
-          type="time"
-          value={gateOpenTime}
-          onChange={(e) => setGateOpenTime(e.target.value)}
-        />
-      </div>
+          <div className="space-y-2">
+            <Label>Gate Close Time</Label>
+            <Input
+              type="time"
+              value={gateCloseTime}
+              onChange={(e) => setGateCloseTime(e.target.value)}
+            />
+          </div>
 
-      <div className="space-y-2">
-        <Label>Gate Close Time</Label>
-        <Input
-          type="time"
-          value={gateCloseTime}
-          onChange={(e) => setGateCloseTime(e.target.value)}
-        />
-      </div>
+            <div className="space-y-2">
+            <Label>Fulltime Warden</Label>
+            <input
+              type="checkbox"
+              checked={fulltimeWarden}
+              onChange={(e) => setFulltimeWarden(e.target.checked)}
+              className="cursor-pointer"
+            />
+          </div>
 
-       
           <div className="space-y-2">
             <Label>Gardian Name</Label>
             <Input
@@ -765,32 +774,38 @@ export function HostelPUT({
     hostel?.restaurants?.length ? hostel?.restaurants : []
   );
 
- 
-
-      const [visitorsAllow, setVisitorAllow] = useState(hostel.visitorsAllow ?  true : false);
-      const [noticePeriod, setNoticePeriod] = useState(hostel?.noticePeriod || "");
-      const [gateOpenTime, setGateOpenTime] = useState( hostel?.gateOpenTime || "");
-      const [gateCloseTime, setGateCloseTime] = useState( hostel?.gateCloseTime || "");
-      const [additionalFee, setAdditionalFee] = useState( hostel?.additionalFee || "");
-      const [gardianInfo, setGardianInfo] = useState({
-        name:  hostel?.gardianInfo?.name || "",
-        phone: hostel?.gardianInfo?.phone || "",
-      });
-  const [restrictions, setRestrictions] = useState(hostel?.restrictions || [""]);
-
+  const [visitorsAllow, setVisitorAllow] = useState(
+    hostel.visitorsAllow ? true : false
+  );
+      const [fulltimeWarden , setFulltimeWarden ] = useState(  hostel?.fulltimeWarden ? true : false);
+  
+  const [noticePeriod, setNoticePeriod] = useState(hostel?.noticePeriod || "");
+  const [gateOpenTime, setGateOpenTime] = useState(hostel?.gateOpenTime || "");
+  const [gateCloseTime, setGateCloseTime] = useState(
+    hostel?.gateCloseTime || ""
+  );
+  const [additionalFee, setAdditionalFee] = useState(
+    hostel?.additionalFee || ""
+  );
+  const [gardianInfo, setGardianInfo] = useState({
+    name: hostel?.gardianInfo?.name || "",
+    phone: hostel?.gardianInfo?.phone || "",
+  });
+  const [restrictions, setRestrictions] = useState(
+    hostel?.restrictions || [""]
+  );
 
   const [existingPhotos, setExistingPhotos] = useState(hostel?.photos || []);
   const [selectedImages, setSelectedImages] = useState([]);
 
-  
-      const handleRestrictions = (index, value) => {
+  const handleRestrictions = (index, value) => {
     const newRestrictions = [...restrictions];
     newRestrictions[index] = value;
     setRestrictions(newRestrictions);
   };
   const addRestrictions = () => setRestrictions([...restrictions, ""]);
-  const removeRestriction = (index) => setRestrictions(restrictions.filter((_, i) => i !== index));
-
+  const removeRestriction = (index) =>
+    setRestrictions(restrictions.filter((_, i) => i !== index));
 
   // Toggle transport add/remove
   const toggleTransport = (item) => {
@@ -873,7 +888,6 @@ export function HostelPUT({
     });
   };
 
-
   const [updatehostel, { isLoading }] = useUpdatehostelMutation();
 
   const handleUpdate = async () => {
@@ -890,7 +904,8 @@ export function HostelPUT({
     formData.append("ownerId", ownerId);
     formData.append("googleMap", googleMap);
 
-       formData.append("visitorsAllow", visitorsAllow);
+    formData.append("visitorsAllow", visitorsAllow);
+        formData.append("fulltimeWarden", fulltimeWarden);
     formData.append("noticePeriod", noticePeriod);
     formData.append("gateOpenTime", gateOpenTime);
     formData.append("gateCloseTime", gateCloseTime);
@@ -898,7 +913,7 @@ export function HostelPUT({
     formData.append("gardianInfo[name]", gardianInfo.name);
     formData.append("gardianInfo[phone]", gardianInfo.phone);
 
-       restrictions.forEach((a, i) => {
+    restrictions.forEach((a, i) => {
       if (a.trim() !== "") {
         formData.append(`restrictions[${i}]`, a);
       }
@@ -992,7 +1007,7 @@ export function HostelPUT({
             <Input value={price} onChange={(e) => setPrice(e.target.value)} />
           </div>
 
-            <div className="space-y-2">
+          <div className="space-y-2">
             <Label>Visitor Allowed</Label>
             <input
               type="checkbox"
@@ -1002,35 +1017,49 @@ export function HostelPUT({
             />
           </div>
 
-
           <div className="space-y-2">
             <Label>Notice Period</Label>
-            <Input value={noticePeriod} onChange={(e) => setNoticePeriod(e.target.value)} />
+            <Input
+              value={noticePeriod}
+              onChange={(e) => setNoticePeriod(e.target.value)}
+            />
           </div>
 
-            <div className="space-y-2">
+          <div className="space-y-2">
             <Label>Additional Fee</Label>
-            <Input value={additionalFee} onChange={(e) => setAdditionalFee(e.target.value)} />
+            <Input
+              value={additionalFee}
+              onChange={(e) => setAdditionalFee(e.target.value)}
+            />
+          </div>
+
+          <div className="space-y-2">
+            <Label>Gate Open Time</Label>
+            <Input
+              type="time"
+              value={gateOpenTime}
+              onChange={(e) => setGateOpenTime(e.target.value)}
+            />
+          </div>
+
+          <div className="space-y-2">
+            <Label>Gate Close Time</Label>
+            <Input
+              type="time"
+              value={gateCloseTime}
+              onChange={(e) => setGateCloseTime(e.target.value)}
+            />
           </div>
 
               <div className="space-y-2">
-        <Label>Gate Open Time</Label>
-        <Input
-          type="time"
-          value={gateOpenTime}
-          onChange={(e) => setGateOpenTime(e.target.value)}
-        />
-      
-      </div>
-
-      <div className="space-y-2">
-        <Label>Gate Close Time</Label>
-        <Input
-          type="time"
-          value={gateCloseTime}
-          onChange={(e) => setGateCloseTime(e.target.value)}
-        />
-      </div>
+            <Label>Fulltime Warden</Label>
+            <input
+              type="checkbox"
+              checked={fulltimeWarden}
+              onChange={(e) => setFulltimeWarden(e.target.checked)}
+              className="cursor-pointer"
+            />
+          </div>
 
           <div className="space-y-2">
             <Label>Gardian Name</Label>
@@ -1075,7 +1104,6 @@ export function HostelPUT({
               + Add Restrictions
             </Button>
           </div>
-
 
           <div className="space-y-2">
             <Label>Accommodation</Label>
@@ -1505,7 +1533,7 @@ export function ShowMorFacility({ facility = [], onClose }) {
                     className="inline-flex items-center gap-1 bg-gray-100 px-2 py-1 rounded text-sm"
                   >
                     {Icon && <Icon className="w-4 h-4" />}
-                    {a.name || a} {a.far} 
+                    {a.name || a} {a.far}
                   </span>
                 );
               })}

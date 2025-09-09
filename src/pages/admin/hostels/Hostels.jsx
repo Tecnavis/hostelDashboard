@@ -100,6 +100,8 @@ export default function AdminHostels() {
   const [selectedNearby, setSelectdNearby] = useState([]);
   const [visitorsAllow, setVisitorAllow] = useState(false);
   const [fulltimeWarden, setFulltimeWarden] = useState(false);
+   const [registrationFee, setRegistrationFee] = useState("");
+    const [refund, setRefund] = useState(false);
   const [noticePeriod, setNoticePeriod] = useState("");
   const [gateOpenTime, setGateOpenTime] = useState("");
   const [gateCloseTime, setGateCloseTime] = useState("");
@@ -268,7 +270,8 @@ export default function AdminHostels() {
       noticePeriod.trim() === "" ||
       gateOpenTime.trim() === "" ||
       gateCloseTime.trim() === "" ||
-      additionalFee.trim() === ""
+      additionalFee.trim() === "" ||
+      registrationFee.trim() == ""
     ) {
       return;
     }
@@ -290,6 +293,9 @@ export default function AdminHostels() {
     formData.append("gateOpenTime", gateOpenTime);
     formData.append("gateCloseTime", gateCloseTime);
     formData.append("additionalFee", additionalFee);
+        formData.append("registrationFee", registrationFee);
+    formData.append("refund",  refund);
+
     formData.append("gardianInfo[name]", gardianInfo.name);
     formData.append("gardianInfo[phone]", gardianInfo.phone);
 
@@ -353,6 +359,8 @@ export default function AdminHostels() {
         setLocation({ street: "", place: "", pincode: "" });
         setVisitorAllow(false);
         setFulltimeWarden(false);
+        setRegistrationFee("");
+        setRefund(false);
         setNoticePeriod("");
         setGateOpenTime("");
         setGateCloseTime("");
@@ -393,6 +401,7 @@ export default function AdminHostels() {
       console.error("Failed to block admin:", error);
     }
   };
+  
 
   return (
     <div className="flex min-h-screen bg-gray-50 ">
@@ -479,6 +488,10 @@ export default function AdminHostels() {
                     setAdditionalFee={setAdditionalFee}
                     fulltimeWarden={fulltimeWarden}
                     setFulltimeWarden={setFulltimeWarden}
+                       registrationFee={registrationFee}
+                    setRegistrationFee={setRegistrationFee}
+                    refund={refund}
+                    setRefund={setRefund}
                   />
                 </Dialog>
 
@@ -712,7 +725,13 @@ export default function AdminHostels() {
                               Close TM
                             </th>
                             <th className="text-left py-3 px-4 font-medium text-gray-500 whitespace-nowrap min-w-[150px]">
-                              Additional Fee
+                              Caution Deposit
+                            </th>
+                            <th className="text-left py-3 px-4 font-medium text-gray-500 whitespace-nowrap min-w-[150px]">
+                              Registration Fee
+                            </th>
+                            <th className="text-left py-3 px-4 font-medium text-gray-500 whitespace-nowrap min-w-[150px]">
+                              Refund
                             </th>
                             <th className="text-left py-3 px-4 font-medium text-gray-500 whitespace-nowrap min-w-[150px]">
                               Gardian Name
@@ -922,6 +941,12 @@ export default function AdminHostels() {
                               </td>
                               <td className="py-3 px-4">
                                 {hostel?.additionalFee}
+                              </td>
+                              <td className="py-3 px-4">
+                                {hostel?.registrationFee}
+                              </td>
+                              <td className="py-3 px-4">
+                                {hostel?.refund == true ? "true" : "false"}
                               </td>
                               <td className="py-3 px-4">
                                 {hostel?.gardianInfo?.name}

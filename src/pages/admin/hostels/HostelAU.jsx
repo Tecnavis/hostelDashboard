@@ -262,6 +262,10 @@ export function HostelPOST({
   setAdditionalFee,
   fulltimeWarden,
   setFulltimeWarden,
+      registrationFee,
+    setRegistrationFee,
+    refund,
+    setRefund,
 }) {
   const [search, setSearch] = useState("");
 
@@ -327,10 +331,28 @@ export function HostelPOST({
           </div>
 
           <div className="space-y-2">
-            <Label>Additional Fee</Label>
+            <Label>Caution Deposit</Label>
             <Input
               value={additionalFee}
               onChange={(e) => setAdditionalFee(e.target.value)}
+            />
+          </div>
+
+             <div className="space-y-2">
+            <Label>Registration Fee</Label>
+            <Input
+              value={registrationFee}
+              onChange={(e) => setRegistrationFee(e.target.value)}
+            />
+          </div>
+
+            <div className="space-y-2">
+            <Label>Refund</Label>
+            <input
+              type="checkbox"
+              checked={refund}
+              onChange={(e) => setRefund(e.target.checked)}
+              className="cursor-pointer"
             />
           </div>
 
@@ -778,6 +800,9 @@ export function HostelPUT({
     hostel.visitorsAllow ? true : false
   );
       const [fulltimeWarden , setFulltimeWarden ] = useState(  hostel?.fulltimeWarden ? true : false);
+
+       const [registrationFee, setRegistrationFee] = useState(hostel?.registrationFee || "");
+          const [refund, setRefund] = useState( hostel.refund ? true : false);
   
   const [noticePeriod, setNoticePeriod] = useState(hostel?.noticePeriod || "");
   const [gateOpenTime, setGateOpenTime] = useState(hostel?.gateOpenTime || "");
@@ -910,6 +935,8 @@ export function HostelPUT({
     formData.append("gateOpenTime", gateOpenTime);
     formData.append("gateCloseTime", gateCloseTime);
     formData.append("additionalFee", additionalFee);
+            formData.append("registrationFee", registrationFee);
+    formData.append("refund",  refund);
     formData.append("gardianInfo[name]", gardianInfo.name);
     formData.append("gardianInfo[phone]", gardianInfo.phone);
 
@@ -1025,11 +1052,29 @@ export function HostelPUT({
             />
           </div>
 
-          <div className="space-y-2">
-            <Label>Additional Fee</Label>
+       <div className="space-y-2">
+            <Label>Caution Deposit</Label>
             <Input
               value={additionalFee}
               onChange={(e) => setAdditionalFee(e.target.value)}
+            />
+          </div>
+
+             <div className="space-y-2">
+            <Label>Registration Fee</Label>
+            <Input
+              value={registrationFee}
+              onChange={(e) => setRegistrationFee(e.target.value)}
+            />
+          </div>
+
+            <div className="space-y-2">
+            <Label>Refund</Label>
+            <input
+              type="checkbox"
+              checked={refund}
+              onChange={(e) => setRefund(e.target.checked)}
+              className="cursor-pointer"
             />
           </div>
 

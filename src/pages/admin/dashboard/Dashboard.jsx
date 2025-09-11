@@ -1,17 +1,59 @@
-"use client"
+"use client";
 
-import { motion } from "framer-motion"
-import { ArrowDown, ArrowUp, Building, Calendar, DollarSign, Hotel, Search, Users } from "lucide-react"
-import { Area, Bar, CartesianGrid, ComposedChart, Line, ResponsiveContainer, Tooltip, XAxis, YAxis } from "recharts"
+import { motion } from "framer-motion";
+import {
+  ArrowDown,
+  ArrowUp,
+  Building,
+  Calendar,
+  DollarSign,
+  Hotel,
+  Search,
+  Users,
+  MoreHorizontal,
+  CheckCircle,
+  Trash2,
+} from "lucide-react";
+import {
+  Area,
+  Bar,
+  CartesianGrid,
+  ComposedChart,
+  Line,
+  ResponsiveContainer,
+  Tooltip,
+  XAxis,
+  YAxis,
+} from "recharts";
 
-import { Sidebar } from "@/components/Sidebar"
-import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar"
-import { Badge } from "@/components/ui/badge"
-import { Button } from "@/components/ui/button"
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card"
-import { Input } from "@/components/ui/input"
-import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs"
-import   { AdminNotifications }  from "@/components/AdminNotification"
+import { Sidebar } from "@/components/Sidebar";
+import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
+import { Badge } from "@/components/ui/badge";
+import { Button } from "@/components/ui/button";
+import {
+  Card,
+  CardContent,
+  CardDescription,
+  CardHeader,
+  CardTitle,
+} from "@/components/ui/card";
+import { Input } from "@/components/ui/input";
+import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
+import { AdminNotifications } from "@/components/AdminNotification";
+import {
+  useGetAllbookingQuery,
+  useUpdatebookingMutation,
+} from "@/app/service/bookings";
+
+import {
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuTrigger,
+} from "@/components/ui/dropdown-menu";
+import { useNavigate } from "react-router-dom";
+import { useGetAllhostelQuery } from "@/app/service/hostel";
+import { useGetAllroomQuery } from "@/app/service/room";
 
 const bookingData = [
   { name: "Jan", bookings: 65, revenue: 4200, occupancy: 72 },
@@ -26,7 +68,7 @@ const bookingData = [
   { name: "Oct", bookings: 95, revenue: 7000, occupancy: 84 },
   { name: "Nov", bookings: 85, revenue: 6200, occupancy: 80 },
   { name: "Dec", bookings: 78, revenue: 5800, occupancy: 76 },
-]
+];
 
 const hostelDistribution = [
   { name: "Miami", value: 8 },
@@ -36,20 +78,42 @@ const hostelDistribution = [
   { name: "Chicago", value: 3 },
   { name: "Denver", value: 3 },
   { name: "Other", value: 7 },
-]
+];
 
-
-      const admin = JSON.parse(localStorage.getItem("admin"));
-    const  superAdminId = admin?.adminDetails;
+const admin = JSON.parse(localStorage.getItem("admin"));
+const superAdminId = admin?.adminDetails;
 
 export default function AdminDashboard() {
+  const navigate = useNavigate();
+
+  const { data, isLoading, refetch } = useGetAllbookingQuery();
+  const [updatebooking, { isLoading: isPosting }] = useUpdatebookingMutation();
+  const { data: hostel } = useGetAllhostelQuery();
+  const { data: room } =  useGetAllroomQuery();
+
+  const handleBooking = async (id, status) => {
+    try {
+      const response = await updatebooking({
+        id,
+        updatebooking: { status },
+      }).unwrap();
+      if (response?.status === 200) {
+        refetch();
+      }
+    } catch (error) {
+      console.error("Failed to bookin status:", error);
+    }
+  };
+
+  
+
   return (
     <div className="flex h-screen bg-gray-50">
       <Sidebar role="admin" />
 
       <div className="flex-1 flex flex-col overflow-hidden">
         <header className="h-16 border-b bg-white flex items-center justify-between px-6">
-          <div className="relative w-64">
+          <div className="relative w-64 ml-7">
             <Search className="absolute left-2 top-2.5 h-4 w-4 text-gray-400" />
             <Input placeholder="Search..." className="pl-8" />
           </div>
@@ -57,14 +121,16 @@ export default function AdminDashboard() {
           <div className="flex items-center gap-4">
             <AdminNotifications variant="admin" />
 
-                <div className="flex items-center gap-3">
+            <div className="flex items-center gap-3">
               <Avatar>
                 <AvatarImage src="/placeholder.svg?height=40&width=40" />
                 <AvatarFallback>{superAdminId?.name?.charAt(0)}</AvatarFallback>
               </Avatar>
               <div className="hidden md:block">
                 <div className="text-sm font-medium">{superAdminId?.name}</div>
-                <div className="text-xs text-gray-500">{superAdminId?.email}</div>
+                <div className="text-xs text-gray-500">
+                  {superAdminId?.email}
+                </div>
               </div>
             </div>
           </div>
@@ -74,15 +140,6 @@ export default function AdminDashboard() {
           <div className="max-w-7xl mx-auto space-y-6">
             <div className="flex items-center justify-between">
               <h1 className="text-2xl font-bold">Dashboard Overview</h1>
-              <div className="flex items-center gap-2">
-                <Button variant="outline" size="sm" className="gap-2">
-                  <Calendar className="h-4 w-4" />
-                  Last 30 days
-                </Button>
-                <Button size="sm" className="bg-rose-600 hover:bg-rose-700">
-                  Generate Report
-                </Button>
-              </div>
             </div>
 
             <motion.div
@@ -95,15 +152,22 @@ export default function AdminDashboard() {
                 <CardContent className="p-6">
                   <div className="flex items-center justify-between">
                     <div>
-                      <p className="text-sm font-medium text-gray-500">Total Hostels</p>
-                      <h3 className="text-3xl font-bold mt-1">24</h3>
+                      <p className="text-sm font-medium text-gray-500">
+                        Total Hostels
+                      </p>
+                      <h3 className="text-3xl font-bold mt-1">
+                        {hostel?.length ?? 0}
+                      </h3>
                     </div>
                     <div className="h-12 w-12 bg-rose-100 rounded-full flex items-center justify-center">
                       <Building className="h-6 w-6 text-rose-600" />
                     </div>
                   </div>
                   <div className="flex items-center mt-4 text-sm">
-                    <Badge variant="outline" className="gap-1 text-green-600 border-green-200 bg-green-50">
+                    <Badge
+                      variant="outline"
+                      className="gap-1 text-green-600 border-green-200 bg-green-50"
+                    >
                       <ArrowUp className="h-3 w-3" />
                       12%
                     </Badge>
@@ -116,15 +180,20 @@ export default function AdminDashboard() {
                 <CardContent className="p-6">
                   <div className="flex items-center justify-between">
                     <div>
-                      <p className="text-sm font-medium text-gray-500">Total Rooms</p>
-                      <h3 className="text-3xl font-bold mt-1">342</h3>
+                      <p className="text-sm font-medium text-gray-500">
+                        Total Rooms
+                      </p>
+                      <h3 className="text-3xl font-bold mt-1">{room?.length ?? 0}</h3>
                     </div>
                     <div className="h-12 w-12 bg-orange-100 rounded-full flex items-center justify-center">
                       <Hotel className="h-6 w-6 text-orange-600" />
                     </div>
                   </div>
                   <div className="flex items-center mt-4 text-sm">
-                    <Badge variant="outline" className="gap-1 text-green-600 border-green-200 bg-green-50">
+                    <Badge
+                      variant="outline"
+                      className="gap-1 text-green-600 border-green-200 bg-green-50"
+                    >
                       <ArrowUp className="h-3 w-3" />
                       8%
                     </Badge>
@@ -137,15 +206,22 @@ export default function AdminDashboard() {
                 <CardContent className="p-6">
                   <div className="flex items-center justify-between">
                     <div>
-                      <p className="text-sm font-medium text-gray-500">Active Bookings</p>
-                      <h3 className="text-3xl font-bold mt-1">156</h3>
+                      <p className="text-sm font-medium text-gray-500">
+                        Active Bookings
+                      </p>
+                      <h3 className="text-3xl font-bold mt-1">
+                        {data?.length ?? 0}
+                      </h3>
                     </div>
                     <div className="h-12 w-12 bg-blue-100 rounded-full flex items-center justify-center">
                       <Users className="h-6 w-6 text-blue-600" />
                     </div>
                   </div>
                   <div className="flex items-center mt-4 text-sm">
-                    <Badge variant="outline" className="gap-1 text-red-600 border-red-200 bg-red-50">
+                    <Badge
+                      variant="outline"
+                      className="gap-1 text-red-600 border-red-200 bg-red-50"
+                    >
                       <ArrowDown className="h-3 w-3" />
                       3%
                     </Badge>
@@ -154,7 +230,7 @@ export default function AdminDashboard() {
                 </CardContent>
               </Card>
 
-              <Card>
+              {/* <Card>
                 <CardContent className="p-6">
                   <div className="flex items-center justify-between">
                     <div>
@@ -173,7 +249,7 @@ export default function AdminDashboard() {
                     <span className="text-gray-500 ml-2">Since last month</span>
                   </div>
                 </CardContent>
-              </Card>
+              </Card> */}
             </motion.div>
 
             <motion.div
@@ -185,16 +261,29 @@ export default function AdminDashboard() {
               <Card className="lg:col-span-2">
                 <CardHeader>
                   <CardTitle>Booking & Revenue Overview</CardTitle>
-                  <CardDescription>Monthly booking and revenue trends</CardDescription>
+                  <CardDescription>
+                    Monthly booking and revenue trends
+                  </CardDescription>
                 </CardHeader>
                 <CardContent>
                   <div className="h-80">
                     <ResponsiveContainer width="100%" height="100%">
-                      <ComposedChart data={bookingData} margin={{ top: 20, right: 20, bottom: 20, left: 20 }}>
+                      <ComposedChart
+                        data={bookingData}
+                        margin={{ top: 20, right: 20, bottom: 20, left: 20 }}
+                      >
                         <CartesianGrid strokeDasharray="3 3" stroke="#f0f0f0" />
                         <XAxis dataKey="name" />
-                        <YAxis yAxisId="left" orientation="left" stroke="#8884d8" />
-                        <YAxis yAxisId="right" orientation="right" stroke="#82ca9d" />
+                        <YAxis
+                          yAxisId="left"
+                          orientation="left"
+                          stroke="#8884d8"
+                        />
+                        <YAxis
+                          yAxisId="right"
+                          orientation="right"
+                          stroke="#82ca9d"
+                        />
                         <Tooltip
                           contentStyle={{
                             backgroundColor: "white",
@@ -210,7 +299,12 @@ export default function AdminDashboard() {
                           stroke="#ec4899"
                           yAxisId="left"
                         />
-                        <Bar dataKey="revenue" barSize={20} fill="#82ca9d" yAxisId="right" />
+                        <Bar
+                          dataKey="revenue"
+                          barSize={20}
+                          fill="#82ca9d"
+                          yAxisId="right"
+                        />
                         <Line
                           type="monotone"
                           dataKey="occupancy"
@@ -249,7 +343,12 @@ export default function AdminDashboard() {
                             border: "none",
                           }}
                         />
-                        <Bar dataKey="value" barSize={20} fill="#ec4899" radius={[0, 4, 4, 0]} />
+                        <Bar
+                          dataKey="value"
+                          barSize={20}
+                          fill="#ec4899"
+                          radius={[0, 4, 4, 0]}
+                        />
                       </ComposedChart>
                     </ResponsiveContainer>
                   </div>
@@ -265,12 +364,16 @@ export default function AdminDashboard() {
               <Tabs defaultValue="recent">
                 <div className="flex items-center justify-between mb-4">
                   <TabsList>
-                    <TabsTrigger value="recent">Recent Bookings</TabsTrigger>
-                    <TabsTrigger value="pending">Pending Approvals</TabsTrigger>
-                    <TabsTrigger value="popular">Popular Hostels</TabsTrigger>
+                    <TabsTrigger className={"cursor-pointer"} value="recent">Recent Bookings</TabsTrigger>
+                    <TabsTrigger className={"cursor-pointer"} value="popular">Popular Hostels</TabsTrigger>
                   </TabsList>
 
-                  <Button variant="outline" size="sm">
+                  <Button
+                    variant="outline"
+                    size="sm"
+                    className={"cursor-pointer"}
+                    onClick={() => navigate("/admin/bookings")}
+                  >
                     View All
                   </Button>
                 </div>
@@ -279,148 +382,132 @@ export default function AdminDashboard() {
                   <Card>
                     <CardHeader className="pb-2">
                       <CardTitle>Recent Bookings</CardTitle>
-                      <CardDescription>Latest bookings across all hostels</CardDescription>
+                      <CardDescription>
+                        Latest bookings across all hostels
+                      </CardDescription>
                     </CardHeader>
                     <CardContent>
                       <div className="overflow-x-auto">
                         <table className="w-full">
                           <thead>
                             <tr className="border-b">
-                              <th className="text-left py-3 px-4 font-medium text-gray-500">Booking ID</th>
-                              <th className="text-left py-3 px-4 font-medium text-gray-500">Guest</th>
-                              <th className="text-left py-3 px-4 font-medium text-gray-500">Hostel</th>
-                              <th className="text-left py-3 px-4 font-medium text-gray-500">Check In</th>
-                              <th className="text-left py-3 px-4 font-medium text-gray-500">Check Out</th>
-                              <th className="text-left py-3 px-4 font-medium text-gray-500">Status</th>
-                              <th className="text-left py-3 px-4 font-medium text-gray-500">Amount</th>
+                              <th className="text-left py-3 px-4 font-medium text-gray-500">
+                                Guest
+                              </th>
+                              <th className="text-left py-3 px-4 font-medium text-gray-500">
+                                Hostel
+                              </th>
+                              <th className="text-left py-3 px-4 font-medium text-gray-500">
+                                Room Name
+                              </th>
+                              <th className="text-left py-3 px-4 font-medium text-gray-500">
+                                Room Type
+                              </th>
+                              <th className="text-left py-3 px-4 font-medium text-gray-500">
+                                Check In
+                              </th>
+                              <th className="text-left py-3 px-4 font-medium text-gray-500">
+                                With Food
+                              </th>
+                              <th className="text-left py-3 px-4 font-medium text-gray-500">
+                                Without Food
+                              </th>
+                              <th className="text-left py-3 px-4 font-medium text-gray-500">
+                                Status
+                              </th>
+                              <th className="text-left py-3 px-4 font-medium text-gray-500">
+                                Actions
+                              </th>
                             </tr>
                           </thead>
                           <tbody>
-                            {[
-                              {
-                                id: "B-1234",
-                                guest: "John Smith",
-                                hostel: "Sunset Hostel",
-                                checkIn: "May 10, 2025",
-                                checkOut: "May 15, 2025",
-                                status: "Confirmed",
-                                amount: "$320",
-                              },
-                              {
-                                id: "B-1235",
-                                guest: "Emma Johnson",
-                                hostel: "City Central",
-                                checkIn: "May 12, 2025",
-                                checkOut: "May 14, 2025",
-                                status: "Pending",
-                                amount: "$180",
-                              },
-                              {
-                                id: "B-1236",
-                                guest: "Michael Brown",
-                                hostel: "Beachside Inn",
-                                checkIn: "May 15, 2025",
-                                checkOut: "May 20, 2025",
-                                status: "Confirmed",
-                                amount: "$450",
-                              },
-                              {
-                                id: "B-1237",
-                                guest: "Sarah Wilson",
-                                hostel: "Mountain View",
-                                checkIn: "May 18, 2025",
-                                checkOut: "May 25, 2025",
-                                status: "Confirmed",
-                                amount: "$560",
-                              },
-                              {
-                                id: "B-1238",
-                                guest: "David Lee",
-                                hostel: "Urban Stay",
-                                checkIn: "May 20, 2025",
-                                checkOut: "May 22, 2025",
-                                status: "Pending",
-                                amount: "$210",
-                              },
-                            ].map((booking, index) => (
-                              <tr key={booking.id} className="border-b">
-                                <td className="py-3 px-4">{booking.id}</td>
-                                <td className="py-3 px-4">{booking.guest}</td>
-                                <td className="py-3 px-4">{booking.hostel}</td>
-                                <td className="py-3 px-4">{booking.checkIn}</td>
-                                <td className="py-3 px-4">{booking.checkOut}</td>
+                            {data?.map((booking) => (
+                              <tr key={booking._id} className="border-b">
                                 <td className="py-3 px-4">
-                                  <Badge variant={booking.status === "Confirmed" ? "success" : "outline"}>
-                                    {booking.status}
+                                  {booking?.userId?.name}
+                                </td>
+                                <td className="py-3 px-4">
+                                  {booking?.hostelId?.name}
+                                </td>
+                                <td className="py-3 px-4">
+                                  {booking?.roomId?.roomNumber}
+                                </td>
+                                <td className="py-3 px-4">
+                                  {booking?.roomId?.roomType}
+                                </td>
+                                <td className="py-3 px-4">
+                                  {new Date(
+                                    booking.checkInDate
+                                  ).toLocaleDateString("en-US", {
+                                    year: "numeric",
+                                    month: "long",
+                                    day: "numeric",
+                                  })}
+                                </td>
+
+                                <td className="py-3 px-4 font-medium">
+                                  {booking?.roomId?.withFood}
+                                </td>
+                                <td className="py-3 px-4 font-medium">
+                                  {booking?.roomId?.withoutFood}
+                                </td>
+                                <td className="py-3 px-4">
+                                  <Badge
+                                    className={`px-2 py-1 rounded text-sm font-medium ${
+                                      booking.status === "confirmed"
+                                        ? "bg-green-100 text-green-800"
+                                        : booking.status === "pending"
+                                        ? "bg-yellow-100 text-yellow-800"
+                                        : "bg-red-100 text-red-800"
+                                    }`}
+                                  >
+                                    {booking.status.charAt(0).toUpperCase() +
+                                      booking.status.slice(1)}
                                   </Badge>
                                 </td>
-                                <td className="py-3 px-4 font-medium">{booking.amount}</td>
-                              </tr>
-                            ))}
-                          </tbody>
-                        </table>
-                      </div>
-                    </CardContent>
-                  </Card>
-                </TabsContent>
 
-                <TabsContent value="pending" className="m-0">
-                  <Card>
-                    <CardHeader className="pb-2">
-                      <CardTitle>Pending Approvals</CardTitle>
-                      <CardDescription>Hostels waiting for admin approval</CardDescription>
-                    </CardHeader>
-                    <CardContent>
-                      <div className="overflow-x-auto">
-                        <table className="w-full">
-                          <thead>
-                            <tr className="border-b">
-                              <th className="text-left py-3 px-4 font-medium text-gray-500">Hostel Name</th>
-                              <th className="text-left py-3 px-4 font-medium text-gray-500">Owner</th>
-                              <th className="text-left py-3 px-4 font-medium text-gray-500">Location</th>
-                              <th className="text-left py-3 px-4 font-medium text-gray-500">Rooms</th>
-                              <th className="text-left py-3 px-4 font-medium text-gray-500">Submitted</th>
-                              <th className="text-left py-3 px-4 font-medium text-gray-500">Actions</th>
-                            </tr>
-                          </thead>
-                          <tbody>
-                            {[
-                              {
-                                name: "Riverside Hostel",
-                                owner: "James Wilson",
-                                location: "San Francisco, CA",
-                                rooms: 12,
-                                submitted: "May 8, 2025",
-                              },
-                              {
-                                name: "Golden Gate Inn",
-                                owner: "Lisa Chen",
-                                location: "San Francisco, CA",
-                                rooms: 8,
-                                submitted: "May 7, 2025",
-                              },
-                              {
-                                name: "Traveler's Rest",
-                                owner: "Robert Johnson",
-                                location: "Los Angeles, CA",
-                                rooms: 15,
-                                submitted: "May 6, 2025",
-                              },
-                            ].map((hostel, index) => (
-                              <tr key={index} className="border-b">
-                                <td className="py-3 px-4 font-medium">{hostel.name}</td>
-                                <td className="py-3 px-4">{hostel.owner}</td>
-                                <td className="py-3 px-4">{hostel.location}</td>
-                                <td className="py-3 px-4">{hostel.rooms}</td>
-                                <td className="py-3 px-4">{hostel.submitted}</td>
                                 <td className="py-3 px-4">
-                                  <div className="flex gap-2">
-                                    <Button size="sm" className="bg-green-600 hover:bg-green-700">
-                                      Approve
-                                    </Button>
-                                    <Button size="sm" variant="outline" className="text-red-600 border-red-200">
-                                      Reject
-                                    </Button>
+                                  <div className="flex items-center gap-2">
+                                    <DropdownMenu>
+                                      <DropdownMenuTrigger asChild>
+                                        <Button
+                                          variant="ghost"
+                                          size="icon"
+                                          className="h-8 w-8"
+                                        >
+                                          <MoreHorizontal className="h-4 w-4" />
+                                        </Button>
+                                      </DropdownMenuTrigger>
+                                      <DropdownMenuContent align="end">
+                                        <DropdownMenuItem
+                                          onClick={() =>
+                                            handleBooking(
+                                              booking?._id,
+                                              "confirmed"
+                                            )
+                                          }
+                                        >
+                                          <CheckCircle />
+                                          {isPosting
+                                            ? "  Confirming..."
+                                            : "Confirmed"}
+                                        </DropdownMenuItem>
+                                        <DropdownMenuItem
+                                          className="text-red-600"
+                                          onClick={() =>
+                                            handleBooking(
+                                              booking?._id,
+                                              "cancelled"
+                                            )
+                                          }
+                                        >
+                                          <Trash2 className="h-4 w-4 mr-2" />
+                                          {isPosting
+                                            ? "Canceling..."
+                                            : "Cancel"}
+                                        </DropdownMenuItem>
+                                      </DropdownMenuContent>
+                                    </DropdownMenu>
                                   </div>
                                 </td>
                               </tr>
@@ -436,48 +523,36 @@ export default function AdminDashboard() {
                   <Card>
                     <CardHeader className="pb-2">
                       <CardTitle>Popular Hostels</CardTitle>
-                      <CardDescription>Most booked hostels this month</CardDescription>
+                      <CardDescription>
+                        Most booked hostels this month
+                      </CardDescription>
                     </CardHeader>
                     <CardContent>
                       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-                        {[
-                          {
-                            name: "Sunset Hostel",
-                            location: "Miami, FL",
-                            image: "/placeholder.svg?height=200&width=300",
-                            rating: 4.8,
-                            bookings: 124,
-                          },
-                          {
-                            name: "City Central",
-                            location: "New York, NY",
-                            image: "/placeholder.svg?height=200&width=300",
-                            rating: 4.7,
-                            bookings: 112,
-                          },
-                          {
-                            name: "Beachside Inn",
-                            location: "San Diego, CA",
-                            image: "/placeholder.svg?height=200&width=300",
-                            rating: 4.6,
-                            bookings: 98,
-                          },
-                        ].map((hostel, index) => (
-                          <Card key={index} className="overflow-hidden">
+                        {hostel?.slice(0, 6).map((hostel) => (
+                          <Card key={hostel._id} className="overflow-hidden">
                             <img
-                              src={hostel.image || "/placeholder.svg"}
+                              src={hostel?.photos[0] || "/placeholder.svg"}
                               alt={hostel.name}
                               className="w-full h-40 object-cover"
                             />
                             <CardContent className="p-4">
-                              <h3 className="font-bold text-lg">{hostel.name}</h3>
-                              <p className="text-gray-500 text-sm">{hostel.location}</p>
+                              <h3 className="font-bold text-lg">
+                                {hostel?.name}
+                              </h3>
+                              <p className="text-gray-500 text-sm">
+                                {hostel?.location?.place}
+                              </p>
                               <div className="flex items-center justify-between mt-3">
                                 <div className="flex items-center">
                                   <span className="text-amber-500">★</span>
-                                  <span className="ml-1 font-medium">{hostel.rating}</span>
+                                  <span className="ml-1 font-medium">
+                                    {5}
+                                  </span>
                                 </div>
-                                <div className="text-sm text-gray-600">{hostel.bookings} bookings</div>
+                                <div className="text-sm text-gray-600">
+                                  {hostel?.bookingCount} bookings
+                                </div>
                               </div>
                             </CardContent>
                           </Card>
@@ -492,6 +567,5 @@ export default function AdminDashboard() {
         </main>
       </div>
     </div>
-  )
+  );
 }
-

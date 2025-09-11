@@ -255,7 +255,6 @@ export default function AdminHostels() {
       category.trim() === "" ||
       selectedImages.length === 0 ||
       ownerId.trim() === "" ||
-      description.trim() === "" ||
       name.trim() === "" ||
       phone.trim() === "" ||
       location.street.trim() === "" ||
@@ -265,13 +264,7 @@ export default function AdminHostels() {
       price.trim() === "" ||
       selectedTransport.some((t) => t.far.trim() === "") ||
       selectedNearby.some((t) => t.far.trim() === "") ||
-      selectedRestaurants.some((t) => t.far.trim() === "") ||
-      googleMap.trim() === "" ||
-      noticePeriod.trim() === "" ||
-      gateOpenTime.trim() === "" ||
-      gateCloseTime.trim() === "" ||
-      additionalFee.trim() === "" ||
-      registrationFee.trim() == ""
+      googleMap.trim() === "" 
     ) {
       return;
     }

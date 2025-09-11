@@ -8,22 +8,12 @@ import {
   ChevronDown,
   ChevronLeft,
   ChevronRight,
-  Download,
-  Eye,
   Filter,
   MoreHorizontal,
   Search,
   Trash2,
 } from "lucide-react";
-import {
-  Bar,
-  BarChart,
-  CartesianGrid,
-  ResponsiveContainer,
-  Tooltip,
-  XAxis,
-  YAxis,
-} from "recharts";
+
 
 import { Sidebar } from "@/components/Sidebar";
 import { Badge } from "@/components/ui/badge";
@@ -57,16 +47,9 @@ import {
   PopoverContent,
   PopoverTrigger,
 } from "@/components/ui/popover";
-import {
-  Select,
-  SelectContent,
-  SelectItem,
-  SelectTrigger,
-  SelectValue,
-} from "@/components/ui/select";
+
 import { Tabs, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import {
-  useGetAllAdminbookingQuery,
   useGetAllbookingQuery,
   useUpdatebookingMutation,
 } from "@/app/service/bookings";
@@ -143,7 +126,6 @@ export default function AdminBookings() {
     startIndex + itemsPerPage
   );
 
-  console.log(paginatedBookings, "hiii");
   
   //  block & unblock admin
   const handleBooking = async (id, status) => {

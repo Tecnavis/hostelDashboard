@@ -264,12 +264,7 @@ export default function OwnerHostels() {
       selectedTransport.some((t) => t.far.trim() === "") ||
       selectedNearby.some((t) => t.far.trim() === "") ||
       selectedRestaurants.some((t) => t.far.trim() === "") ||
-      googleMap.trim() === "" ||
-      noticePeriod.trim() === "" ||
-      gateOpenTime.trim() === "" ||
-      gateCloseTime.trim() === "" ||
-      additionalFee.trim() === "" ||
-      registrationFee.trim() === ""
+      googleMap.trim() === "" 
     ) {
       return;
     }

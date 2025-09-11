@@ -8,8 +8,9 @@ export const roomApi = createApi({
     //  Get all room (reading)
 
     getAllroom: builder.query({
-      query: (id) => `/rooms`,
+      query: () => `/rooms`,
     }),
+
 
      getAllHostelRoom: builder.query({
       query: (id) => `/rooms/hostels/${id}`,
@@ -76,7 +77,7 @@ updateroom: builder.mutation({
 });
 
 export const {
-    useGetAllroomQuery, 
+   useGetAllroomQuery,
     useGetAllHostelRoomQuery,
     useGetAroomByIdQuery,
     useAddNewroomMutation, 

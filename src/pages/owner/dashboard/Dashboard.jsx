@@ -1,7 +1,7 @@
 "use client"
 
 import { motion } from "framer-motion"
-import { ArrowDown, ArrowUp, Building, Calendar, DollarSign, Hotel, Plus, Search, Users } from "lucide-react"
+import { ArrowDown, ArrowUp, Building, Calendar, DollarSign, Hotel, Plus, Search, Slice, Users } from "lucide-react"
 import {
   Area,
   AreaChart,
@@ -25,6 +25,9 @@ import { Button } from "@/components/ui/button"
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card"
 import { Input } from "@/components/ui/input"
 import   { OwnerNotifications }  from "@/components/OwnerNotification"
+import { useGetAllOwnerhostelQuery } from "@/app/service/hostel"
+import { useGetAllHostelRoomQuery } from "@/app/service/room"
+import { useGetAllOwnerbookingQuery } from "@/app/service/bookings"
 
 const revenueData = [
   { name: "Jan", revenue: 2100 },
@@ -65,13 +68,25 @@ const COLORS = ["#ec4899", "#f97316", "#8b5cf6", "#06b6d4", "#10b981"]
     const  ownerId = owner?.ownerDetails;
 
 export default function OwnerDashboard() {
+
+
+
+    const { data: hostel } =
+      useGetAllOwnerhostelQuery(ownerId._id);
+      const { data: booking } =
+      useGetAllOwnerbookingQuery(ownerId._id);
+      
+      
+      // const { data: room } = useGetAllHostelRoomQuery(hostel[0]?._id || null);
+      
+
   return (
     <div className="flex h-screen bg-gray-50">
       <Sidebar role="owner" />
 
       <div className="flex-1 flex flex-col overflow-hidden">
         <header className="h-16 border-b bg-white flex items-center justify-between px-6">
-          <div className="relative w-64">
+          <div className="relative w-64  ml-7">
             <Search className="absolute left-2 top-2.5 h-4 w-4 text-gray-400" />
             <Input placeholder="Search..." className="pl-8" />
           </div>
@@ -96,16 +111,6 @@ export default function OwnerDashboard() {
           <div className="max-w-7xl mx-auto space-y-6">
             <div className="flex items-center justify-between">
               <h1 className="text-2xl font-bold">Owner Dashboard</h1>
-              <div className="flex items-center gap-2">
-                <Button variant="outline" size="sm" className="gap-2">
-                  <Calendar className="h-4 w-4" />
-                  Last 30 days
-                </Button>
-                <Button size="sm" className="bg-orange-600 hover:bg-orange-700 gap-2">
-                  <Plus className="h-4 w-4" />
-                  Add New Hostel
-                </Button>
-              </div>
             </div>
 
             <motion.div
@@ -119,7 +124,7 @@ export default function OwnerDashboard() {
                   <div className="flex items-center justify-between">
                     <div>
                       <p className="text-sm font-medium text-gray-500">My Hostels</p>
-                      <h3 className="text-3xl font-bold mt-1">3</h3>
+                      <h3 className="text-3xl font-bold mt-1">{hostel?.length ?? 0}</h3>
                     </div>
                     <div className="h-12 w-12 bg-orange-100 rounded-full flex items-center justify-center">
                       <Building className="h-6 w-6 text-orange-600" />
@@ -139,7 +144,7 @@ export default function OwnerDashboard() {
                   <div className="flex items-center justify-between">
                     <div>
                       <p className="text-sm font-medium text-gray-500">Total Rooms</p>
-                      <h3 className="text-3xl font-bold mt-1">42</h3>
+                      {/* <h3 className="text-3xl font-bold mt-1">{room?.length ?? 0}</h3> */}
                     </div>
                     <div className="h-12 w-12 bg-blue-100 rounded-full flex items-center justify-center">
                       <Hotel className="h-6 w-6 text-blue-600" />
@@ -159,7 +164,7 @@ export default function OwnerDashboard() {
                   <div className="flex items-center justify-between">
                     <div>
                       <p className="text-sm font-medium text-gray-500">Current Bookings</p>
-                      <h3 className="text-3xl font-bold mt-1">18</h3>
+                      <h3 className="text-3xl font-bold mt-1">{booking?.length ?? 0}</h3>
                     </div>
                     <div className="h-12 w-12 bg-green-100 rounded-full flex items-center justify-center">
                       <Users className="h-6 w-6 text-green-600" />
@@ -168,27 +173,6 @@ export default function OwnerDashboard() {
                   <div className="flex items-center mt-4 text-sm">
                     <Badge variant="outline" className="gap-1 text-red-600 border-red-200 bg-red-50">
                       <ArrowDown className="h-3 w-3" />2
-                    </Badge>
-                    <span className="text-gray-500 ml-2">Since last month</span>
-                  </div>
-                </CardContent>
-              </Card>
-
-              <Card>
-                <CardContent className="p-6">
-                  <div className="flex items-center justify-between">
-                    <div>
-                      <p className="text-sm font-medium text-gray-500">Monthly Revenue</p>
-                      <h3 className="text-3xl font-bold mt-1">$8,245</h3>
-                    </div>
-                    <div className="h-12 w-12 bg-amber-100 rounded-full flex items-center justify-center">
-                      <DollarSign className="h-6 w-6 text-amber-600" />
-                    </div>
-                  </div>
-                  <div className="flex items-center mt-4 text-sm">
-                    <Badge variant="outline" className="gap-1 text-green-600 border-green-200 bg-green-50">
-                      <ArrowUp className="h-3 w-3" />
-                      12%
                     </Badge>
                     <span className="text-gray-500 ml-2">Since last month</span>
                   </div>
@@ -316,52 +300,31 @@ export default function OwnerDashboard() {
                 </CardHeader>
                 <CardContent>
                   <div className="space-y-4">
-                    {[
-                      {
-                        guest: "Emma Johnson",
-                        hostel: "Sunset Beach Hostel",
-                        dates: "May 12-15, 2025",
-                        amount: "$240",
-                        status: "Confirmed",
-                      },
-                      {
-                        guest: "Michael Brown",
-                        hostel: "Downtown Backpackers",
-                        dates: "May 15-18, 2025",
-                        amount: "$320",
-                        status: "Pending",
-                      },
-                      {
-                        guest: "Sarah Wilson",
-                        hostel: "Mountain View Lodge",
-                        dates: "May 20-25, 2025",
-                        amount: "$450",
-                        status: "Confirmed",
-                      },
-                      {
-                        guest: "David Lee",
-                        hostel: "Sunset Beach Hostel",
-                        dates: "May 22-24, 2025",
-                        amount: "$180",
-                        status: "Pending",
-                      },
-                      {
-                        guest: "Jennifer Garcia",
-                        hostel: "Downtown Backpackers",
-                        dates: "May 25-28, 2025",
-                        amount: "$270",
-                        status: "Confirmed",
-                      },
-                    ].map((booking, index) => (
-                      <div key={index} className="flex items-center justify-between p-3 border rounded-lg">
+                    {booking?.slice(0, 5).map((booking) => (
+                      <div key={booking._id} className="flex items-center justify-between p-3 border rounded-lg">
                         <div>
-                          <div className="font-medium">{booking.guest}</div>
-                          <div className="text-sm text-gray-500">{booking.hostel}</div>
-                          <div className="text-xs text-gray-400">{booking.dates}</div>
+                          <div className="font-medium">{booking?.userId?.name}</div>
+                          <div className="text-sm text-gray-500">{booking?.hostelId?.name}</div>
+                          <div className="text-xs text-gray-400">
+                               {new Date(
+                                  booking.checkInDate
+                                ).toLocaleDateString("en-US", {
+                                  year: "numeric",
+                                  month: "long",
+                                  day: "numeric",
+                                })}
+                          </div>
                         </div>
                         <div className="text-right">
-                          <div className="font-medium">{booking.amount}</div>
-                          <Badge variant={booking.status === "Confirmed" ? "success" : "outline"} className="mt-1">
+                          <Badge 
+                             className={`px-2 py-1 rounded text-sm font-medium ${
+                                    booking.status === "confirmed"
+                                      ? "bg-green-100 text-green-800"
+                                      : booking.status === "pending"
+                                      ? "bg-yellow-100 text-yellow-800"
+                                      : "bg-red-100 text-red-800"
+                                  }`}
+                          >
                             {booking.status}
                           </Badge>
                         </div>
@@ -377,73 +340,51 @@ export default function OwnerDashboard() {
               animate={{ opacity: 1, y: 0 }}
               transition={{ duration: 0.5, delay: 0.4 }}
             >
-              <Card>
-                <CardHeader>
-                  <CardTitle>My Hostels</CardTitle>
-                  <CardDescription>Manage your hostel properties</CardDescription>
-                </CardHeader>
-                <CardContent>
-                  <div className="grid gap-6">
-                    {[
-                      {
-                        name: "Sunset Beach Hostel",
-                        location: "Miami, FL",
-                        image: "/placeholder.svg?height=200&width=300",
-                        rooms: 18,
-                        occupancy: "78%",
-                        rating: 4.8,
-                      },
-                      {
-                        name: "Downtown Backpackers",
-                        location: "New York, NY",
-                        image: "/placeholder.svg?height=200&width=300",
-                        rooms: 14,
-                        occupancy: "92%",
-                        rating: 4.6,
-                      },
-                      {
-                        name: "Mountain View Lodge",
-                        location: "Denver, CO",
-                        image: "/placeholder.svg?height=200&width=300",
-                        rooms: 10,
-                        occupancy: "65%",
-                        rating: 4.7,
-                      },
-                    ].map((hostel, index) => (
-                      <div key={index} className="flex gap-4 p-4 border rounded-lg">
-                        <img
-                          src={hostel.image || "/placeholder.svg"}
-                          alt={hostel.name}
-                          className="w-24 h-24 object-cover rounded-md"
-                        />
-                        <div className="flex-1">
-                          <h3 className="font-bold">{hostel.name}</h3>
-                          <p className="text-sm text-gray-500">{hostel.location}</p>
-                          <div className="flex items-center gap-6 mt-2">
-                            <div className="flex items-center gap-1">
-                              <Hotel className="h-4 w-4 text-gray-400" />
-                              <span className="text-sm">{hostel.rooms} rooms</span>
-                            </div>
-                            <div className="flex items-center gap-1">
-                              <Users className="h-4 w-4 text-gray-400" />
-                              <span className="text-sm">{hostel.occupancy} occupied</span>
-                            </div>
-                            <div className="flex items-center gap-1">
-                              <span className="text-amber-500">★</span>
-                              <span className="text-sm">{hostel.rating}</span>
-                            </div>
-                          </div>
-                        </div>
-                        <div className="flex items-center">
-                          <Button variant="outline" size="sm">
-                            Manage
-                          </Button>
-                        </div>
-                      </div>
-                    ))}
-                  </div>
-                </CardContent>
-              </Card>
+         <Card>
+  <CardHeader>
+    <CardTitle>My Hostels</CardTitle>
+    <CardDescription>Manage your hostel properties</CardDescription>
+  </CardHeader>
+  <CardContent>
+    {/* ✅ Responsive grid */}
+    <div className="grid gap-6 grid-cols-1 sm:grid-cols-2 lg:grid-cols-3">
+      {
+   hostel?.slice(0, 3).map((hostel, index) => (
+        <div
+          key={index}
+          className="flex flex-col sm:flex-row gap-4 p-4 border rounded-lg"
+        >
+          <img
+            src={hostel?.photos[0] || "/placeholder.svg"}
+            alt={hostel.name}
+            className="w-full sm:w-24 h-24 object-cover rounded-md"
+          />
+          <div className="flex-1">
+            <h3 className="font-bold">{hostel.name}</h3>
+            <p className="text-sm text-gray-500">{hostel?.location?.place}</p>
+            <div className="flex flex-wrap items-center gap-4 mt-2">
+              <div className="flex items-center gap-1">
+                <Hotel className="h-4 w-4 text-gray-400" />
+                {/* <span className="text-sm">{hostel.rooms} rooms</span> */}
+              </div>
+          
+              <div className="flex items-center gap-1">
+                <span className="text-amber-500">★</span>
+                {/* <span className="text-sm">{hostel.rating}</span> */}
+              </div>
+
+                  <div className="flex items-center gap-1">
+                      {hostel?.bookingCount} bookings
+              </div>
+            </div>
+          </div>
+       
+        </div>
+      ))}
+    </div>
+  </CardContent>
+</Card>
+
             </motion.div>
           </div>
         </main>

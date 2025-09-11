@@ -91,6 +91,8 @@ export default function AdminDashboard() {
   const { data: hostel } = useGetAllhostelQuery();
   const { data: room } =  useGetAllroomQuery();
 
+  
+
   const handleBooking = async (id, status) => {
     try {
       const response = await updatebooking({
@@ -365,17 +367,17 @@ export default function AdminDashboard() {
                 <div className="flex items-center justify-between mb-4">
                   <TabsList>
                     <TabsTrigger className={"cursor-pointer"} value="recent">Recent Bookings</TabsTrigger>
-                    <TabsTrigger className={"cursor-pointer"} value="popular">Popular Hostels</TabsTrigger>
+                    <TabsTrigger className={"cursor-pointer"} value="popular">Hostels</TabsTrigger>
                   </TabsList>
 
-                  <Button
+                  {/* <Button
                     variant="outline"
                     size="sm"
                     className={"cursor-pointer"}
                     onClick={() => navigate("/admin/bookings")}
                   >
                     View All
-                  </Button>
+                  </Button> */}
                 </div>
 
                 <TabsContent value="recent" className="m-0">
@@ -522,10 +524,10 @@ export default function AdminDashboard() {
                 <TabsContent value="popular" className="m-0">
                   <Card>
                     <CardHeader className="pb-2">
-                      <CardTitle>Popular Hostels</CardTitle>
-                      <CardDescription>
+                      <CardTitle>Hostels</CardTitle>
+                      {/* <CardDescription>
                         Most booked hostels this month
-                      </CardDescription>
+                      </CardDescription> */}
                     </CardHeader>
                     <CardContent>
                       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
@@ -546,10 +548,11 @@ export default function AdminDashboard() {
                               <div className="flex items-center justify-between mt-3">
                                 <div className="flex items-center">
                                   <span className="text-amber-500">★</span>
-                                  <span className="ml-1 font-medium">
-                                    {5}
-                                  </span>
+                                  <span className="ml-1 font-medium">{hostel?.rating?.average}</span>
                                 </div>
+                                    <div className="text-sm text-gray-600">
+                                {hostel?.roomsId?.length} rooms
+                              </div>
                                 <div className="text-sm text-gray-600">
                                   {hostel?.bookingCount} bookings
                                 </div>

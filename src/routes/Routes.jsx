@@ -2,6 +2,7 @@ import AdminAdmins from "@/pages/admin/admins/Admins";
 import AdminAnalytics from "@/pages/admin/analytics/Analytics";
 import Blogs from "@/pages/admin/blog/Blog";
 import AdminBookings from "@/pages/admin/bookings/Bookings";
+import AdminCards from "@/pages/admin/cards/Cards";
 import AdminDashboard from "@/pages/admin/dashboard/Dashboard";
 import AdminHostels from "@/pages/admin/hostels/Hostels";
 import AdminHostelsRooms from "@/pages/admin/hostels/rooms/Rooms";
@@ -16,6 +17,7 @@ import LoginPage from "@/pages/login/Login";
 import SignupPage from "@/pages/login/Signup";
 import OwnerAnalytics from "@/pages/owner/analytics/Analytics";
 import OwnerBookings from "@/pages/owner/bookings/Bookings";
+import OwnerCards from "@/pages/owner/cards/Cards";
 import OwnerDashboard from "@/pages/owner/dashboard/Dashboard";
 import OwnerHostels from "@/pages/owner/hostels/Hostels";
 import OwnerHostelsRooms from "@/pages/owner/hostels/rooms/Rooms";
@@ -61,6 +63,10 @@ export default function AppRoutes() {
           path="/admin/notifications"
           element={<AdminNotificationsPage />}
         />
+          <Route
+          path="/admin/cards"
+          element={<AdminCards />}
+        />
 
         {/* owner dashboard */}
 
@@ -79,6 +85,10 @@ export default function AppRoutes() {
              <Route
           path="/owner/notifications"
           element={<OwnerNotificationsPage />}
+        />
+             <Route
+          path="/owner/cards"
+          element={<OwnerCards />}
         />
       </Route>
     </Routes>

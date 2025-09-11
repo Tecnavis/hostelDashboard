@@ -16,6 +16,7 @@ import {
   Users,
   User,
   Bell,
+  Image,
 } from "lucide-react";
 
 import { cn } from "@/lib/utils";
@@ -45,8 +46,11 @@ export function Sidebar() {
         { title: "Blogs", href: "/admin/blogs", icon: Hotel },
     // { title: "Analytics", href: "/admin/analytics", icon: BarChart3 },
     // { title: "Messages", href: "/admin/messages", icon: MessageSquare },
+    { title: "Cards", href: "/admin/cards", icon: Image },
     { title: "Notifications", href: "/admin/notifications", icon: Bell },
+
   ];
+
 
   const ownerNavItems = [
     { title: "Dashboard", href: "/owner/dashboard", icon: LayoutDashboard },
@@ -58,6 +62,7 @@ export function Sidebar() {
     { title: "Bookings", href: "/owner/bookings", icon: Hotel },
     // { title: "Analytics", href: "/owner/analytics", icon: BarChart3 },
     // { title: "Messages", href: "/owner/messages", icon: MessageSquare },
+        { title: "Cards", href: "/owner/cards", icon: Image },
     { title: "Notifications", href: "/owner/notifications", icon: Bell },
 
     // { title: "Settings", href: "/owner/settings", icon: Settings },

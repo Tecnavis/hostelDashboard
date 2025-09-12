@@ -530,37 +530,49 @@ export default function AdminDashboard() {
                       </CardDescription> */}
                     </CardHeader>
                     <CardContent>
-                      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-                        {hostel?.slice(0, 6).map((hostel) => (
-                          <Card key={hostel._id} className="overflow-hidden">
-                            <img
-                              src={hostel?.photos[0] || "/placeholder.svg"}
-                              alt={hostel.name}
-                              className="w-full h-40 object-cover"
-                            />
-                            <CardContent className="p-4">
-                              <h3 className="font-bold text-lg">
-                                {hostel?.name}
-                              </h3>
-                              <p className="text-gray-500 text-sm">
-                                {hostel?.location?.place}
-                              </p>
-                              <div className="flex items-center justify-between mt-3">
-                                <div className="flex items-center">
-                                  <span className="text-amber-500">★</span>
-                                  <span className="ml-1 font-medium">{hostel?.rating?.average}</span>
-                                </div>
-                                    <div className="text-sm text-gray-600">
-                                {hostel?.roomsId?.length} rooms
-                              </div>
-                                <div className="text-sm text-gray-600">
-                                  {hostel?.bookingCount} bookings
-                                </div>
-                              </div>
-                            </CardContent>
-                          </Card>
-                        ))}
-                      </div>
+
+
+                    <div className="grid grid-cols-2 md:grid-cols-2 lg:grid-cols-3 gap-4">
+  {hostel?.slice(0, 6).map((hostel) => (
+    <Card 
+      key={hostel._id} 
+      className="overflow-hidden flex flex-col h-full"
+    >
+      <img
+        src={hostel?.photos[0] || "/placeholder.svg"}
+        alt={hostel.name}
+        className="w-full h-40 object-cover block"
+      />
+      <CardContent className="p-4 flex flex-col flex-1">
+        <h3 className="font-bold text-base line-clamp-1">{hostel?.name}</h3>
+        <p className="text-gray-500 text-sm line-clamp-1">
+          {hostel?.location?.place}
+        </p>
+
+        {/* Info Section */}
+        <div className="mt-auto pt-3 space-y-2 md:space-y-0 md:flex md:items-center md:justify-between">
+          {/* Rating */}
+          <div className="flex items-center">
+            <span className="text-amber-500">★</span>
+            <span className="ml-1 font-medium">{hostel?.rating?.average}</span>
+          </div>
+
+          {/* Rooms */}
+          <div className="text-sm text-gray-600">
+            {hostel?.roomsId?.length} rooms
+          </div>
+
+          {/* Bookings */}
+          <div className="text-sm text-gray-600">
+            {hostel?.bookingCount} bookings
+          </div>
+        </div>
+      </CardContent>
+    </Card>
+  ))}
+</div>
+
+                      
                     </CardContent>
                   </Card>
                 </TabsContent>

@@ -55,41 +55,53 @@ import { useNavigate } from "react-router-dom";
 import { useGetAllhostelQuery } from "@/app/service/hostel";
 import { useGetAllroomQuery } from "@/app/service/room";
 
-const bookingData = [
-  { name: "Jan", bookings: 65, revenue: 4200, occupancy: 72 },
-  { name: "Feb", bookings: 59, revenue: 3800, occupancy: 67 },
-  { name: "Mar", bookings: 80, revenue: 5100, occupancy: 78 },
-  { name: "Apr", bookings: 81, revenue: 5200, occupancy: 79 },
-  { name: "May", bookings: 90, revenue: 6000, occupancy: 82 },
-  { name: "Jun", bookings: 103, revenue: 7200, occupancy: 85 },
-  { name: "Jul", bookings: 110, revenue: 8000, occupancy: 88 },
-  { name: "Aug", bookings: 115, revenue: 8500, occupancy: 90 },
-  { name: "Sep", bookings: 102, revenue: 7800, occupancy: 86 },
-  { name: "Oct", bookings: 95, revenue: 7000, occupancy: 84 },
-  { name: "Nov", bookings: 85, revenue: 6200, occupancy: 80 },
-  { name: "Dec", bookings: 78, revenue: 5800, occupancy: 76 },
-];
 
-const hostelDistribution = [
-  { name: "Miami", value: 8 },
-  { name: "New York", value: 6 },
-  { name: "Los Angeles", value: 5 },
-  { name: "San Francisco", value: 4 },
-  { name: "Chicago", value: 3 },
-  { name: "Denver", value: 3 },
-  { name: "Other", value: 7 },
-];
 
 const admin = JSON.parse(localStorage.getItem("admin"));
 const superAdminId = admin?.adminDetails;
 
 export default function AdminDashboard() {
-  const navigate = useNavigate();
 
   const { data, isLoading, refetch } = useGetAllbookingQuery();
   const [updatebooking, { isLoading: isPosting }] = useUpdatebookingMutation();
   const { data: hostel } = useGetAllhostelQuery();
   const { data: room } =  useGetAllroomQuery();
+  
+  
+
+const hostelDistribution = hostel?.reduce((acc, val) => {
+  const place = val.location.place;
+
+  // check if already exists
+  const existing = acc.find((item) => item.name === place);
+
+  if (existing) {
+    existing.value += 1; 
+  } else {
+    acc.push({ name: place, value: 1 }); 
+  }
+
+  return acc;
+}, []);
+
+
+const  bookingData  = data?.reduce((acc, val) => {
+  // take the checkInDate of the booking
+  const month = new Date(val.checkInDate).toLocaleString("default", {
+    month: "long"
+  });
+
+  // check if this month already exists
+  const existing = acc.find((item) => item.name === month);
+
+  if (existing) {
+    existing.value += 1; 
+  } else {
+    acc.push({ name: month, bookings: 1 }); 
+  }
+
+  return acc;
+}, []);
 
   
 
@@ -262,9 +274,9 @@ export default function AdminDashboard() {
             >
               <Card className="lg:col-span-2">
                 <CardHeader>
-                  <CardTitle>Booking & Revenue Overview</CardTitle>
+                  <CardTitle>Booking Overview</CardTitle>
                   <CardDescription>
-                    Monthly booking and revenue trends
+                    Monthly booking
                   </CardDescription>
                 </CardHeader>
                 <CardContent>

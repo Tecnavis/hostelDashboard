@@ -16,6 +16,10 @@ export const roomApi = createApi({
       query: (id) => `/rooms/hostels/${id}`,
     }),
 
+    getAllHostelRoomOwner: builder.query({
+      query: (id) => `/rooms/owner/${id}`,
+    }),
+
     // Get room by id
 
     getAroomById: builder.query({
@@ -85,5 +89,6 @@ export const {
     useDeleteroomMutation,
     useDeleteAllroomMutation,
     useBlockroomMutation,
+    useGetAllHostelRoomOwnerQuery,
   } = roomApi; 
   

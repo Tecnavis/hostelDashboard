@@ -5,21 +5,16 @@ import {
   ArrowDown,
   ArrowUp,
   Building,
-  Calendar,
-  DollarSign,
   Hotel,
-  Plus,
   Search,
-  Slice,
   Users,
 } from "lucide-react";
 import {
   Area,
-  AreaChart,
   Bar,
-  BarChart,
   CartesianGrid,
   Cell,
+  ComposedChart,
   Legend,
   Pie,
   PieChart,
@@ -27,12 +22,14 @@ import {
   Tooltip,
   XAxis,
   YAxis,
+  Line,
 } from "recharts";
+
+
 
 import { Sidebar } from "@/components/Sidebar";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { Badge } from "@/components/ui/badge";
-import { Button } from "@/components/ui/button";
 import {
   Card,
   CardContent,
@@ -43,41 +40,9 @@ import {
 import { Input } from "@/components/ui/input";
 import { OwnerNotifications } from "@/components/OwnerNotification";
 import { useGetAllOwnerhostelQuery } from "@/app/service/hostel";
-import { useGetAllHostelRoomQuery } from "@/app/service/room";
+import { useGetAllHostelRoomOwnerQuery } from "@/app/service/room";
 import { useGetAllOwnerbookingQuery } from "@/app/service/bookings";
 
-const revenueData = [
-  { name: "Jan", revenue: 2100 },
-  { name: "Feb", revenue: 1800 },
-  { name: "Mar", revenue: 2400 },
-  { name: "Apr", revenue: 2700 },
-  { name: "May", revenue: 3200 },
-  { name: "Jun", revenue: 3800 },
-  { name: "Jul", revenue: 4200 },
-  { name: "Aug", revenue: 4500 },
-  { name: "Sep", revenue: 4000 },
-  { name: "Oct", revenue: 3600 },
-  { name: "Nov", revenue: 3100 },
-  { name: "Dec", revenue: 2800 },
-];
-
-const occupancyData = [
-  { name: "Mon", occupancy: 65 },
-  { name: "Tue", occupancy: 59 },
-  { name: "Wed", occupancy: 80 },
-  { name: "Thu", occupancy: 81 },
-  { name: "Fri", occupancy: 90 },
-  { name: "Sat", occupancy: 95 },
-  { name: "Sun", occupancy: 88 },
-];
-
-const roomTypeData = [
-  { name: "Private Double", value: 45 },
-  { name: "Private Single", value: 20 },
-  { name: "4-Bed Dorm", value: 15 },
-  { name: "6-Bed Dorm", value: 10 },
-  { name: "8-Bed Dorm", value: 10 },
-];
 
 const COLORS = ["#ec4899", "#f97316", "#8b5cf6", "#06b6d4", "#10b981"];
 
@@ -85,10 +50,67 @@ const owner = JSON.parse(localStorage.getItem("owner"));
 const ownerId = owner?.ownerDetails;
 
 export default function OwnerDashboard() {
-  const { data: hostel } = useGetAllOwnerhostelQuery(ownerId._id);
-  const { data: booking } = useGetAllOwnerbookingQuery(ownerId._id);
 
-  // const { data: room } = useGetAllHostelRoomQuery(hostel[0]?._id || null);
+  
+  const { data: hostel } = useGetAllOwnerhostelQuery(ownerId?._id);
+  const { data: booking } = useGetAllOwnerbookingQuery(ownerId?._id);
+    const { data: room } =    useGetAllHostelRoomOwnerQuery(ownerId?._id);  
+
+  const bookingData = booking?.reduce((acc, val) => {
+    // take the checkInDate of the booking
+    const month = new Date(val.checkInDate).toLocaleString("default", {
+      month: "long",
+    });
+
+    // check if this month already exists
+    const existing = acc.find((item) => item.name === month);
+
+    if (existing) {
+      existing.value += 1;
+    } else {
+      acc.push({ name: month, bookings: 1 });
+    }
+
+    return acc;
+  }, []);
+
+  const hostelDistribution = hostel?.reduce((acc, val) => {
+    const place = val.location.place;
+
+    // check if already exists
+    const existing = acc.find((item) => item.name === place);
+
+    if (existing) {
+      existing.value += 1;
+    } else {
+      acc.push({ name: place, value: 1 });
+    }
+
+    return acc;
+  }, []);
+
+
+ const roomCount = hostel?.reduce((acc, val) => {
+  return acc + val?.roomsId?.length ;
+}, 0);
+
+
+    const roomTypeData = room?.reduce((acc, val) => {
+    const roomName = val?.roomNumber;
+
+    // check if already exists
+    const existing = acc.find((item) => item.name === roomName );
+
+    if (existing) {
+      existing.value += 1;
+    } else {
+      acc.push({ name: roomName, value: 1 });
+    }
+
+    return acc;
+  }, []);
+
+  
 
   return (
     <div className="flex h-screen bg-gray-50">
@@ -163,7 +185,7 @@ export default function OwnerDashboard() {
                       <p className="text-sm font-medium text-gray-500">
                         Total Rooms
                       </p>
-                      {/* <h3 className="text-3xl font-bold mt-1">{room?.length ?? 0}</h3> */}
+                      <h3 className="text-3xl font-bold mt-1">{roomCount ?? 0}</h3>
                     </div>
                     <div className="h-12 w-12 bg-blue-100 rounded-full flex items-center justify-center">
                       <Hotel className="h-6 w-6 text-blue-600" />
@@ -217,21 +239,28 @@ export default function OwnerDashboard() {
             >
               <Card className="lg:col-span-2">
                 <CardHeader>
-                  <CardTitle>Revenue Overview</CardTitle>
-                  <CardDescription>
-                    Monthly revenue across all hostels
-                  </CardDescription>
+                  <CardTitle>Booking Overview</CardTitle>
+                  <CardDescription>Monthly booking</CardDescription>
                 </CardHeader>
                 <CardContent>
                   <div className="h-80">
                     <ResponsiveContainer width="100%" height="100%">
-                      <AreaChart
-                        data={revenueData}
+                      <ComposedChart
+                        data={bookingData}
                         margin={{ top: 20, right: 20, bottom: 20, left: 20 }}
                       >
                         <CartesianGrid strokeDasharray="3 3" stroke="#f0f0f0" />
                         <XAxis dataKey="name" />
-                        <YAxis />
+                        <YAxis
+                          yAxisId="left"
+                          orientation="left"
+                          stroke="#8884d8"
+                        />
+                        <YAxis
+                          yAxisId="right"
+                          orientation="right"
+                          stroke="#82ca9d"
+                        />
                         <Tooltip
                           contentStyle={{
                             backgroundColor: "white",
@@ -239,16 +268,29 @@ export default function OwnerDashboard() {
                             boxShadow: "0 4px 12px rgba(0, 0, 0, 0.1)",
                             border: "none",
                           }}
-                          formatter={(value) => [`$${value}`, "Revenue"]}
                         />
                         <Area
                           type="monotone"
-                          dataKey="revenue"
-                          stroke="#f97316"
-                          fill="rgba(249, 115, 22, 0.2)"
-                          strokeWidth={2}
+                          dataKey="bookings"
+                          fill="rgba(236, 72, 153, 0.1)"
+                          stroke="#ec4899"
+                          yAxisId="left"
                         />
-                      </AreaChart>
+                        <Bar
+                          dataKey="revenue"
+                          barSize={20}
+                          fill="#82ca9d"
+                          yAxisId="right"
+                        />
+                        <Line
+                          type="monotone"
+                          dataKey="occupancy"
+                          stroke="#ff7300"
+                          strokeWidth={2}
+                          dot={{ r: 4 }}
+                          yAxisId="left"
+                        />
+                      </ComposedChart>
                     </ResponsiveContainer>
                   </div>
                 </CardContent>
@@ -275,7 +317,7 @@ export default function OwnerDashboard() {
                             `${name} ${(percent * 100).toFixed(0)}%`
                           }
                         >
-                          {roomTypeData.map((entry, index) => (
+                          {roomTypeData?.map((entry, index) => (
                             <Cell
                               key={`cell-${index}`}
                               fill={COLORS[index % COLORS.length]}
@@ -306,21 +348,20 @@ export default function OwnerDashboard() {
             >
               <Card>
                 <CardHeader>
-                  <CardTitle>Weekly Occupancy Rate</CardTitle>
-                  <CardDescription>
-                    Average occupancy by day of week
-                  </CardDescription>
+                  <CardTitle>Hostel Distribution</CardTitle>
+                  <CardDescription>Hostels by location</CardDescription>
                 </CardHeader>
                 <CardContent>
                   <div className="h-80">
                     <ResponsiveContainer width="100%" height="100%">
-                      <BarChart
-                        data={occupancyData}
-                        margin={{ top: 20, right: 20, bottom: 20, left: 20 }}
+                      <ComposedChart
+                        layout="vertical"
+                        data={hostelDistribution}
+                        margin={{ top: 20, right: 20, bottom: 20, left: 60 }}
                       >
-                        <CartesianGrid strokeDasharray="3 3" stroke="#f0f0f0" />
-                        <XAxis dataKey="name" />
-                        <YAxis />
+                        <CartesianGrid stroke="#f0f0f0" />
+                        <XAxis type="number" />
+                        <YAxis dataKey="name" type="category" scale="band" />
                         <Tooltip
                           contentStyle={{
                             backgroundColor: "white",
@@ -328,14 +369,14 @@ export default function OwnerDashboard() {
                             boxShadow: "0 4px 12px rgba(0, 0, 0, 0.1)",
                             border: "none",
                           }}
-                          formatter={(value) => [`${value}%`, "Occupancy"]}
                         />
                         <Bar
-                          dataKey="occupancy"
-                          fill="#f97316"
-                          radius={[4, 4, 0, 0]}
+                          dataKey="value"
+                          barSize={20}
+                          fill="#ec4899"
+                          radius={[0, 4, 4, 0]}
                         />
-                      </BarChart>
+                      </ComposedChart>
                     </ResponsiveContainer>
                   </div>
                 </CardContent>

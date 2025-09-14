@@ -253,18 +253,13 @@ export default function OwnerHostels() {
       category.trim() === "" ||
       selectedImages.length === 0 ||
       ownerId.trim() === "" ||
-      description.trim() === "" ||
       name.trim() === "" ||
       phone.trim() === "" ||
       location.street.trim() === "" ||
       location.place.trim() === "" ||
       location.pincode.trim() === "" ||
       accommodationType.trim() === "" ||
-      price.trim() === "" ||
-      selectedTransport.some((t) => t.far.trim() === "") ||
-      selectedNearby.some((t) => t.far.trim() === "") ||
-      selectedRestaurants.some((t) => t.far.trim() === "") ||
-      googleMap.trim() === "" 
+      price.trim() === "" 
     ) {
       return;
     }

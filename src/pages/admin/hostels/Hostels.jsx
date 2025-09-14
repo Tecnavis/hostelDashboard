@@ -261,10 +261,7 @@ export default function AdminHostels() {
       location.place.trim() === "" ||
       location.pincode.trim() === "" ||
       accommodationType.trim() === "" ||
-      price.trim() === "" ||
-      selectedTransport.some((t) => t.far.trim() === "") ||
-      selectedNearby.some((t) => t.far.trim() === "") ||
-      googleMap.trim() === "" 
+      price.trim() === ""
     ) {
       return;
     }

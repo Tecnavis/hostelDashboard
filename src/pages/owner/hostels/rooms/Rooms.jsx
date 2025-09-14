@@ -305,11 +305,7 @@ export default function OwnerHostelsRooms() {
 
     if (
       roomNumber.trim() === "" ||
-      selectedImages.length === 0 ||
-      capacity.trim() === "" ||
-      currentOccupancy.trim() === "" ||
-      withFood.trim() === "" ||
-      withoutFood.trim() === ""
+      selectedImages.length === 0 
     ) {
       return;
     }

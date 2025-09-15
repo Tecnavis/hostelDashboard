@@ -1,8 +1,6 @@
 import {
   ImagePlus,
   Upload,
-  BedDouble,
-  BedSingle,
   CookingPot,
   Bath,
   Fan,
@@ -26,8 +24,6 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 
 export const iconMap = {
-  BedDouble,
-  BedSingle,
   CookingPot,
   Bath,
   Fan,
@@ -41,8 +37,6 @@ export const iconMap = {
 };
 
 export const AVAILABLE_AMENITIES = [
-  { name: "Double Beds", icon: "BedDouble" },
-  { name: "Single Beds", icon: "BedSingle" },
   { name: "Kitchen", icon: "CookingPot" },
   { name: "Attached washroom", icon: "Bath" },
   { name: "Fans", icon: "Fan" },

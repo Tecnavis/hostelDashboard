@@ -19,13 +19,13 @@ export default function HomePage() {
             transition={{ duration: 0.5 }}
             className="flex items-center gap-2"
           >
-            <Hotel className="h-6 w-6 sm:h-8 sm:w-8 text-rose-600" />
-            <span className="text-xl sm:text-2xl font-bold text-rose-600">
-              HostelHub
-            </span>
+            <img src="./logo-red.png" width={70} alt="logo" />
           </motion.div>
           <div className="flex items-center gap-1">
-            <UserCog className="h-4 w-4 text-rose-600 cursor-pointer" onClick={() => router("/admin-login")} />
+            <UserCog
+              className="h-4 w-4 text-rose-600 cursor-pointer"
+              onClick={() => router("/admin-login")}
+            />
             <Button
               variant="ghost"
               className="px-2 py-1 text-sm h-8 cursor-pointer"
@@ -59,19 +59,6 @@ export default function HomePage() {
               A complete dashboard solution for hostel owners and administrators
               to manage bookings, rooms, and guests.
             </p>
-            {/* <div className="flex gap-4 mt-4">
-              <Button size="lg" className="bg-rose-600 hover:bg-rose-700" onClick={() => router("/login")}>
-                Login as Admin
-              </Button>
-              <Button
-                size="lg"
-                variant="outline"
-                className="border-rose-600 text-rose-600 hover:bg-rose-50"
-                onClick={() => router("/login?role=owner")}
-              >
-                Login as Hostel Owner
-              </Button>
-            </div> */}
           </motion.div>
 
           <motion.div
@@ -133,11 +120,10 @@ export default function HomePage() {
         <div className="container mx-auto px-4">
           <div className="flex flex-col md:flex-row justify-between items-center">
             <div className="flex items-center gap-2 mb-6 md:mb-0">
-              <Hotel className="h-6 w-6 text-rose-400" />
-              <span className="text-xl font-bold">HostelHub</span>
+              <img src="./logo-white.png" width={70} alt="logo" />
             </div>
             <div className="text-gray-400 text-sm">
-              © 2025 HostelHub. All rights reserved.
+              © {new Date().getFullYear()} Hostay. All rights reserved.
             </div>
           </div>
         </div>

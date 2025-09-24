@@ -1,9 +1,9 @@
-"use client"
+"use client";
 
-import { useState } from "react"
-import { motion } from "framer-motion"
-import { Eye, EyeOff, Hotel, Mail } from "lucide-react"
-import { Button } from "@/components/ui/button"
+import { useState } from "react";
+import { motion } from "framer-motion";
+import { Eye, EyeOff, Hotel, Mail } from "lucide-react";
+import { Button } from "@/components/ui/button";
 import {
   Card,
   CardContent,
@@ -11,38 +11,37 @@ import {
   CardFooter,
   CardHeader,
   CardTitle,
-} from "@/components/ui/card"
-import { Input } from "@/components/ui/input"
-import { Label } from "@/components/ui/label"
-import { Link, useNavigate } from "react-router-dom"
-import { useLoginAdminMutation } from "@/app/service/admin"
+} from "@/components/ui/card";
+import { Input } from "@/components/ui/input";
+import { Label } from "@/components/ui/label";
+import { Link, useNavigate } from "react-router-dom";
+import { useLoginAdminMutation } from "@/app/service/admin";
 
 export default function AdminLoginPage() {
-  const navigate = useNavigate()
+  const navigate = useNavigate();
 
-  const [email, setEmail] = useState("")
-  const [password, setPassword] = useState("")
-  const [showPassword, setShowPassword] = useState(false)
+  const [email, setEmail] = useState("");
+  const [password, setPassword] = useState("");
+  const [showPassword, setShowPassword] = useState(false);
 
-    const [loginAdmin, { isLoading: isAdminLoading }] = useLoginAdminMutation()
-  
+  const [loginAdmin, { isLoading: isAdminLoading }] = useLoginAdminMutation();
 
   const handleLogin = async (e) => {
-    e.preventDefault()
-    if (!email.trim() || !password.trim()) return
+    e.preventDefault();
+    if (!email.trim() || !password.trim()) return;
 
     try {
-      const response = await loginAdmin ({ email, password })
+      const response = await loginAdmin({ email, password });
       if (response?.data?.status === 200) {
-        localStorage.setItem("admin", JSON.stringify(response.data))
-        setEmail("")
-        setPassword("")
-        navigate("/admin/dashboard")
+        localStorage.setItem("admin", JSON.stringify(response.data));
+        setEmail("");
+        setPassword("");
+        navigate("/admin/dashboard");
       }
     } catch (error) {
-      console.error("Login failed:", error)
+      console.error("Login failed:", error);
     }
-  }
+  };
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-rose-50 to-orange-50 flex flex-col items-center justify-center p-4">
@@ -53,8 +52,7 @@ export default function AdminLoginPage() {
         transition={{ duration: 0.5 }}
         className="flex items-center gap-2 mb-8"
       >
-        <Hotel className="h-8 w-8 text-rose-600" />
-        <span className="text-2xl font-bold text-rose-600">HostelHub</span>
+        <img src="./logo-red.png" width={70} alt="logo" />
       </motion.div>
 
       {/* Login Form */}
@@ -121,14 +119,12 @@ export default function AdminLoginPage() {
                 className="w-full bg-orange-600 hover:bg-orange-700"
                 disabled={isAdminLoading}
               >
-                {isAdminLoading  ? "Logging in..." : "Login"}
+                {isAdminLoading ? "Logging in..." : "Login"}
               </Button>
             </CardFooter>
           </Card>
         </form>
       </motion.div>
-
-      
     </div>
-  )
+  );
 }

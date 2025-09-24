@@ -61,8 +61,7 @@ export default function SignupPage() {
         transition={{ duration: 0.5 }}
         className="flex items-center gap-2 mb-8"
       >
-        <Hotel className="h-8 w-8 text-rose-600" />
-        <span className="text-2xl font-bold text-rose-600">HostelHub</span>
+        <img src="./logo-red.png" width={70} alt="logo" />
       </motion.div>
 
       <motion.div

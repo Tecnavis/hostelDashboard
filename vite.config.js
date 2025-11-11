@@ -13,7 +13,7 @@ export default defineConfig({
     preview: {
     host: '0.0.0.0',
     port: 7861,
-    allowedHosts: ['hostel-dashboard-48qp.onrender.com'], 
+    allowedHosts: ['hostel-dashboard-48qp.onrender.com', 'admin.hostay.org'], 
   },
   resolve: {
     alias: {
